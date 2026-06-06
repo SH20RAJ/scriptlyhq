@@ -1,10 +1,20 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, X, ShieldAlert, BadgeHelp, CheckCircle2 } from "lucide-react";
+import { Check, X, CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { PRICING_PLANS } from "@/data";
+
+export const metadata: Metadata = {
+  title: "Pricing Packages | ScriptlyHQ",
+  description: "Check pricing for landing page templates, customization setup packages, bespoke custom builds, and monthly retainer support contracts.",
+  keywords: [
+    "landing page pricing",
+    "cheap website templates",
+    "landing page designer cost",
+    "monthly website maintenance pricing"
+  ]
+};
 
 export default function PricingPage() {
   const comparisonFeatures = [
@@ -146,7 +156,7 @@ export default function PricingPage() {
         </div>
 
         {/* Comparison Table Section */}
-        <div className="border-t border-white/5 pt-20">
+        <div className="border-t border-white/5 pt-20" id="support">
           <h2 className="text-2xl font-extrabold text-white text-center mb-12">
             Detailed Package Comparison
           </h2>

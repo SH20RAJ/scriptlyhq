@@ -128,8 +128,13 @@ export default function Footer() {
             <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-4">Contact</h4>
             <ul className="space-y-2.5">
               <li>
-                <span className="text-sm text-gray-400 block">Website:</span>
-                <span className="text-sm text-white font-medium">scriptlyhq.strivio.world</span>
+                <span className="text-sm text-gray-400 block">Email:</span>
+                <a
+                  href="mailto:shaswatraj3@gmail.com"
+                  className="text-sm text-white font-medium hover:text-brand-emerald transition-colors"
+                >
+                  shaswatraj3@gmail.com
+                </a>
               </li>
               <li>
                 <span className="text-sm text-gray-400 block">Instagram DM:</span>
@@ -143,9 +148,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <Link href="/contact" className="text-sm text-gray-400 hover:text-white transition-colors">
-                  Submit Enquiry Form
-                </Link>
+                <span className="text-sm text-gray-400 block">Website:</span>
+                <span className="text-sm text-gray-300">scriptlyhq.strivio.world</span>
               </li>
             </ul>
           </div>

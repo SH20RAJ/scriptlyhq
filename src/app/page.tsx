@@ -1,37 +1,35 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { 
   ArrowRight, 
   CheckCircle2, 
-  MessageCircle, 
   Zap, 
-  Sliders, 
   Globe, 
-  HelpCircle, 
-  Star, 
-  Plus, 
-  Minus,
+  Clock, 
+  TrendingUp, 
+  Heart,
   Instagram,
-  ArrowUpRight,
-  TrendingUp,
-  Clock,
-  Layers,
-  Heart
+  ArrowUpRight
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { TEMPLATES, INSPIRATION_STYLES, SERVICES, PRICING_PLANS, FAQS, CATEGORIES } from "@/data";
+import FaqSection from "@/components/FaqSection";
+import { TEMPLATES, INSPIRATION_STYLES, SERVICES, PRICING_PLANS, CATEGORIES } from "@/data";
+
+export const metadata: Metadata = {
+  title: "ScriptlyHQ | Landing Pages you can Buy, Customize, & Launch Fast",
+  description: "Browse landing page templates or order customized layouts for your startup, café, clinic, dentist, salon, or coaching brand. Launch inside 4 days.",
+  keywords: [
+    "landing page templates India",
+    "buy landing page template",
+    "custom landing page design",
+    "ScriptlyHQ",
+    "landing page customization"
+  ]
+};
 
 export default function Home() {
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
-
-  const toggleFaq = (index: number) => {
-    setActiveFaq(activeFaq === index ? null : index);
-  };
-
   const featuredTemplates = TEMPLATES.slice(0, 6);
 
   return (
@@ -473,7 +471,7 @@ export default function Home() {
                   </p>
                   <Link
                     href={`/contact?style=${style.id}`}
-                    className="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-xl text-xs font-semibold text-gray-950 bg-white hover:bg-gray-150 transition-colors"
+                    className="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-xl text-xs font-semibold text-gray-950 bg-white hover:bg-white/150 transition-colors"
                   >
                     Use this style
                   </Link>
@@ -602,36 +600,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="space-y-4">
-              {FAQS.map((faq, index) => {
-                const isOpen = activeFaq === index;
-                return (
-                  <div
-                    key={index}
-                    className="rounded-2xl border border-white/5 bg-gray-900/20 overflow-hidden"
-                  >
-                    <button
-                      onClick={() => toggleFaq(index)}
-                      className="w-full flex items-center justify-between p-6 text-left focus:outline-none transition-colors hover:bg-white/5"
-                    >
-                      <span className="font-semibold text-white text-sm sm:text-base">
-                        {faq.question}
-                      </span>
-                      {isOpen ? (
-                        <Minus className="h-4 w-4 text-brand-emerald shrink-0" />
-                      ) : (
-                        <Plus className="h-4 w-4 text-brand-indigo shrink-0" />
-                      )}
-                    </button>
-                    {isOpen && (
-                      <div className="px-6 pb-6 text-sm sm:text-base text-gray-400 border-t border-white/5 pt-4 leading-relaxed">
-                        {faq.answer}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <FaqSection />
           </div>
         </section>
 

@@ -1,21 +1,29 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
 import { 
   ArrowRight, 
   CheckCircle2, 
-  MessageSquare, 
-  Zap, 
   Sliders, 
   Layers, 
   Globe, 
   Search, 
   Settings, 
   ShieldCheck,
-  Smartphone
+  Zap
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Services & Capabilities | ScriptlyHQ Agency",
+  description: "Learn about our landing page store downloads, custom template tailoring, search engine setup, WhatsApp links, and hosting launch services.",
+  keywords: [
+    "custom landing page design",
+    "landing page customization",
+    "website setup and deployment",
+    "landing page agency India"
+  ]
+};
 
 export default function ServicesPage() {
   const mainServices = [

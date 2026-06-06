@@ -1,11 +1,21 @@
-"use client";
-
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, ArrowRight, Sparkles, AlertCircle } from "lucide-react";
+import { Sparkles, AlertCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { INSPIRATION_STYLES } from "@/data";
+
+export const metadata: Metadata = {
+  title: "Design Inspiration Gallery | ScriptlyHQ",
+  description: "Browse curated visual directions and landing page layout themes. Choose minimal SaaS, premium restaurant, clinic trust, and salon beauty styles.",
+  keywords: [
+    "landing page inspiration India",
+    "minimalist landing page layout",
+    "modern web design themes",
+    "premium CSS templates"
+  ]
+};
 
 export default function InspirationPage() {
   return (

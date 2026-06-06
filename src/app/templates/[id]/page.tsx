@@ -1,18 +1,13 @@
-"use client";
-
-import { use } from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { 
   ArrowLeft, 
   CheckCircle2, 
-  MessageSquare, 
   Star, 
   ChevronRight, 
   Layers, 
-  Code,
-  Globe,
-  Settings
+  Code
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -22,8 +17,25 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-export default function TemplateDetailPage({ params }: Props) {
-  const resolvedParams = use(params);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params;
+  const template = TEMPLATES.find((t) => t.id === resolvedParams.id);
+  if (!template) return { title: "Template Not Found | ScriptlyHQ" };
+  
+  return {
+    title: `${template.name} - Buy & Customize | ScriptlyHQ`,
+    description: `${template.description} Best for ${template.bestFor}. Starting at ${template.price}.`,
+    keywords: [
+      `${template.category} website template`,
+      `buy ${template.category} page`,
+      `custom ${template.category} landing page`,
+      "ScriptlyHQ template"
+    ]
+  };
+}
+
+export default async function TemplateDetailPage({ params }: Props) {
+  const resolvedParams = await params;
   const template = TEMPLATES.find((t) => t.id === resolvedParams.id);
 
   if (!template) {
