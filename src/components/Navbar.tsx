@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowRight, Layers } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,9 +26,13 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-violet via-brand-indigo to-brand-emerald flex items-center justify-center shadow-lg shadow-brand-indigo/20">
-                <Layers className="h-5 w-5 text-white" />
-              </div>
+              <Image
+                src="/logo.png"
+                alt="ScriptlyHQ Logo"
+                width={36}
+                height={36}
+                className="h-9 w-9 object-contain rounded-lg"
+              />
               <span className="text-xl font-bold tracking-tight text-white">
                 Scriptly<span className="text-brand-emerald">HQ</span>
               </span>

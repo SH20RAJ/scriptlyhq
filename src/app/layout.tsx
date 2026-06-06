@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://scriptlyhq.strivio.world"),
   title: "ScriptlyHQ | Landing Pages you can Buy, Customize, & Launch Fast",
   description: "Buy ready-made landing pages, customize them for your brand, or get a new one built from scratch. Premium, high-converting templates for SaaS, restaurants, clinics, dentists, gyms, salons, and local businesses.",
   keywords: [
@@ -28,12 +29,30 @@ export const metadata: Metadata = {
     "lead generation landing page"
   ],
   authors: [{ name: "ScriptlyHQ Team", url: "https://scriptlyhq.strivio.world" }],
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" }
+    ],
+    apple: [
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" }
+    ]
+  },
   openGraph: {
     title: "ScriptlyHQ | Landing Pages you can Buy, Customize, & Launch Fast",
     description: "Ready-made landing pages or custom builds for local businesses, SaaS, creators, and clinics. Get customized launches in days.",
     url: "https://scriptlyhq.strivio.world",
     siteName: "ScriptlyHQ",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 1200,
+        alt: "ScriptlyHQ Open Graph Image",
+      }
+    ]
   }
 };
 
