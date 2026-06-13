@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import { createProductAction, updateProductAction } from "../lib/actions/products";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Upload, Loader2, Info, Image as ImageIcon, Sparkles, Globe, FileUp } from "lucide-react";
+import { ArrowLeft, Save, Upload, Loader2, Info, Image as ImageIcon, Sparkles, Globe, FileUp, Eye } from "lucide-react";
 import Link from "next/link";
 import { marked } from "marked";
 import { Tweet } from "react-tweet";
@@ -216,13 +216,26 @@ export default function ProductForm({ categories, subcategories, initialData }: 
       
       {/* Action Header */}
       <div className="flex items-center justify-between border-b border-neutral-900 pb-5">
-        <Link
-          href="/admin/products"
-          className="inline-flex items-center text-sm font-semibold text-neutral-400 hover:text-white transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to list
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link
+            href="/admin/products"
+            className="inline-flex items-center text-sm font-semibold text-neutral-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to list
+          </Link>
+
+          {slug && (
+            <Link
+              href={`/products/${slug}`}
+              target="_blank"
+              className="inline-flex items-center text-sm font-semibold text-neutral-400 hover:text-white transition-colors"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              View Product
+            </Link>
+          )}
+        </div>
         
         <div className="flex items-center gap-3">
           <button

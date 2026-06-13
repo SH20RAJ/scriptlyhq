@@ -90,7 +90,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const htmlDescription = await marked.parse(product.description || "");
 
   const isTweet = product.videoUrl?.includes("twitter.com") || product.videoUrl?.includes("x.com");
-  const tweetId = isTweet ? product.videoUrl.match(/status\/(\d+)/)?.[1] : null;
+  const tweetId = isTweet ? product.videoUrl?.match(/status\/(\d+)/)?.[1] : null;
 
 
   return (
