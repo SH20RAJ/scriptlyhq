@@ -2,10 +2,9 @@ export const dynamic = "force-dynamic";
 
 import { db } from "../../../db";
 import { products } from "../../../db/schema";
-import { desc } from "drizzle-orm";
+import { desc, sql } from "drizzle-orm";
 import Link from "next/link";
-import { deleteProductAction } from "../../../lib/actions/products";
-import { Plus, Globe, Sparkles, AlertCircle } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,13 +15,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { AdminActions } from "./AdminActions";
 
-export default async function AdminProductsPage() {
+interface PageProps {
+  searchParams: Promise<{
+    page?: string;
+  }>;
+}
+
+export default async function AdminProductsPage({ searchParams }: PageProps) {
+  const resolvedParams = await searchParams;
+  const currentPage = parseInt(resolvedParams.page || "1", 10) || 1;
+  const limit = 10;
+  const offset = (currentPage - 1) * limit;
+
+  // Query total product count
+  const countResult = await db.select({ count: sql<number>`count(*)` }).from(products);
+  const totalCount = Number(countResult[0]?.count || 0);
+
+  // Fetch paginated products list
   const productsList = await db.query.products.findMany({
     orderBy: [desc(products.createdAt)],
+    limit,
+    offset,
   });
+
+  const totalPages = Math.ceil(totalCount / limit);
 
   return (
     <div className="space-y-12">
@@ -47,7 +66,7 @@ export default async function AdminProductsPage() {
       </div>
 
       {/* Products Table Card */}
-      {productsList.length === 0 ? (
+      {totalCount === 0 ? (
         <div className="text-center py-24 border border-dashed border-border rounded-xl bg-card/30">
           <AlertCircle className="w-10 h-10 mx-auto text-muted-foreground mb-4" />
           <p className="text-sm text-muted-foreground">Your catalog is currently empty.</p>
@@ -60,7 +79,7 @@ export default async function AdminProductsPage() {
           <Table>
             <TableHeader className="bg-muted/30">
               <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="w-[40%] px-6">Product Details</TableHead>
+                <TableHead className="w-[45%] px-6">Product Details</TableHead>
                 <TableHead className="px-6">Category</TableHead>
                 <TableHead className="px-6">Price</TableHead>
                 <TableHead className="px-6">Status</TableHead>
@@ -69,15 +88,33 @@ export default async function AdminProductsPage() {
             </TableHeader>
             <TableBody>
               {productsList.map((prod) => (
-                <TableRow key={prod.id} className="border-border hover:bg-muted/20 transition-colors">
+                <TableRow key={prod.id} className="border-border hover:bg-muted/20 transition-colors group">
                   
-                  {/* Title & Slug */}
+                  {/* Thumbnail & Product Details */}
                   <TableCell className="px-6 py-5">
-                    <div className="font-medium text-foreground text-base">
-                      {prod.title}
-                    </div>
-                    <div className="text-[10px] font-mono text-muted-foreground mt-1.5 uppercase tracking-tighter opacity-70">
-                      ID: {prod.id.slice(0, 8)}... | v{prod.version}
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-12 h-12 rounded-lg border border-border bg-muted overflow-hidden flex-shrink-0">
+                        {prod.thumbnail ? (
+                          <img
+                            src={prod.thumbnail}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[8px] font-black uppercase text-muted-foreground bg-muted/40 tracking-wider">
+                            No Img
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
+                          {prod.title}
+                        </div>
+                        <div className="text-[10px] font-mono text-muted-foreground mt-1 uppercase tracking-tighter opacity-70">
+                          ID: {prod.id.slice(0, 8)}... | v{prod.version}
+                        </div>
+                      </div>
                     </div>
                   </TableCell>
 
@@ -115,12 +152,60 @@ export default async function AdminProductsPage() {
 
                   {/* Action Buttons */}
                   <TableCell className="px-6 text-right">
-                    <AdminActions productId={prod.id} />
+                    <AdminActions productId={prod.id} productSlug={prod.slug} />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t border-border/40 bg-muted/5">
+              <div className="text-xs text-muted-foreground font-medium">
+                Showing <span className="font-semibold text-foreground">{offset + 1}</span> to{" "}
+                <span className="font-semibold text-foreground">
+                  {Math.min(offset + limit, totalCount)}
+                </span>{" "}
+                of <span className="font-semibold text-foreground">{totalCount}</span> products
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className={`rounded-lg cursor-pointer ${currentPage <= 1 ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <Link href={`/admin/products?page=${currentPage - 1}`}>Previous</Link>
+                </Button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNum = idx + 1;
+                    const isCurrent = pageNum === currentPage;
+                    return (
+                      <Button
+                        key={pageNum}
+                        asChild
+                        variant={isCurrent ? "default" : "outline"}
+                        size="sm"
+                        className="h-8 w-8 p-0 rounded-lg cursor-pointer"
+                      >
+                        <Link href={`/admin/products?page=${pageNum}`}>{pageNum}</Link>
+                      </Button>
+                    );
+                  })}
+                </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className={`rounded-lg cursor-pointer ${currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <Link href={`/admin/products?page=${currentPage + 1}`}>Next</Link>
+                </Button>
+              </div>
+            </div>
+          )}
         </Card>
       )}
     </div>
