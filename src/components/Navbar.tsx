@@ -15,10 +15,10 @@ export default function Navbar() {
           </Link>
           <nav className="hidden md:flex gap-6">
             <Link
-              href="/"
+              href="/explore"
               className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              Browse
+              Explore
             </Link>
             <Link
               href="/search"
