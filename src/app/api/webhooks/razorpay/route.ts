@@ -34,18 +34,18 @@ export async function POST(req: Request) {
       const razorpayPaymentId = entity?.id;
 
       if (razorpayOrderId) {
-        const orderRecord = await db.query.orders.findFirst({
+        const orderRecords = await db.query.orders.findMany({
           where: eq(orders.razorpayOrderId, razorpayOrderId),
         });
 
-        if (orderRecord && orderRecord.status !== "completed") {
+        if (orderRecords.length > 0) {
           await db
             .update(orders)
             .set({
               status: "completed",
               razorpayPaymentId: razorpayPaymentId || null,
             })
-            .where(eq(orders.id, orderRecord.id));
+            .where(eq(orders.razorpayOrderId, razorpayOrderId));
         }
       }
     }
