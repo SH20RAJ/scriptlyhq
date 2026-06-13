@@ -1,18 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function RootLoading() {
+export default function ExploreLoading() {
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8 space-y-12">
-      {/* Hero section skeleton */}
-      <div className="text-center py-20 space-y-6">
-        <Skeleton className="h-12 w-3/4 md:w-1/2 mx-auto rounded-xl" />
-        <Skeleton className="h-6 w-2/3 md:w-1/3 mx-auto rounded-lg" />
-        <div className="flex justify-center gap-4 pt-4">
-          <Skeleton className="h-12 w-32 rounded-full" />
-          <Skeleton className="h-12 w-32 rounded-full" />
-        </div>
-      </div>
-
       {/* Categories filter skeleton */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-4 border-b border-border/20">
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
