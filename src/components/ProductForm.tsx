@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Upload, Loader2, Info, Image as ImageIcon, Sparkles, Globe, FileUp } from "lucide-react";
 import Link from "next/link";
 import { marked } from "marked";
+import { Tweet } from "react-tweet";
 
 interface ProductFormProps {
   categories: { id: string; name: string; slug: string }[];
@@ -58,6 +59,9 @@ export default function ProductForm({ categories, subcategories, initialData }: 
   const [screenshots, setScreenshots] = useState(initialData?.screenshots || "");
   const [videoUrl, setVideoUrl] = useState(initialData?.videoUrl || "");
   const [fileUrl, setFileUrl] = useState(initialData?.fileUrl || "");
+
+  const isTweet = videoUrl?.includes("twitter.com") || videoUrl?.includes("x.com");
+  const tweetId = isTweet ? videoUrl.match(/status\/(\d+)/)?.[1] : null;
 
   // Load from localStorage on mount (only for New Product form, i.e., isEdit is false)
   useEffect(() => {
@@ -434,6 +438,13 @@ export default function ProductForm({ categories, subcategories, initialData }: 
             <div className="space-y-2">
               <label className="text-[10px] font-black text-neutral-400 uppercase">Video Embed URL</label>
               <input type="url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="e.g. https://youtube.com/watch?v=..." className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
+              {tweetId && (
+                <div className="mt-4 flex justify-center bg-black/20 rounded-2xl p-2 border border-neutral-800">
+                  <div className="w-full max-w-[400px]">
+                    <Tweet id={tweetId} />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Download URL */}

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { db } from "../../../db";
 import { products } from "../../../db/schema";
-import { desc, sql } from "drizzle-orm";
+import { desc, sql, ilike, and, asc } from "drizzle-orm";
 import Link from "next/link";
 import { Plus, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,31 +17,76 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { AdminActions } from "./AdminActions";
+import AdminSearchSort from "./AdminSearchSort";
 
 interface PageProps {
   searchParams: Promise<{
     page?: string;
+    search?: string;
+    sort?: string;
   }>;
 }
 
 export default async function AdminProductsPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const currentPage = parseInt(resolvedParams.page || "1", 10) || 1;
+  const currentSearch = resolvedParams.search || "";
+  const currentSort = resolvedParams.sort || "newest";
   const limit = 50;
   const offset = (currentPage - 1) * limit;
 
-  // Query total product count
-  const countResult = await db.select({ count: sql<number>`count(*)` }).from(products);
+  // Build the where clause for search
+  const whereClause = currentSearch ? ilike(products.title, `%${currentSearch}%`) : undefined;
+
+  // Build the order by clause for sort
+  let orderBy;
+  switch (currentSort) {
+    case "oldest":
+      orderBy = [asc(products.createdAt)];
+      break;
+    case "price_asc":
+      orderBy = [asc(products.price)];
+      break;
+    case "price_desc":
+      orderBy = [desc(products.price)];
+      break;
+    case "title_asc":
+      orderBy = [asc(products.title)];
+      break;
+    case "title_desc":
+      orderBy = [desc(products.title)];
+      break;
+    case "newest":
+    default:
+      orderBy = [desc(products.createdAt)];
+      break;
+  }
+
+  // Query total product count with filter
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(products)
+    .where(whereClause);
   const totalCount = Number(countResult[0]?.count || 0);
 
-  // Fetch paginated products list
+  // Fetch paginated products list with filter and sort
   const productsList = await db.query.products.findMany({
-    orderBy: [desc(products.createdAt)],
+    where: whereClause,
+    orderBy: orderBy,
     limit,
     offset,
   });
 
   const totalPages = Math.ceil(totalCount / limit);
+
+  const getPageLink = (pageNum: number) => {
+    const params = new URLSearchParams();
+    if (pageNum > 1) params.set("page", pageNum.toString());
+    if (currentSearch) params.set("search", currentSearch);
+    if (currentSort !== "newest") params.set("sort", currentSort);
+    const queryString = params.toString();
+    return `/admin/products${queryString ? `?${queryString}` : ""}`;
+  };
 
   return (
     <div className="space-y-12">
@@ -65,14 +110,20 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
         </Button>
       </div>
 
+      <AdminSearchSort />
+
       {/* Products Table Card */}
       {totalCount === 0 ? (
         <div className="text-center py-24 border border-dashed border-border rounded-xl bg-card/30">
           <AlertCircle className="w-10 h-10 mx-auto text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground">Your catalog is currently empty.</p>
-          <Button asChild variant="link" className="mt-2 text-foreground">
-            <Link href="/admin/products/new">Create your first product</Link>
-          </Button>
+          <p className="text-sm text-muted-foreground">
+            {currentSearch ? `No results found for "${currentSearch}"` : "Your catalog is currently empty."}
+          </p>
+          {!currentSearch && (
+            <Button asChild variant="link" className="mt-2 text-foreground">
+              <Link href="/admin/products/new">Create your first product</Link>
+            </Button>
+          )}
         </div>
       ) : (
         <Card className="border-border bg-card overflow-hidden">
@@ -176,7 +227,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                   size="sm"
                   className={`rounded-lg cursor-pointer ${currentPage <= 1 ? "pointer-events-none opacity-50" : ""}`}
                 >
-                  <Link href={`/admin/products?page=${currentPage - 1}`}>Previous</Link>
+                  <Link href={getPageLink(currentPage - 1)}>Previous</Link>
                 </Button>
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }).map((_, idx) => {
@@ -190,7 +241,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                         size="sm"
                         className="h-8 w-8 p-0 rounded-lg cursor-pointer"
                       >
-                        <Link href={`/admin/products?page=${pageNum}`}>{pageNum}</Link>
+                        <Link href={getPageLink(pageNum)}>{pageNum}</Link>
                       </Button>
                     );
                   })}
@@ -201,7 +252,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                   size="sm"
                   className={`rounded-lg cursor-pointer ${currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}`}
                 >
-                  <Link href={`/admin/products?page=${currentPage + 1}`}>Next</Link>
+                  <Link href={getPageLink(currentPage + 1)}>Next</Link>
                 </Button>
               </div>
             </div>
@@ -211,3 +262,4 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
     </div>
   );
 }
+

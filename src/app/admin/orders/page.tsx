@@ -2,13 +2,68 @@ export const dynamic = "force-dynamic";
 
 import { db } from "../../../db";
 import { orders, products, users } from "../../../db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, ilike, or, sql, asc } from "drizzle-orm";
 import { ShoppingCart, AlertCircle, Calendar, Hash, User, CreditCard } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import AdminOrdersSearchSort from "./AdminOrdersSearchSort";
 
-export default async function AdminOrdersPage() {
+interface PageProps {
+  searchParams: Promise<{
+    page?: string;
+    search?: string;
+    sort?: string;
+  }>;
+}
+
+export default async function AdminOrdersPage({ searchParams }: PageProps) {
+  const resolvedParams = await searchParams;
+  const currentPage = parseInt(resolvedParams.page || "1", 10) || 1;
+  const currentSearch = resolvedParams.search || "";
+  const currentSort = resolvedParams.sort || "newest";
+  const limit = 50;
+  const offset = (currentPage - 1) * limit;
+
+  // Build where clause for search
+  const whereClause = currentSearch
+    ? or(
+        ilike(orders.id, `%${currentSearch}%`),
+        ilike(users.email, `%${currentSearch}%`),
+        ilike(users.name, `%${currentSearch}%`),
+        ilike(products.title, `%${currentSearch}%`)
+      )
+    : undefined;
+
+  // Build order by clause
+  let orderBy;
+  switch (currentSort) {
+    case "oldest":
+      orderBy = [asc(orders.createdAt)];
+      break;
+    case "amount_asc":
+      orderBy = [asc(orders.amount)];
+      break;
+    case "amount_desc":
+      orderBy = [desc(orders.amount)];
+      break;
+    case "newest":
+    default:
+      orderBy = [desc(orders.createdAt)];
+      break;
+  }
+
+  // Query total count for pagination
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(orders)
+    .innerJoin(products, eq(orders.productId, products.id))
+    .innerJoin(users, eq(orders.userId, users.id))
+    .where(whereClause);
+  const totalCount = Number(countResult[0]?.count || 0);
+
   const allOrdersList = await db
     .select({
       orderId: orders.id,
@@ -25,7 +80,21 @@ export default async function AdminOrdersPage() {
     .from(orders)
     .innerJoin(products, eq(orders.productId, products.id))
     .innerJoin(users, eq(orders.userId, users.id))
-    .orderBy(desc(orders.createdAt));
+    .where(whereClause)
+    .orderBy(...orderBy)
+    .limit(limit)
+    .offset(offset);
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const getPageLink = (pageNum: number) => {
+    const params = new URLSearchParams();
+    if (pageNum > 1) params.set("page", pageNum.toString());
+    if (currentSearch) params.set("search", currentSearch);
+    if (currentSort !== "newest") params.set("sort", currentSort);
+    const queryString = params.toString();
+    return `/admin/orders${queryString ? `?${queryString}` : ""}`;
+  };
 
   return (
     <div className="space-y-12">
@@ -34,10 +103,14 @@ export default async function AdminOrdersPage() {
         <p className="text-sm text-muted-foreground font-medium">Fulfillment logs and payment records.</p>
       </div>
 
-      {allOrdersList.length === 0 ? (
+      <AdminOrdersSearchSort />
+
+      {totalCount === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 border border-dashed border-border rounded-3xl bg-card/30 space-y-4">
           <AlertCircle className="w-10 h-10 text-muted-foreground opacity-50" />
-          <p className="text-sm text-muted-foreground font-medium">No transaction records found.</p>
+          <p className="text-sm text-muted-foreground font-medium">
+            {currentSearch ? `No matches found for "${currentSearch}"` : "No transaction records found."}
+          </p>
         </div>
       ) : (
         <Card className="border-border/50 bg-card/50 rounded-[2rem] overflow-hidden">
@@ -131,6 +204,54 @@ export default async function AdminOrdersPage() {
               ))}
             </TableBody>
           </Table>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-8 py-4 border-t border-border/40 bg-muted/5">
+              <div className="text-xs text-muted-foreground font-medium">
+                Showing <span className="font-semibold text-foreground">{offset + 1}</span> to{" "}
+                <span className="font-semibold text-foreground">
+                  {Math.min(offset + limit, totalCount)}
+                </span>{" "}
+                of <span className="font-semibold text-foreground">{totalCount}</span> orders
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className={`rounded-lg cursor-pointer ${currentPage <= 1 ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <Link href={getPageLink(currentPage - 1)}>Previous</Link>
+                </Button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNum = idx + 1;
+                    const isCurrent = pageNum === currentPage;
+                    return (
+                      <Button
+                        key={pageNum}
+                        asChild
+                        variant={isCurrent ? "default" : "outline"}
+                        size="sm"
+                        className="h-8 w-8 p-0 rounded-lg cursor-pointer"
+                      >
+                        <Link href={getPageLink(pageNum)}>{pageNum}</Link>
+                      </Button>
+                    );
+                  })}
+                </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className={`rounded-lg cursor-pointer ${currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <Link href={getPageLink(currentPage + 1)}>Next</Link>
+                </Button>
+              </div>
+            </div>
+          )}
         </Card>
       )}
     </div>
