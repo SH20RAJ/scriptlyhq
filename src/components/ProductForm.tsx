@@ -5,6 +5,8 @@ import { createProductAction, updateProductAction } from "../lib/actions/product
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Upload, Loader2, Info } from "lucide-react";
 import Link from "next/link";
+import { marked } from "marked";
+
 
 interface ProductFormProps {
   categories: { id: string; name: string; slug: string }[];
@@ -41,6 +43,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
   const [slug, setSlug] = useState(initialData?.slug || "");
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || "");
   const [description, setDescription] = useState(initialData?.description || "");
+  const [descTab, setDescTab] = useState<"write" | "preview">("write");
   const [category, setCategory] = useState(initialData?.category || categories[0]?.slug || "");
   const [subcategory, setSubcategory] = useState(initialData?.subcategory || "");
   const [tags, setTags] = useState(initialData?.tags || "");
@@ -197,7 +200,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Price (INR ₹) *</label>
+              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Price (USD $) *</label>
               <input type="number" name="price" step="0.01" min="0" required value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
             </div>
           </div>
@@ -208,8 +211,41 @@ export default function ProductForm({ categories, subcategories, initialData }: 
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Full Description *</label>
-            <textarea name="description" required rows={10} value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Full Description * (Markdown)</label>
+              <div className="flex bg-neutral-900 border border-neutral-800 rounded-lg p-0.5 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setDescTab("write")}
+                  className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${descTab === "write" ? "bg-neutral-800 text-white" : "text-neutral-400 hover:text-white"}`}
+                >
+                  Write
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDescTab("preview")}
+                  className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${descTab === "preview" ? "bg-neutral-800 text-white" : "text-neutral-400 hover:text-white"}`}
+                >
+                  Preview
+                </button>
+              </div>
+            </div>
+            {descTab === "write" ? (
+              <textarea
+                name="description"
+                required
+                rows={10}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Markdown is supported... e.g. # Header, - Bullet Points"
+                className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors font-medium text-sm"
+              />
+            ) : (
+              <div 
+                dangerouslySetInnerHTML={{ __html: marked.parseSync(description || "*No description typed yet.*") }} 
+                className="markdown-content w-full px-4 py-3 min-h-[240px] rounded-xl border border-neutral-800 bg-neutral-950 text-white overflow-y-auto font-medium text-sm"
+              />
+            )}
           </div>
         </div>
 
