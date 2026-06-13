@@ -158,7 +158,7 @@ export default function AdminCouponsClient() {
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                  {discountType === "percentage" ? "Discount Value (%)" : "Discount Value (₹)"}
+                  {discountType === "percentage" ? "Discount Value (%)" : "Discount Value ($)"}
                 </label>
                 <input
                   type="number"
@@ -171,7 +171,7 @@ export default function AdminCouponsClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Minimum Order Subtotal (₹)</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Minimum Order Subtotal ($)</label>
                 <input
                   type="number"
                   step="any"
@@ -261,12 +261,12 @@ export default function AdminCouponsClient() {
                           {coupon.discountValue}% Off
                         </Badge>
                       ) : (
-                        <span className="font-bold">₹{(coupon.discountValue / 100).toLocaleString("en-IN")} Off</span>
+                        <span className="font-bold">${(coupon.discountValue / 100).toFixed(2)} Off</span>
                       )}
                     </TableCell>
                     <TableCell className="px-8 py-5 font-bold text-sm text-muted-foreground tabular-nums">
                       {coupon.minPurchaseAmount > 0 
-                        ? `₹${(coupon.minPurchaseAmount / 100).toLocaleString("en-IN")}` 
+                        ? `$${(coupon.minPurchaseAmount / 100).toFixed(2)}` 
                         : "None"}
                     </TableCell>
                     <TableCell className="px-8 py-5">
