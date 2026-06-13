@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { createProductAction, updateProductAction } from "../lib/actions/products";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Upload, Loader2, Info, Image as ImageIcon, Sparkles, Globe, FileUp } from "lucide-react";
@@ -33,6 +33,7 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ categories, subcategories, initialData }: ProductFormProps) {
+  const isEdit = !!initialData;
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +58,80 @@ export default function ProductForm({ categories, subcategories, initialData }: 
   const [screenshots, setScreenshots] = useState(initialData?.screenshots || "");
   const [videoUrl, setVideoUrl] = useState(initialData?.videoUrl || "");
   const [fileUrl, setFileUrl] = useState(initialData?.fileUrl || "");
+
+  // Load from localStorage on mount (only for New Product form, i.e., isEdit is false)
+  useEffect(() => {
+    if (isEdit) return;
+    try {
+      const saved = localStorage.getItem("scriptlyhq_new_product_draft");
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.title) setTitle(data.title);
+        if (data.slug) setSlug(data.slug);
+        if (data.category) setCategory(data.category);
+        if (data.subcategory) setSubcategory(data.subcategory);
+        if (data.price) setPrice(data.price);
+        if (data.shortDescription) setShortDescription(data.shortDescription);
+        if (data.description) setDescription(data.description);
+        if (data.thumbnailUrl) setThumbnailUrl(data.thumbnailUrl);
+        if (data.previewGif) setPreviewGif(data.previewGif);
+        if (data.screenshots) setScreenshots(data.screenshots);
+        if (data.videoUrl) setVideoUrl(data.videoUrl);
+        if (data.fileUrl) setFileUrl(data.fileUrl);
+        if (data.demoUrl) setDemoUrl(data.demoUrl);
+        if (data.tags) setTags(data.tags);
+        if (data.version) setVersion(data.version);
+        if (data.featured !== undefined) setFeatured(data.featured);
+        if (data.published !== undefined) setPublished(data.published);
+      }
+    } catch (err) {
+      console.error("Failed to load draft from localStorage:", err);
+    }
+  }, [isEdit]);
+
+  // Save to localStorage when values change (only for New Product form, i.e., isEdit is false)
+  useEffect(() => {
+    if (isEdit) return;
+    const data = {
+      title,
+      slug,
+      category,
+      subcategory,
+      price,
+      shortDescription,
+      description,
+      thumbnailUrl,
+      previewGif,
+      screenshots,
+      videoUrl,
+      fileUrl,
+      demoUrl,
+      tags,
+      version,
+      featured,
+      published,
+    };
+    localStorage.setItem("scriptlyhq_new_product_draft", JSON.stringify(data));
+  }, [
+    isEdit,
+    title,
+    slug,
+    category,
+    subcategory,
+    price,
+    shortDescription,
+    description,
+    thumbnailUrl,
+    previewGif,
+    screenshots,
+    videoUrl,
+    fileUrl,
+    demoUrl,
+    tags,
+    version,
+    featured,
+    published,
+  ]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetSetter: (val: string) => void, fieldName: string) => {
     const file = e.target.files?.[0];
@@ -90,7 +165,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
     }
   };
 
-  const isEdit = !!initialData;
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -119,6 +194,9 @@ export default function ProductForm({ categories, subcategories, initialData }: 
         }
 
         if (result.success) {
+          if (!isEdit) {
+            localStorage.removeItem("scriptlyhq_new_product_draft");
+          }
           router.push("/admin/products");
           router.refresh();
         }
