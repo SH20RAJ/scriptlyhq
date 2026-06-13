@@ -172,8 +172,10 @@ import { categories as categoriesTable } from "../../db/schema";
 
 export async function ensureCategoriesSeeded() {
   try {
-    const existing = await db.query.categories.findFirst();
-    if (!existing) {
+    // Check if categories exist
+    const existingCategories = await db.query.categories.findFirst();
+    if (!existingCategories) {
+      console.log("Seeding default categories...");
       const DEFAULT_CATEGORIES = [
         { id: "landing-pages", name: "Landing Pages", slug: "landing-pages" },
         { id: "saas-templates", name: "SaaS Templates", slug: "saas-templates" },
@@ -186,8 +188,10 @@ export async function ensureCategoriesSeeded() {
       await db.insert(categoriesTable).values(DEFAULT_CATEGORIES);
     }
 
+    // Check if products exist
     const existingProducts = await db.query.products.findFirst();
     if (!existingProducts) {
+      console.log("Seeding default products...");
       const DEFAULT_PRODUCTS = [
         {
           id: "prod-saas-template",
@@ -199,7 +203,7 @@ export async function ensureCategoriesSeeded() {
           tags: "nextjs,saas,boilerplate,drizzle",
           thumbnail: null,
           demoUrl: "https://demo.scriptlyhq.com/saas-starter",
-          fileUrl: null as string | null,
+          fileUrl: "/mock/saas-starter.zip",
           price: 100, // ₹1.00
           version: "1.0.0",
           featured: true,
@@ -215,7 +219,7 @@ export async function ensureCategoriesSeeded() {
           tags: "marketing,growth,ebook,guide",
           thumbnail: null,
           demoUrl: null,
-          fileUrl: null as string | null,
+          fileUrl: "/mock/growth-guide.pdf",
           price: 300, // ₹3.00
           version: "2.1.0",
           featured: true,
@@ -231,7 +235,7 @@ export async function ensureCategoriesSeeded() {
           tags: "ai,prompt,gpt,claude,marketing",
           thumbnail: null,
           demoUrl: null,
-          fileUrl: null as string | null,
+          fileUrl: "/mock/copywriter-prompt.txt",
           price: 400, // ₹4.00
           version: "1.0.0",
           featured: false,
@@ -247,7 +251,7 @@ export async function ensureCategoriesSeeded() {
           tags: "chrome,extension,javascript,react",
           thumbnail: null,
           demoUrl: "https://demo.scriptlyhq.com/chrome-extension",
-          fileUrl: null as string | null,
+          fileUrl: "/mock/chrome-boilerplate.zip",
           price: 1000, // ₹10.00
           version: "1.2.0",
           featured: false,
@@ -263,7 +267,7 @@ export async function ensureCategoriesSeeded() {
           tags: "tailwind,ui,glassmorphism,css",
           thumbnail: null,
           demoUrl: "https://demo.scriptlyhq.com/glassmorphism",
-          fileUrl: null as string | null,
+          fileUrl: "/mock/glass-ui-kit.zip",
           price: 4900, // ₹49.00
           version: "1.0.0",
           featured: false,
@@ -271,53 +275,60 @@ export async function ensureCategoriesSeeded() {
         },
       ];
 
-      const path = await import("path");
-      const fs = await import("fs/promises");
-      const uploadDir = path.join(process.cwd(), "uploads");
-      await fs.mkdir(uploadDir, { recursive: true });
-
-      for (const prod of DEFAULT_PRODUCTS) {
-        const mockFilePath = path.join(uploadDir, `${prod.id}-mock-release.zip`);
-        await fs.writeFile(mockFilePath, `Mock product archive content for ${prod.title}`);
-        prod.fileUrl = mockFilePath;
-      }
-
       await db.insert(products).values(DEFAULT_PRODUCTS);
     }
   } catch (err) {
-    console.error("Failed to seed categories and products:", err);
+    // Check if the error is about missing tables
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    if (errorMessage.includes('relation "categories" does not exist') || 
+        errorMessage.includes('relation "products" does not exist') ||
+        errorMessage.includes('Failed query')) {
+      console.warn("Database tables not found. Please run migrations.");
+    } else {
+      console.error("Failed to seed categories and products:", err);
+    }
   }
 }
 
 export async function getCategoriesAction() {
-  await ensureCategoriesSeeded();
-  return await db.query.categories.findMany();
+  try {
+    await ensureCategoriesSeeded();
+    return await db.query.categories.findMany();
+  } catch (err) {
+    console.error("getCategoriesAction failed:", err);
+    return [];
+  }
 }
 
 export async function getProductsAction(options?: { category?: string; search?: string }) {
-  await ensureCategoriesSeeded();
-  
-  const allProducts = await db.query.products.findMany({
-    orderBy: [desc(products.createdAt)],
-  });
+  try {
+    await ensureCategoriesSeeded();
+    
+    const allProducts = await db.query.products.findMany({
+      orderBy: [desc(products.createdAt)],
+    });
 
-  let filtered = allProducts.filter((p) => p.published);
+    let filtered = allProducts.filter((p) => p.published);
 
-  if (options?.category && options.category !== "all") {
-    filtered = filtered.filter((p) => p.category === options.category);
+    if (options?.category && options.category !== "all") {
+      filtered = filtered.filter((p) => p.category === options.category);
+    }
+
+    if (options?.search) {
+      const term = options.search.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.title.toLowerCase().includes(term) ||
+          p.shortDescription.toLowerCase().includes(term) ||
+          p.description.toLowerCase().includes(term) ||
+          (p.tags && p.tags.toLowerCase().includes(term))
+      );
+    }
+
+    return filtered;
+  } catch (err) {
+    console.error("getProductsAction failed:", err);
+    return [];
   }
-
-  if (options?.search) {
-    const term = options.search.toLowerCase();
-    filtered = filtered.filter(
-      (p) =>
-        p.title.toLowerCase().includes(term) ||
-        p.shortDescription.toLowerCase().includes(term) ||
-        p.description.toLowerCase().includes(term) ||
-        (p.tags && p.tags.toLowerCase().includes(term))
-    );
-  }
-
-  return filtered;
 }
 
