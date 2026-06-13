@@ -88,6 +88,25 @@ export async function createRazorpayOrderAction({
   const totalDiscount = autoDiscount + couponDiscount;
   const finalAmount = Math.max(subtotal - totalDiscount, 100); // minimum $1.00 for checkout
 
+  // Fetch live exchange rate from USD to INR, fallback to 95 if API fails
+  let usdToInrRate = 95;
+  try {
+    const exchangeRes = await fetch("https://open.er-api.com/v6/latest/USD", {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+    if (exchangeRes.ok) {
+      const exchangeData = await exchangeRes.json() as { rates?: Record<string, number> };
+      const liveRate = exchangeData.rates?.["INR"];
+      if (liveRate && liveRate > 0) {
+        usdToInrRate = liveRate;
+      }
+    }
+  } catch (err) {
+    console.error("Failed to fetch live USD to INR exchange rate. Falling back to 95.", err);
+  }
+
+  const finalAmountInInrPaise = Math.round(finalAmount * usdToInrRate);
+
   // Generate Razorpay Order
   let rzpOrderId = "rzp_order_mock_" + crypto.randomBytes(8).toString("hex");
   const isMockKeys = (process.env.RAZORPAY_KEY_ID || "").startsWith("rzp_test_mock");
@@ -96,8 +115,8 @@ export async function createRazorpayOrderAction({
     try {
       const razorpay = getRazorpay();
       const rzpOrder = await razorpay.orders.create({
-        amount: finalAmount, // USD cents
-        currency: "USD",
+        amount: finalAmountInInrPaise, // INR paise
+        currency: "INR",
         receipt: crypto.randomUUID(),
       });
       rzpOrderId = rzpOrder.id;
@@ -150,7 +169,7 @@ export async function createRazorpayOrderAction({
   return {
     success: true,
     razorpayOrderId: rzpOrderId,
-    amount: finalAmount, // USD cents
+    amount: finalAmountInInrPaise, // INR paise
     key: process.env.RAZORPAY_KEY_ID || "rzp_test_mockkeyid123",
     productName: selectedProducts.length === 1 ? selectedProducts[0].title : `${selectedProducts.length} items in Cart`,
     userEmail: user.email,

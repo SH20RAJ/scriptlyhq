@@ -98,7 +98,7 @@ export default function CartClient() {
         const options = {
           key: orderData.key,
           amount: orderData.amount,
-          currency: "USD",
+          currency: "INR",
           name: "ScriptHQ",
           description: orderData.productName,
           order_id: orderData.razorpayOrderId,
