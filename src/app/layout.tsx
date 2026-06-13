@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: {
-		default: "ScriptHQ by Strivio - Premium Digital Product Marketplace",
-		template: "%s | ScriptHQ by Strivio",
+		default: "ScriptlyStore - Premium Digital Product Marketplace",
+		template: "%s | ScriptlyStore",
 	},
 	description: "Discover and download high-quality Landing Pages, SaaS Templates, Ebooks, AI Prompts, UI Kits, and Development Scripts.",
-	metadataBase: new URL("https://scriptlyhq.strivio.world"),
+	metadataBase: new URL("https://scriptly.store"),
 	manifest: "/manifest.json",
 	alternates: {
 		types: {
@@ -28,30 +28,30 @@ export const metadata: Metadata = {
 		},
 	},
 	openGraph: {
-		title: "ScriptHQ by Strivio - Premium Digital Product Marketplace",
+		title: "ScriptlyStore - Premium Digital Product Marketplace",
 		description: "Discover and download high-quality Landing Pages, SaaS Templates, Ebooks, AI Prompts, UI Kits, and Development Scripts.",
 		type: "website",
 		locale: "en_US",
-		siteName: "ScriptHQ by Strivio",
+		siteName: "ScriptlyStore",
 		images: [
 			{
 				url: "/og-image.png",
 				width: 1200,
 				height: 630,
-				alt: "ScriptHQ Premium Digital Product Marketplace",
+				alt: "ScriptlyStore Premium Digital Product Marketplace",
 			},
 		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "ScriptHQ by Strivio",
+		title: "ScriptlyStore",
 		description: "Premium Digital Product Marketplace",
 		images: ["/og-image.png"],
 	},
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
-		title: "ScriptHQ by Strivio",
+		title: "ScriptlyStore",
 	},
 	icons: {
 		icon: [

@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | ScriptHQ",
-  description: "Terms and conditions for using the ScriptHQ marketplace.",
+  title: "Terms of Service | ScriptlyStore",
+  description: "Terms and conditions for using the ScriptlyStore marketplace.",
 };
 
 export default function TermsPage() {
@@ -17,14 +17,14 @@ export default function TermsPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">1. Acceptance of Terms</h2>
           <p>
-            By accessing or using ScriptHQ, you agree to be bound by these Terms of Service. If you do not agree to all of these terms, do not use our services.
+            By accessing or using ScriptlyStore, you agree to be bound by these Terms of Service. If you do not agree to all of these terms, do not use our services.
           </p>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">2. Digital Products & Licensing</h2>
           <p>
-            All products sold on ScriptHQ are digital assets. Upon purchase, you are granted a non-exclusive, non-transferable license to use the asset according to the specific license type selected at checkout.
+            All products sold on ScriptlyStore are digital assets. Upon purchase, you are granted a non-exclusive, non-transferable license to use the asset according to the specific license type selected at checkout.
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Standard License: Personal or single-client use.</li>
@@ -48,7 +48,7 @@ export default function TermsPage() {
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            ScriptHQ is a product of Strivio Inc. For legal inquiries, please contact legal@strivio.world.
+            ScriptlyStore is a product of Strivio Inc. For legal inquiries, please contact legal@strivio.world.
           </p>
         </section>
       </div>

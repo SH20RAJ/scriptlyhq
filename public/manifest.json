@@ -1,6 +1,6 @@
 {
-  "name": "ScriptHQ by Strivio",
-  "short_name": "ScriptHQ",
+  "name": "ScriptlyStore",
+  "short_name": "ScriptlyStore",
   "description": "Premium Digital Product Marketplace",
   "start_url": "/",
   "display": "standalone",

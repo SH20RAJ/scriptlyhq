@@ -227,7 +227,7 @@ export async function ensureCategoriesSeeded() {
           category: "saas-templates",
           tags: "nextjs,saas,boilerplate,drizzle",
           thumbnail: "/thumbnails/saas_starter.png",
-          demoUrl: "https://demo.scriptlyhq.com/saas-starter",
+          demoUrl: "https://demo.scriptlystore.com/saas-starter",
           fileUrl: "/mock/saas-starter.zip",
           price: 100, // ₹1.00
           version: "1.0.0",
@@ -275,7 +275,7 @@ export async function ensureCategoriesSeeded() {
           category: "scripts",
           tags: "chrome,extension,javascript,react",
           thumbnail: "/thumbnails/chrome_boilerplate.png",
-          demoUrl: "https://demo.scriptlyhq.com/chrome-extension",
+          demoUrl: "https://demo.scriptlystore.com/chrome-extension",
           fileUrl: "/mock/chrome-boilerplate.zip",
           price: 1000, // ₹10.00
           version: "1.2.0",
@@ -291,7 +291,7 @@ export async function ensureCategoriesSeeded() {
           category: "ui-kits",
           tags: "tailwind,ui,glassmorphism,css",
           thumbnail: "/thumbnails/glass_ui.png",
-          demoUrl: "https://demo.scriptlyhq.com/glassmorphism",
+          demoUrl: "https://demo.scriptlystore.com/glassmorphism",
           fileUrl: "/mock/glass-ui-kit.zip",
           price: 4900, // ₹49.00
           version: "1.0.0",

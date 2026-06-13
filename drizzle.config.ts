@@ -5,6 +5,6 @@ export default defineConfig({
   out: "./src/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL || "postgres://localhost:5432/scriptlyhq",
+    url: process.env.DATABASE_URL || "postgres://localhost:5432/scriptlystore",
   },
 });

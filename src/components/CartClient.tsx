@@ -99,7 +99,7 @@ export default function CartClient() {
           key: orderData.key,
           amount: orderData.amount,
           currency: "INR",
-          name: "ScriptHQ",
+          name: "ScriptlyStore",
           description: orderData.productName,
           order_id: orderData.razorpayOrderId,
           handler: async function (response: any) {

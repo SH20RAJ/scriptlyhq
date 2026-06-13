@@ -67,7 +67,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
   useEffect(() => {
     if (isEdit) return;
     try {
-      const saved = localStorage.getItem("scriptlyhq_new_product_draft");
+      const saved = localStorage.getItem("scriptlystore_new_product_draft");
       if (saved) {
         const data = JSON.parse(saved);
         if (data.title) setTitle(data.title);
@@ -115,7 +115,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
       featured,
       published,
     };
-    localStorage.setItem("scriptlyhq_new_product_draft", JSON.stringify(data));
+    localStorage.setItem("scriptlystore_new_product_draft", JSON.stringify(data));
   }, [
     isEdit,
     title,
@@ -199,7 +199,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
 
         if (result.success) {
           if (!isEdit) {
-            localStorage.removeItem("scriptlyhq_new_product_draft");
+            localStorage.removeItem("scriptlystore_new_product_draft");
           }
           router.push("/admin/products");
           router.refresh();

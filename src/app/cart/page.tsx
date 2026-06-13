@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import CartClient from "../../components/CartClient";
 
 export const metadata: Metadata = {
-  title: "Shopping Cart | ScriptHQ",
+  title: "Shopping Cart | ScriptlyStore",
   description: "Review your selected digital assets and checkout securely.",
 };
 

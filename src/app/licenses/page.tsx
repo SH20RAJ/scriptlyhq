@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Product Licenses | ScriptHQ",
+  title: "Product Licenses | ScriptlyStore",
   description: "Terms and details of our commercial and personal licenses.",
 };
 
@@ -17,7 +17,7 @@ export default function LicensesPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">1. Commercial License</h2>
           <p>
-            All premium templates, boilerplates, prompts, and scripts purchased on ScriptHQ come with a standard commercial license. Under this license:
+            All premium templates, boilerplates, prompts, and scripts purchased on ScriptlyStore come with a standard commercial license. Under this license:
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>You may build unlimited personal or commercial projects using the code assets.</li>
@@ -33,14 +33,14 @@ export default function LicensesPage() {
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>**Redistribution**: You cannot resell, redistribute, sub-license, or share the original ZIP package or source files directly, even for free or inside a larger builder bundle.</li>
-            <li>**Marketplace Re-hosting**: You cannot host the templates or files on another marketplace to compete directly with ScriptHQ.</li>
+            <li>**Marketplace Re-hosting**: You cannot host the templates or files on another marketplace to compete directly with ScriptlyStore.</li>
           </ul>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">3. Attribution</h2>
           <p>
-            Attribution back to ScriptHQ or Strivio inside your compiled frontend applications is optional and not required. The source code is entirely yours to run and deploy.
+            Attribution back to ScriptlyStore or Strivio inside your compiled frontend applications is optional and not required. The source code is entirely yours to run and deploy.
           </p>
         </section>
 

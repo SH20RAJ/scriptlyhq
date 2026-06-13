@@ -11,7 +11,7 @@ export default function Navbar() {
         <div className="flex items-center gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2">
             <span className="inline-block font-bold sm:text-xl tracking-tighter">
-              ScriptHQ
+              ScriptlyStore
             </span>
           </Link>
           <nav className="hidden md:flex gap-6">

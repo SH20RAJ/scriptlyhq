@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | ScriptHQ",
-  description: "How we handle your data at ScriptHQ.",
+  title: "Privacy Policy | ScriptlyStore",
+  description: "How we handle your data at ScriptlyStore.",
 };
 
 export default function PrivacyPage() {
@@ -24,7 +24,7 @@ export default function PrivacyPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">2. Payment Data</h2>
           <p>
-            Payments are processed securely via Razorpay. ScriptHQ does not store or have access to your full credit card details or bank credentials.
+            Payments are processed securely via Razorpay. ScriptlyStore does not store or have access to your full credit card details or bank credentials.
           </p>
         </section>
 

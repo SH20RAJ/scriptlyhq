@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Shipping & Delivery Policy | ScriptHQ",
+  title: "Shipping & Delivery Policy | ScriptlyStore",
   description: "Immediate delivery policy for digital files and templates.",
 };
 
@@ -17,7 +17,7 @@ export default function ShippingPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">1. Delivery Method</h2>
           <p>
-            ScriptHQ sells downloadable digital assets. There is no physical shipping involved. All purchased templates, code scripts, prompts, and kit files are delivered instantly after payment confirmation.
+            ScriptlyStore sells downloadable digital assets. There is no physical shipping involved. All purchased templates, code scripts, prompts, and kit files are delivered instantly after payment confirmation.
           </p>
         </section>
 

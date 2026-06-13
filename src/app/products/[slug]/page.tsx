@@ -33,14 +33,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
   if (!product) {
-    return { title: "Product Not Found | ScriptHQ" };
+    return { title: "Product Not Found | ScriptlyStore" };
   }
 
   return {
-    title: `${product.title} - ScriptHQ`,
+    title: `${product.title} - ScriptlyStore`,
     description: product.shortDescription,
     openGraph: {
-      title: `${product.title} - ScriptHQ`,
+      title: `${product.title} - ScriptlyStore`,
       description: product.shortDescription,
       images: product.thumbnail ? [{ url: product.thumbnail }] : [],
     },

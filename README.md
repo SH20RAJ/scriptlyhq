@@ -17,7 +17,7 @@ ScriptlyHQ is a modern, simple, clean, and production-ready digital product mark
 ## Directory Structure
 
 ```text
-scriptlyhq/
+scriptlystore/
 ├── src/
 │   ├── app/
 │   │   ├── admin/             # Admin panel routes (overview, catalog management, orders)
@@ -71,7 +71,7 @@ RAZORPAY_KEY_SECRET=rzp_test_mocksecret123
 RAZORPAY_WEBHOOK_SECRET=rzp_test_mockwebhooksecret123
 
 # Administrator Access Emails (Comma-separated)
-ADMIN_EMAILS=shaswatraj@gmail.com,admin@scriptlyhq.com
+ADMIN_EMAILS=shaswatraj@gmail.com,admin@scriptly.store
 ```
 
 ### 3. Database Sync

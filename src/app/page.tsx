@@ -140,7 +140,7 @@ export default async function Home({ searchParams }: PageProps) {
         <div className="container max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 border-b border-border/40 pb-12 mb-10">
             <div className="space-y-4">
-              <p className="text-lg font-black tracking-tighter">ScriptHQ</p>
+              <p className="text-lg font-black tracking-tighter">ScriptlyStore</p>
               <p className="text-xs text-muted-foreground leading-relaxed max-w-xs font-medium">
                 Premium digital product marketplace for developer templates, SaaS boilerplates, prompts, scripts, and UI kits.
               </p>

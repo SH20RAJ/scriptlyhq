@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { tag } = await params;
   const decodedTag = decodeURIComponent(tag);
   return {
-    title: "Tagged as #" + decodedTag + " | ScriptHQ",
-    description: "Browse premium digital assets tagged with " + decodedTag + " on ScriptHQ.",
+    title: "Tagged as #" + decodedTag + " | ScriptlyStore",
+    description: "Browse premium digital assets tagged with " + decodedTag + " on ScriptlyStore.",
   };
 }
 

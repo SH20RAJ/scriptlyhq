@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Refund Policy | ScriptHQ",
+  title: "Refund Policy | ScriptlyStore",
   description: "Our cancellation and refund policies for digital products.",
 };
 
@@ -17,7 +17,7 @@ export default function RefundPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">1. Nature of Digital Goods</h2>
           <p>
-            Due to the downloadable nature of digital products, SaaS templates, boilerplates, ebooks, prompts, scripts, and UI kits hosted on ScriptHQ, all purchases are final and non-refundable. Once a file link is generated or access is unlocked, we cannot revoke files or issue refunds.
+            Due to the downloadable nature of digital products, SaaS templates, boilerplates, ebooks, prompts, scripts, and UI kits hosted on ScriptlyStore, all purchases are final and non-refundable. Once a file link is generated or access is unlocked, we cannot revoke files or issue refunds.
           </p>
         </section>
 

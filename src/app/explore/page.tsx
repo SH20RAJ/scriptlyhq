@@ -8,7 +8,7 @@ import { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Explore Library | ScriptHQ",
+  title: "Explore Library | ScriptlyStore",
   description: "Browse premium digital assets by category. SaaS templates, UI kits, boilerplates and more.",
 };
 

@@ -3,7 +3,7 @@ import { db } from "../db";
 import { products, categories } from "../db/schema";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://scriptlyhq.strivio.world";
+  const baseUrl = "https://scriptly.store";
 
   // Static routes
   const routes = ["", "/search", "/dashboard"].map((route) => ({

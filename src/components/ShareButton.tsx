@@ -36,7 +36,7 @@ export default function ShareButton({ productTitle, productSlug }: ShareButtonPr
 
   const productUrl = typeof window !== "undefined" 
     ? `${window.location.origin}/products/${productSlug}`
-    : `https://scriptlyhq.strivio.world/products/${productSlug}`;
+    : `https://scriptly.store/products/${productSlug}`;
 
   const handleCopy = async () => {
     try {
@@ -52,7 +52,7 @@ export default function ShareButton({ productTitle, productSlug }: ShareButtonPr
     {
       name: "Twitter / X",
       icon: TwitterIcon,
-      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${productTitle} on ScriptHQ!`)}&url=${encodeURIComponent(productUrl)}`,
+      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${productTitle} on ScriptlyStore!`)}&url=${encodeURIComponent(productUrl)}`,
       color: "hover:bg-neutral-800 hover:text-white"
     },
     {
@@ -70,13 +70,13 @@ export default function ShareButton({ productTitle, productSlug }: ShareButtonPr
     {
       name: "WhatsApp",
       icon: MessageSquare,
-      url: `https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out ${productTitle} on ScriptHQ: ${productUrl}`)}`,
+      url: `https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out ${productTitle} on ScriptlyStore: ${productUrl}`)}`,
       color: "hover:bg-emerald-600/10 hover:text-emerald-400"
     },
     {
       name: "Email",
       icon: Mail,
-      url: `mailto:?subject=${encodeURIComponent(productTitle)}&body=${encodeURIComponent(`Check out this premium digital product on ScriptHQ:\n\n${productUrl}`)}`,
+      url: `mailto:?subject=${encodeURIComponent(productTitle)}&body=${encodeURIComponent(`Check out this premium digital product on ScriptlyStore:\n\n${productUrl}`)}`,
       color: "hover:bg-neutral-800 hover:text-neutral-200"
     }
   ];

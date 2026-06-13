@@ -30,7 +30,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Load cart from localStorage on mount
   useEffect(() => {
     try {
-      const storedCart = localStorage.getItem("scriptlyhq_cart");
+      const storedCart = localStorage.getItem("scriptlystore_cart");
       if (storedCart) {
         setCart(JSON.parse(storedCart));
       }
@@ -44,7 +44,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loaded) {
       try {
-        localStorage.setItem("scriptlyhq_cart", JSON.stringify(cart));
+        localStorage.setItem("scriptlystore_cart", JSON.stringify(cart));
       } catch (error) {
         console.error("Failed to save cart to localStorage", error);
       }

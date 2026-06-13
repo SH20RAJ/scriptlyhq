@@ -4,8 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Award, Compass, Heart, Shield } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About Us | ScriptHQ",
-  description: "Learn about the mission and principles behind ScriptHQ.",
+  title: "About Us | ScriptlyStore",
+  description: "Learn about the mission and principles behind ScriptlyStore.",
 };
 
 export default function AboutPage() {
@@ -21,7 +21,7 @@ export default function AboutPage() {
           <span className="text-muted-foreground">of Digital Assets.</span>
         </h1>
         <p className="text-base text-muted-foreground font-medium leading-relaxed">
-          ScriptHQ by Strivio is a curated digital products marketplace designed specifically for builders, developers, creators, and modern startups.
+          ScriptlyStore is a curated digital products marketplace designed specifically for builders, developers, creators, and modern startups.
         </p>
       </div>
 
@@ -70,7 +70,7 @@ export default function AboutPage() {
             </div>
             <h3 className="font-bold text-lg text-foreground tracking-tight">Strivio Network</h3>
             <p className="text-sm font-medium text-muted-foreground leading-relaxed">
-              ScriptHQ is backed by the Strivio network. We build and deploy modern developer boilerplates, tools, widgets, and instructional guides worldwide.
+              ScriptlyStore is backed by the Strivio network. We build and deploy modern developer boilerplates, tools, widgets, and instructional guides worldwide.
             </p>
           </CardContent>
         </Card>

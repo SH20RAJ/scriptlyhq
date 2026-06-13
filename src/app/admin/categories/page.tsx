@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import AdminCategoriesClient from "../../../components/AdminCategoriesClient";
 
 export const metadata: Metadata = {
-  title: "Admin Categories Manager | ScriptHQ",
+  title: "Admin Categories Manager | ScriptlyStore",
   description: "Create, edit, and delete product categories and subcategories for the marketplace.",
 };
 

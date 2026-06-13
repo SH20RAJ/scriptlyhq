@@ -3,8 +3,8 @@ import { Mail, MapPin, ShieldCheck, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  title: "Contact Us | ScriptHQ",
-  description: "Get in touch with customer support at ScriptHQ.",
+  title: "Contact Us | ScriptlyStore",
+  description: "Get in touch with customer support at ScriptlyStore.",
 };
 
 export default function ContactPage() {
@@ -16,7 +16,7 @@ export default function ContactPage() {
         </Badge>
         <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground sm:leading-[1.1]">
           Get in Touch <br />
-          <span className="text-muted-foreground">with ScriptHQ.</span>
+          <span className="text-muted-foreground">with ScriptlyStore.</span>
         </h1>
         <p className="text-base text-muted-foreground font-medium leading-relaxed">
           Need help with orders, payment validations, or builder tools? We are here to assist.
