@@ -171,6 +171,34 @@ export async function deleteProductAction(id: string) {
   return { success: true };
 }
 
+export async function toggleProductPublishAction(id: string) {
+  const authorized = await isAdmin();
+  if (!authorized) {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+
+  const existing = await db.query.products.findFirst({
+    where: eq(products.id, id),
+  });
+
+  if (!existing) {
+    throw new Error("Product not found");
+  }
+
+  await db
+    .update(products)
+    .set({
+      published: !existing.published,
+      updatedAt: new Date(),
+    })
+    .where(eq(products.id, id));
+
+  revalidatePath("/");
+  revalidatePath(`/products/${existing.slug}`);
+  revalidatePath("/admin/products");
+  return { success: true };
+}
+
 import { categories as categoriesTable, subcategories } from "../../db/schema";
 
 export async function ensureCategoriesSeeded() {

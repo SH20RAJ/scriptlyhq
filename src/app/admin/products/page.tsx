@@ -203,7 +203,11 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
 
                   {/* Action Buttons */}
                   <TableCell className="px-6 text-right">
-                    <AdminActions productId={prod.id} productSlug={prod.slug} />
+                    <AdminActions 
+                      productId={prod.id} 
+                      productSlug={prod.slug} 
+                      isPublished={prod.published} 
+                    />
                   </TableCell>
                 </TableRow>
               ))}

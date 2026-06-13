@@ -18,6 +18,8 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { marked } from "marked";
 import ShareButton from "../../../components/ShareButton";
 import { Tweet } from "react-tweet";
+import { isAdmin } from "../../../lib/auth-utils";
+import AdminToolbar from "./AdminToolbar";
 
 
 interface PageProps {
@@ -54,6 +56,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
   });
 
   if (!product) notFound();
+
+  const authorized = await isAdmin();
+  if (!product.published && !authorized) notFound();
 
   // Fetch related products (same category, not current product, published)
   const relatedProducts = await db.query.products.findMany({
@@ -102,6 +107,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
             Back to Library
           </Link>
         </Button>
+
+        {authorized && (
+          <AdminToolbar productId={product.id} isPublished={product.published} />
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           {/* Main Content */}

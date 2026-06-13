@@ -249,7 +249,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
             ) : (
               <FileUp className="w-4 h-4" />
             )}
-            <span>Save Draft</span>
+            <span>{(isEdit && initialData?.published) ? "Move to Draft" : "Save Draft"}</span>
           </button>
 
           <button
@@ -262,7 +262,11 @@ export default function ProductForm({ categories, subcategories, initialData }: 
             ) : (
               <Save className="w-4 h-4" />
             )}
-            <span>{isEdit ? "Update Product" : "Publish Product"}</span>
+            <span>
+              {isEdit 
+                ? (initialData?.published ? "Update Product" : "Publish Now") 
+                : "Publish Product"}
+            </span>
           </button>
         </div>
       </div>
