@@ -89,7 +89,7 @@ export default async function PurchaseSuccessPage({ searchParams }: PageProps) {
             <div className="flex justify-between items-baseline pt-2">
               <span className="text-muted-foreground font-medium">Amount Paid</span>
               <span className="text-2xl font-bold text-foreground">
-                ₹{(receipt.amount / 100).toLocaleString("en-IN")}
+                ${(receipt.amount / 100).toFixed(2)}
               </span>
             </div>
           </div>
