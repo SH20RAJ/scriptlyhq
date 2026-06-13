@@ -48,12 +48,12 @@ export default async function OffersPage() {
                 Get 20% Off Your Purchase
               </h2>
               <p className="text-muted-foreground text-sm font-medium leading-relaxed">
-                Add premium boilerplates, kits, or prompts to your cart. Once your subtotal exceeds **₹5,000**, a **20% flat discount** will be automatically applied at checkout.
+                Add premium boilerplates, kits, or prompts to your cart. Once your subtotal exceeds **$60.00**, a **20% flat discount** will be automatically applied at checkout.
               </p>
             </div>
           </div>
           <div className="pt-8 border-t border-border/40 mt-8 flex items-center justify-between">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Min. Cart: ₹5,000</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Min. Cart: $60.00</span>
             <Button asChild className="rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[10px] cursor-pointer">
               <Link href="/">
                 Shop Now
@@ -83,11 +83,11 @@ export default async function OffersPage() {
                   <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground leading-tight">
                     {coupon.discountType === "percentage" 
                       ? `Get ${coupon.discountValue}% Discount` 
-                      : `Get ₹${(coupon.discountValue / 100).toLocaleString("en-IN")} Off`}
+                      : `Get $${(coupon.discountValue / 100).toFixed(2)} Off`}
                   </h2>
                   <p className="text-muted-foreground text-sm font-medium leading-relaxed">
                     Use the coupon code <strong className="text-foreground tracking-wider font-bold">"{coupon.code}"</strong> in your cart page to redeem this exclusive discount. 
-                    {coupon.minPurchaseAmount > 0 && ` Applicable for purchases over ₹${(coupon.minPurchaseAmount / 100).toLocaleString("en-IN")}.`}
+                    {coupon.minPurchaseAmount > 0 && ` Applicable for purchases over $${(coupon.minPurchaseAmount / 100).toFixed(2)}.`}
                   </p>
                 </div>
               </div>
