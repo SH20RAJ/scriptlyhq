@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { Pool } from "@neondatabase/serverless";
 import * as schema from "./schema";
 
 declare global {
@@ -10,12 +10,8 @@ declare global {
 const connectionString = process.env.DATABASE_URL || "postgres://localhost:5432/scriptlyhq";
 
 // For serverless/development environments, reuse the connection
-const client = postgres(connectionString, { 
-  max: 1,
-  connect_timeout: 5, // 5 seconds connect timeout to prevent hangs
-  idle_timeout: 10    // 10 seconds idle timeout
-});
-export const db = globalThis.db || drizzle(client, { schema });
+const pool = new Pool({ connectionString });
+export const db = globalThis.db || drizzle(pool, { schema });
 
 if (process.env.NODE_ENV !== "production") {
   globalThis.db = db;

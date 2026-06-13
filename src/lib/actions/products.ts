@@ -4,7 +4,6 @@ import { db } from "../../db";
 import { products } from "../../db/schema";
 import { eq, desc } from "drizzle-orm";
 import { isAdmin } from "../auth-utils";
-import { saveProductFile, saveThumbnailFile, deleteProductFile, deleteThumbnailFile } from "../storage";
 import { revalidatePath } from "next/cache";
 
 export async function createProductAction(formData: FormData) {
@@ -32,18 +31,8 @@ export async function createProductAction(formData: FormData) {
   const featured = formData.get("featured") === "true";
   const published = formData.get("published") === "true";
 
-  const thumbnailFile = formData.get("thumbnail") as File;
-  const productFile = formData.get("file") as File;
-
-  let thumbnailUrl: string | null = null;
-  if (thumbnailFile && thumbnailFile.size > 0) {
-    thumbnailUrl = await saveThumbnailFile(thumbnailFile);
-  }
-
-  let fileUrl: string | null = null;
-  if (productFile && productFile.size > 0) {
-    fileUrl = await saveProductFile(productFile);
-  }
+  const thumbnailUrl = formData.get("thumbnail") as string;
+  const fileUrl = formData.get("fileUrl") as string;
 
   const id = crypto.randomUUID();
 
@@ -55,9 +44,9 @@ export async function createProductAction(formData: FormData) {
     description,
     category,
     tags: tags || null,
-    thumbnail: thumbnailUrl,
+    thumbnail: thumbnailUrl || null,
     demoUrl,
-    fileUrl,
+    fileUrl: fileUrl || null,
     price,
     version,
     featured,
@@ -87,8 +76,8 @@ export async function updateProductAction(id: string, formData: FormData) {
   const featured = formData.get("featured") === "true";
   const published = formData.get("published") === "true";
 
-  const thumbnailFile = formData.get("thumbnail") as File;
-  const productFile = formData.get("file") as File;
+  const thumbnailUrl = formData.get("thumbnail") as string;
+  const fileUrl = formData.get("fileUrl") as string;
 
   const existing = await db.query.products.findFirst({
     where: eq(products.id, id),
@@ -96,22 +85,6 @@ export async function updateProductAction(id: string, formData: FormData) {
 
   if (!existing) {
     throw new Error("Product not found");
-  }
-
-  let thumbnailUrl = existing.thumbnail;
-  if (thumbnailFile && thumbnailFile.size > 0) {
-    if (existing.thumbnail) {
-      await deleteThumbnailFile(existing.thumbnail);
-    }
-    thumbnailUrl = await saveThumbnailFile(thumbnailFile);
-  }
-
-  let fileUrl = existing.fileUrl;
-  if (productFile && productFile.size > 0) {
-    if (existing.fileUrl) {
-      await deleteProductFile(existing.fileUrl);
-    }
-    fileUrl = await saveProductFile(productFile);
   }
 
   await db
@@ -123,9 +96,9 @@ export async function updateProductAction(id: string, formData: FormData) {
       description,
       category,
       tags: tags || null,
-      thumbnail: thumbnailUrl,
+      thumbnail: thumbnailUrl || null,
       demoUrl,
-      fileUrl,
+      fileUrl: fileUrl || null,
       price,
       version,
       featured,
@@ -152,13 +125,6 @@ export async function deleteProductAction(id: string) {
 
   if (!existing) {
     throw new Error("Product not found");
-  }
-
-  if (existing.thumbnail) {
-    await deleteThumbnailFile(existing.thumbnail);
-  }
-  if (existing.fileUrl) {
-    await deleteProductFile(existing.fileUrl);
   }
 
   await db.delete(products).where(eq(products.id, id));
@@ -292,7 +258,7 @@ export async function ensureCategoriesSeeded() {
 
 export async function getCategoriesAction() {
   try {
-    await ensureCategoriesSeeded();
+    // We don't seed on every request anymore to keep things clean
     return await db.query.categories.findMany();
   } catch (err) {
     console.error("getCategoriesAction failed:", err);
@@ -302,8 +268,6 @@ export async function getCategoriesAction() {
 
 export async function getProductsAction(options?: { category?: string; search?: string }) {
   try {
-    await ensureCategoriesSeeded();
-    
     const allProducts = await db.query.products.findMany({
       orderBy: [desc(products.createdAt)],
     });

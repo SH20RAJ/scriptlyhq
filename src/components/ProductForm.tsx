@@ -17,6 +17,7 @@ interface ProductFormProps {
     category: string;
     tags: string | null;
     thumbnail: string | null;
+    fileUrl: string | null;
     demoUrl: string | null;
     price: number; // in paise
     version: string;
@@ -41,6 +42,8 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   const [demoUrl, setDemoUrl] = useState(initialData?.demoUrl || "");
   const [featured, setFeatured] = useState(initialData?.featured || false);
   const [published, setPublished] = useState(initialData ? initialData.published : true);
+  const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnail || "");
+  const [fileUrl, setFileUrl] = useState(initialData?.fileUrl || "");
 
   const isEdit = !!initialData;
 
@@ -261,48 +264,36 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
           />
         </div>
 
-        {/* Thumbnail Upload */}
+        {/* Thumbnail URL Input */}
         <div className="space-y-2 col-span-1 p-5 border border-neutral-900 bg-neutral-900/10 rounded-xl">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Thumbnail Image *</span>
-            {isEdit && (
-              <span className="text-[10px] text-neutral-500 font-normal normal-case">
-                (Leave empty to keep current)
-              </span>
-            )}
+          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+            Thumbnail Image URL *
           </label>
-          <div className="flex items-center space-x-3 mt-1.5">
-            <Upload className="w-5 h-5 text-neutral-500" />
-            <input
-              type="file"
-              name="thumbnail"
-              accept="image/*"
-              required={!isEdit}
-              className="text-xs text-neutral-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-800 file:text-neutral-300 hover:file:bg-neutral-700 file:cursor-pointer"
-            />
-          </div>
+          <input
+            type="url"
+            name="thumbnail"
+            required
+            value={thumbnailUrl}
+            onChange={(e) => setThumbnailUrl(e.target.value)}
+            placeholder="https://example.com/thumbnail.jpg"
+            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          />
         </div>
 
-        {/* Product ZIP Upload */}
+        {/* Product Download URL Input */}
         <div className="space-y-2 col-span-1 p-5 border border-neutral-900 bg-neutral-900/10 rounded-xl">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Product ZIP File *</span>
-            {isEdit && (
-              <span className="text-[10px] text-neutral-500 font-normal normal-case">
-                (Leave empty to keep current)
-              </span>
-            )}
+          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+            Product Download URL (ZIP/File) *
           </label>
-          <div className="flex items-center space-x-3 mt-1.5">
-            <Upload className="w-5 h-5 text-neutral-500" />
-            <input
-              type="file"
-              name="file"
-              accept=".zip"
-              required={!isEdit}
-              className="text-xs text-neutral-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-800 file:text-neutral-300 hover:file:bg-neutral-700 file:cursor-pointer"
-            />
-          </div>
+          <input
+            type="url"
+            name="fileUrl"
+            required
+            value={fileUrl}
+            onChange={(e) => setFileUrl(e.target.value)}
+            placeholder="https://example.com/product.zip"
+            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          />
         </div>
 
         {/* Feature Switches */}

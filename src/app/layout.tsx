@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { HexclaveProvider } from "@hexclave/next";
+import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import Script from "next/script";
 import "./globals.css";
 
@@ -41,13 +41,16 @@ export default function RootLayout({
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-neutral-50 min-h-screen flex flex-col`}>
 				<HexclaveProvider app={stack}>
-					<Navbar />
-					<main className="flex-1">
-						{children}
-					</main>
+					<HexclaveTheme>
+						<Navbar />
+						<main className="flex-1">
+							{children}
+						</main>
+					</HexclaveTheme>
 				</HexclaveProvider>
 				<Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
 			</body>
 		</html>
 	);
 }
+
