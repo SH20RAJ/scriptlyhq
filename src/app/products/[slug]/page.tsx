@@ -2,8 +2,9 @@ export const dynamic = "force-dynamic";
 
 import { db } from "../../../db";
 import { products, orders } from "../../../db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { ProductCard } from "../../../components/SearchFilter";
 import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import ProductCheckout from "../../../components/ProductCheckout";
 import Link from "next/link";
@@ -51,6 +52,16 @@ export default async function ProductDetailPage({ params }: PageProps) {
   });
 
   if (!product) notFound();
+
+  // Fetch related products (same category, not current product, published)
+  const relatedProducts = await db.query.products.findMany({
+    where: and(
+      eq(products.category, product.category),
+      ne(products.id, product.id),
+      eq(products.published, true)
+    ),
+    limit: 3,
+  });
 
   const user = await getOrCreateDbUser();
   let hasPurchased = false;
@@ -227,6 +238,22 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+
+        {/* Related Products Grid */}
+        {relatedProducts.length > 0 && (
+          <div className="space-y-8 mt-20 pt-12 border-t border-border/40">
+            <div className="flex items-center gap-4">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">You May Also Like</h2>
+              <div className="h-px flex-1 bg-border/20" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {relatedProducts.map((rel) => (
+                <ProductCard key={rel.id} prod={rel} categoryName={rel.category} />
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

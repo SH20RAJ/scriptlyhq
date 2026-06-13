@@ -16,6 +16,8 @@ import {
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 
+import { useCart } from "./CartContext";
+
 export default function SearchFilter({
   categories,
 }: {
@@ -106,6 +108,21 @@ export default function SearchFilter({
 
 export function ProductCard({ prod, categoryName }: { prod: any, categoryName: string }) {
   const [isHovered, setIsHovered] = useState(false);
+  const { addToCart, isInCart } = useCart();
+  const inCart = isInCart(prod.id);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart({
+      id: prod.id,
+      title: prod.title,
+      slug: prod.slug,
+      price: prod.price,
+      category: prod.category,
+      thumbnail: prod.thumbnail,
+    });
+  };
 
   return (
     <Card 
@@ -120,6 +137,7 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
               src={prod.thumbnail}
               alt={prod.title}
               fill
+              loading="lazy"
               className={`object-cover transition-transform duration-700 group-hover:scale-105 ${isHovered && prod.previewGif ? 'opacity-0' : 'opacity-100'}`}
             />
           )}
@@ -129,8 +147,9 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
                   src={prod.previewGif}
                   alt={`${prod.title} preview`}
                   fill
-                  className="object-cover"
                   unoptimized
+                  loading="lazy"
+                  className="object-cover"
                 />
              </div>
           )}
@@ -177,9 +196,20 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
                </Badge>
             )}
           </div>
-          <Button asChild variant="link" size="xs" className="p-0 h-auto text-foreground font-bold uppercase tracking-widest text-[10px] hover:no-underline hover:text-muted-foreground transition-colors">
-            <Link href={`/products/${prod.slug}`}>Details</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="xs" className="h-8 px-2.5 text-muted-foreground hover:text-white uppercase tracking-widest text-[9px] font-bold rounded-lg cursor-pointer">
+              <Link href={`/products/${prod.slug}`}>Details</Link>
+            </Button>
+            <Button
+              onClick={handleAddToCart}
+              disabled={inCart}
+              variant={inCart ? "secondary" : "default"}
+              size="xs"
+              className="h-8 px-2.5 font-bold uppercase tracking-widest text-[9px] rounded-lg transition-all cursor-pointer"
+            >
+              {inCart ? "In Cart" : "Add to Cart"}
+            </Button>
+          </div>
         </div>
       </div>
     </Card>
