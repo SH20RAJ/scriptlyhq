@@ -106,13 +106,23 @@ export default async function ProductDetailPage({ params }: PageProps) {
               {product.videoUrl ? (
                 <div className="rounded-3xl border border-border/60 bg-black overflow-hidden shadow-2xl shadow-primary/5">
                   <AspectRatio ratio={16 / 9}>
-                    <iframe
-                      src={product.videoUrl.replace("watch?v=", "embed/").split("&")[0]}
-                      title={product.title}
-                      className="absolute inset-0 w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                    {product.videoUrl.split("?")[0].toLowerCase().endsWith(".mp4") || product.videoUrl.toLowerCase().includes(".mp4") ? (
+                      <video
+                        src={product.videoUrl}
+                        controls
+                        className="absolute inset-0 w-full h-full object-cover"
+                        poster={product.thumbnail || undefined}
+                        preload="metadata"
+                      />
+                    ) : (
+                      <iframe
+                        src={product.videoUrl.replace("watch?v=", "embed/").split("&")[0]}
+                        title={product.title}
+                        className="absolute inset-0 w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    )}
                   </AspectRatio>
                 </div>
               ) : (
