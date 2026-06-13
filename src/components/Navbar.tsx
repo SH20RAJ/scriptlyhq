@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import AuthButtons from "./AuthButtons";
+import CartIcon from "./CartIcon";
 import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
@@ -26,10 +27,17 @@ export default function Navbar() {
             >
               Search
             </Link>
+            <Link
+              href="/offers"
+              className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Offers
+            </Link>
           </nav>
         </div>
 
         <div className="flex items-center justify-end space-x-4">
+          <CartIcon />
           <Suspense fallback={
             <div className="flex items-center space-x-2 animate-pulse">
               <div className="w-16 h-8 bg-muted rounded-md" />

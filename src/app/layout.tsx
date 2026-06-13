@@ -55,6 +55,7 @@ export const viewport = {
 
 import Navbar from "../components/Navbar";
 import { stack } from "../lib/stack";
+import { CartProvider } from "../components/CartContext";
 
 export default function RootLayout({
 	children,
@@ -69,10 +70,12 @@ export default function RootLayout({
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-neutral-50 min-h-screen flex flex-col`}>
 				<HexclaveProvider app={stack}>
 					<HexclaveTheme>
-						<Navbar />
-						<main className="flex-1">
-							{children}
-						</main>
+						<CartProvider>
+							<Navbar />
+							<main className="flex-1">
+								{children}
+							</main>
+						</CartProvider>
 					</HexclaveTheme>
 				</HexclaveProvider>
 				<Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
