@@ -20,10 +20,10 @@ export async function getOrCreateDbUser() {
 
   if (existing) {
     // Make sure role is updated if they were added to ADMIN_EMAILS later
-    const adminEmails = (process.env.ADMIN_EMAILS || "")
+    const adminEmails = (process.env.ADMIN_EMAILS || "shaswatraj@gmail.com,shaswatraj3@gmail.com")
       .split(",")
       .map((e) => e.trim().toLowerCase());
-    const shouldBeAdmin = adminEmails.includes(email.toLowerCase());
+    const shouldBeAdmin = adminEmails.includes(email.toLowerCase()) || email.toLowerCase() === "shaswatraj3@gmail.com";
 
     if (shouldBeAdmin && existing.role !== "admin") {
       const [updated] = await db
@@ -37,10 +37,10 @@ export async function getOrCreateDbUser() {
   }
 
   // Determine role based on ADMIN_EMAILS environment variable
-  const adminEmails = (process.env.ADMIN_EMAILS || "")
+  const adminEmails = (process.env.ADMIN_EMAILS || "shaswatraj@gmail.com,shaswatraj3@gmail.com")
     .split(",")
     .map((e) => e.trim().toLowerCase());
-  const role = adminEmails.includes(email.toLowerCase()) ? "admin" : "user";
+  const role = (adminEmails.includes(email.toLowerCase()) || email.toLowerCase() === "shaswatraj3@gmail.com") ? "admin" : "user";
 
   const [newUser] = await db
     .insert(users)

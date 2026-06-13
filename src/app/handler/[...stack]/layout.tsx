@@ -24,7 +24,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
         
         <p className="mt-8 text-center text-xs text-neutral-500 font-medium tracking-wide uppercase">
-          Secure Cloud Authentication by ScriptlyHQ
+          Secure Cloud Authentication by ScriptHQ
         </p>
       </div>
     </div>

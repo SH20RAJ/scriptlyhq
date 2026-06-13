@@ -3,7 +3,7 @@ import { products } from "../../db/schema";
 import { desc } from "drizzle-orm";
 
 export async function GET() {
-  const baseUrl = "https://scriptlyhq.shraj.workers.dev";
+  const baseUrl = "https://scriptlyhq.strivio.world";
   const allProducts = await db.query.products.findMany({
     where: (products, { eq }) => eq(products.published, true),
     orderBy: [desc(products.createdAt)],
@@ -24,9 +24,9 @@ export async function GET() {
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>ScriptlyHQ - Premium Digital Assets</title>
+  <title>ScriptHQ by Strivio - Premium Digital Assets</title>
   <link>${baseUrl}</link>
-  <description>The latest premium digital assets from ScriptlyHQ</description>
+  <description>The latest premium digital assets from ScriptHQ by Strivio</description>
   <language>en-us</language>
   <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
   <atom:link href="${baseUrl}/rss" rel="self" type="application/rss+xml" />

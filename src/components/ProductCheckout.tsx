@@ -71,7 +71,7 @@ export default function ProductCheckout({
           key: orderData.key,
           amount: orderData.amount,
           currency: "INR",
-          name: "ScriptlyHQ",
+          name: "ScriptHQ",
           description: orderData.productName,
           order_id: orderData.razorpayOrderId,
           handler: async function (response: any) {
