@@ -37,6 +37,17 @@ export const products = pgTable("products", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const coupons = pgTable("coupons", {
+  id: text("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  discountType: text("discount_type").notNull(),
+  discountValue: integer("discount_value").notNull(),
+  minPurchaseAmount: integer("min_purchase_amount").default(0).notNull(),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const orders = pgTable("orders", {
   id: text("id").primaryKey(),
   userId: text("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
@@ -45,6 +56,8 @@ export const orders = pgTable("orders", {
   razorpayPaymentId: text("razorpay_payment_id"),
   amount: integer("amount").notNull(), // Amount in paise
   status: text("status").default("pending").notNull(), // 'pending', 'completed', 'failed'
+  couponCode: text("coupon_code"),
+  discountApplied: integer("discount_applied").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
