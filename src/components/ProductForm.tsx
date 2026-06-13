@@ -242,7 +242,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
               />
             ) : (
               <div 
-                dangerouslySetInnerHTML={{ __html: marked.parseSync(description || "*No description typed yet.*") }} 
+                dangerouslySetInnerHTML={{ __html: marked.parse(description || "*No description typed yet.*") as string }} 
                 className="markdown-content w-full px-4 py-3 min-h-[240px] rounded-xl border border-neutral-800 bg-neutral-950 text-white overflow-y-auto font-medium text-sm"
               />
             )}
