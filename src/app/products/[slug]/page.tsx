@@ -177,9 +177,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
                 <div className="space-y-4">
                   <ProductCheckout
-                    productId={product.id}
-                    productSlug={product.slug}
-                    price={product.price}
+                    product={product}
                     hasPurchased={hasPurchased}
                     userLoggedIn={!!user}
                   />

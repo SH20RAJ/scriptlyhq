@@ -2,9 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { createRazorpayOrderAction, verifyPaymentAction } from "../lib/actions/orders";
-import { CreditCard, Download, Loader2 } from "lucide-react";
+import { CreditCard, Download, Loader2, ShoppingCart, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useCart } from "./CartContext";
 
 declare global {
   interface Window {
@@ -13,54 +14,51 @@ declare global {
 }
 
 interface ProductCheckoutProps {
-  productId: string;
-  productSlug: string;
-  price: number; // in paise
+  product: {
+    id: string;
+    title: string;
+    slug: string;
+    price: number; // in paise
+    category: string;
+    thumbnail: string | null;
+  };
   hasPurchased: boolean;
   userLoggedIn: boolean;
 }
 
 export default function ProductCheckout({
-  productId,
-  productSlug,
-  price,
+  product,
   hasPurchased,
   userLoggedIn,
 }: ProductCheckoutProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const { addToCart, removeFromCart, isInCart } = useCart();
+
+  const inCart = isInCart(product.id);
 
   if (hasPurchased) {
     return (
-      <Button asChild className="w-full h-12 rounded-lg font-semibold">
-        <a href={`/api/download/${productId}`}>
-          <Download className="w-5 h-5 mr-2" />
+      <Button asChild className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-[11px]">
+        <a href={`/api/download/${product.id}`}>
+          <Download className="w-4 h-4 mr-2" />
           <span>Download Files</span>
         </a>
       </Button>
     );
   }
 
-  if (!userLoggedIn) {
-    return (
-      <Button
-        onClick={() => {
-          router.push(`/handler/sign-in?redirectTo=/products/${productSlug}`);
-        }}
-        className="w-full h-12 rounded-lg font-semibold cursor-pointer"
-      >
-        <CreditCard className="w-5 h-5 mr-2" />
-        <span>Sign in to Buy</span>
-      </Button>
-    );
-  }
-
   const handleCheckout = async () => {
+    if (!userLoggedIn) {
+      router.push(`/handler/sign-in?redirectTo=/products/${product.slug}`);
+      return;
+    }
+
     setError(null);
     startTransition(async () => {
       try {
-        const orderData = await createRazorpayOrderAction({ productId });
+        const orderData = await createRazorpayOrderAction({ productId: product.id });
 
         if (!orderData.success) {
           setError("Failed to initialize order. Please try again.");
@@ -118,20 +116,49 @@ export default function ProductCheckout({
     });
   };
 
+  const handleCartToggle = () => {
+    if (inCart) {
+      removeFromCart(product.id);
+    } else {
+      addToCart(product);
+    }
+  };
+
   return (
     <div className="w-full space-y-3">
-      <Button
-        onClick={handleCheckout}
-        disabled={isPending}
-        className="w-full h-12 rounded-lg font-semibold cursor-pointer"
-      >
-        {isPending ? (
-          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-        ) : (
-          <CreditCard className="w-5 h-5 mr-2" />
-        )}
-        <span>Buy Now (₹{(price / 100).toLocaleString("en-IN")})</span>
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button
+          onClick={handleCheckout}
+          disabled={isPending}
+          className="flex-1 h-12 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer"
+        >
+          {isPending ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <CreditCard className="w-4 h-4 mr-2" />
+          )}
+          <span>{userLoggedIn ? `Buy Now` : "Sign in to Buy"}</span>
+        </Button>
+
+        <Button
+          type="button"
+          onClick={handleCartToggle}
+          variant={inCart ? "destructive" : "secondary"}
+          className="h-12 px-6 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer"
+        >
+          {inCart ? (
+            <>
+              <Trash className="w-4 h-4 mr-2" />
+              <span>Remove</span>
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              <span>Add to Cart</span>
+            </>
+          )}
+        </Button>
+      </div>
 
       {error && (
         <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-lg text-center">
