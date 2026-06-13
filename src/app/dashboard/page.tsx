@@ -185,7 +185,7 @@ export default async function DashboardPage() {
                           </div>
                         </div>
                         <p className="text-sm font-black text-foreground tabular-nums">
-                          ₹{(item.amount / 100).toLocaleString("en-IN")}
+                          ${(item.amount / 100).toFixed(2)}
                         </p>
                       </div>
                     ))}
@@ -196,7 +196,7 @@ export default async function DashboardPage() {
                   <div className="flex items-center justify-between font-black uppercase tracking-widest text-[10px]">
                      <span className="text-muted-foreground">Total Invested</span>
                      <span className="text-foreground text-sm">
-                        ₹{(purchasedItems.reduce((acc, curr) => acc + curr.amount, 0) / 100).toLocaleString("en-IN")}
+                        ${(purchasedItems.reduce((acc, curr) => acc + curr.amount, 0) / 100).toFixed(2)}
                      </span>
                   </div>
                 </CardContent>
