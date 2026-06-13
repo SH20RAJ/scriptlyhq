@@ -15,6 +15,14 @@ export const categories = pgTable("categories", {
   slug: text("slug").notNull().unique(),
 });
 
+export const subcategories = pgTable("subcategories", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  categoryId: text("category_id").references(() => categories.id, { onDelete: "cascade" }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const products = pgTable("products", {
   id: text("id").primaryKey(), // UUID or unique ID
   title: text("title").notNull(),
@@ -22,6 +30,7 @@ export const products = pgTable("products", {
   shortDescription: text("short_description").notNull(),
   description: text("description").notNull(),
   category: text("category").notNull(), // References categories.slug or stored as string
+  subcategory: text("subcategory"), // References subcategories.slug or stored as string
   tags: text("tags"), // Comma-separated tags
   thumbnail: text("thumbnail"), // URL/Path to thumbnail image
   previewGif: text("preview_gif"), // URL to preview GIF on hover
