@@ -24,6 +24,7 @@ export async function createProductAction(formData: FormData) {
   const shortDescription = formData.get("shortDescription") as string;
   const description = formData.get("description") as string;
   const category = formData.get("category") as string;
+  const subcategory = formData.get("subcategory") as string;
   const tags = formData.get("tags") as string;
   const demoUrl = (formData.get("demoUrl") as string) || null;
   const price = Math.round(parseFloat(formData.get("price") as string) * 100); // convert to paise
@@ -46,6 +47,7 @@ export async function createProductAction(formData: FormData) {
     shortDescription,
     description,
     category,
+    subcategory: subcategory || null,
     tags: tags || null,
     thumbnail: thumbnailUrl || null,
     previewGif: previewGif || null,
@@ -75,6 +77,7 @@ export async function updateProductAction(id: string, formData: FormData) {
   const shortDescription = formData.get("shortDescription") as string;
   const description = formData.get("description") as string;
   const category = formData.get("category") as string;
+  const subcategory = formData.get("subcategory") as string;
   const tags = formData.get("tags") as string;
   const demoUrl = (formData.get("demoUrl") as string) || null;
   const price = Math.round(parseFloat(formData.get("price") as string) * 100);
@@ -104,6 +107,7 @@ export async function updateProductAction(id: string, formData: FormData) {
       shortDescription,
       description,
       category,
+      subcategory: subcategory || null,
       tags: tags || null,
       thumbnail: thumbnailUrl || null,
       previewGif: previewGif || null,
@@ -296,6 +300,15 @@ export async function getCategoriesAction() {
     return await db.query.categories.findMany();
   } catch (err) {
     console.error("getCategoriesAction failed:", err);
+    return [];
+  }
+}
+
+export async function getSubcategoriesAction() {
+  try {
+    return await db.query.subcategories.findMany();
+  } catch (err) {
+    console.error("getSubcategoriesAction failed:", err);
     return [];
   }
 }

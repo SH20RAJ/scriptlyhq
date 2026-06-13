@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { db } from "../../../../../db";
 import { products } from "../../../../../db/schema";
 import { eq } from "drizzle-orm";
-import { getCategoriesAction } from "../../../../../lib/actions/products";
+import { getCategoriesAction, getSubcategoriesAction } from "../../../../../lib/actions/products";
 import ProductForm from "../../../../../components/ProductForm";
 import { notFound } from "next/navigation";
 
@@ -26,6 +26,7 @@ export default async function EditProductPage({ params }: PageProps) {
   }
 
   const categoriesList = await getCategoriesAction();
+  const subcategoriesList = await getSubcategoriesAction();
 
   return (
     <div className="space-y-8">
@@ -38,7 +39,7 @@ export default async function EditProductPage({ params }: PageProps) {
         </p>
       </div>
 
-      <ProductForm categories={categoriesList} initialData={product} />
+      <ProductForm categories={categoriesList} subcategories={subcategoriesList} initialData={product} />
     </div>
   );
 }

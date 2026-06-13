@@ -1,10 +1,11 @@
 export const dynamic = "force-dynamic";
 
-import { getCategoriesAction } from "../../../../lib/actions/products";
+import { getCategoriesAction, getSubcategoriesAction } from "../../../../lib/actions/products";
 import ProductForm from "../../../../components/ProductForm";
 
 export default async function NewProductPage() {
   const categoriesList = await getCategoriesAction();
+  const subcategoriesList = await getSubcategoriesAction();
 
   return (
     <div className="space-y-8">
@@ -17,7 +18,7 @@ export default async function NewProductPage() {
         </p>
       </div>
       
-      <ProductForm categories={categoriesList} />
+      <ProductForm categories={categoriesList} subcategories={subcategoriesList} />
     </div>
   );
 }

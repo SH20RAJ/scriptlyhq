@@ -8,6 +8,7 @@ import Link from "next/link";
 
 interface ProductFormProps {
   categories: { id: string; name: string; slug: string }[];
+  subcategories: { id: string; name: string; slug: string; categoryId: string }[];
   initialData?: {
     id: string;
     title: string;
@@ -15,6 +16,7 @@ interface ProductFormProps {
     shortDescription: string;
     description: string;
     category: string;
+    subcategory: string | null;
     tags: string | null;
     thumbnail: string | null;
     previewGif: string | null;
@@ -29,7 +31,7 @@ interface ProductFormProps {
   };
 }
 
-export default function ProductForm({ categories, initialData }: ProductFormProps) {
+export default function ProductForm({ categories, subcategories, initialData }: ProductFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +42,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || "");
   const [description, setDescription] = useState(initialData?.description || "");
   const [category, setCategory] = useState(initialData?.category || categories[0]?.slug || "");
+  const [subcategory, setSubcategory] = useState(initialData?.subcategory || "");
   const [tags, setTags] = useState(initialData?.tags || "");
   const [price, setPrice] = useState(initialData ? (initialData.price / 100).toString() : "");
   const [version, setVersion] = useState(initialData?.version || "1.0.0");
@@ -99,6 +102,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
     formData.set("screenshots", screenshots);
     formData.set("videoUrl", videoUrl);
     formData.set("fileUrl", fileUrl);
+    formData.set("subcategory", subcategory);
 
     startTransition(async () => {
       try {
@@ -169,13 +173,27 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
             <input type="text" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="auto-generated-if-empty" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Category *</label>
-              <select name="category" required value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors">
+              <select name="category" required value={category} onChange={(e) => {
+                setCategory(e.target.value);
+                setSubcategory("");
+              }} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors">
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.slug}>{cat.name}</option>
                 ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Subcategory</label>
+              <select name="subcategory" value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors">
+                <option value="">No Subcategory</option>
+                {subcategories
+                  .filter((sub) => sub.categoryId === category || sub.categoryId === categories.find(c => c.slug === category)?.id)
+                  .map((sub) => (
+                    <option key={sub.id} value={sub.slug}>{sub.name}</option>
+                  ))}
               </select>
             </div>
             <div className="space-y-2">
