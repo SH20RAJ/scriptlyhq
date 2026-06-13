@@ -24,3 +24,79 @@ body {
 	color: var(--foreground);
 	font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Hexclave Auth Overrides */
+.hexclave-auth-container {
+  --hexclave-primary: #10b981; /* emerald-500 */
+  --hexclave-background: transparent;
+}
+
+.hexclave-auth-container [class*="AuthCard"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.hexclave-auth-container [class*="AuthTitle"],
+.hexclave-auth-container [class*="AuthSubtitle"] {
+  display: none !important;
+}
+
+.hexclave-auth-container input {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  color: white !important;
+  padding: 12px 16px !important;
+  transition: all 0.2s ease !important;
+}
+
+.hexclave-auth-container input:focus {
+  border-color: #10b981 !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+}
+
+.hexclave-auth-container button[type="submit"] {
+  background: #10b981 !important;
+  color: #050505 !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+  transition: all 0.2s ease !important;
+  margin-top: 8px !important;
+  text-transform: none !important;
+}
+
+.hexclave-auth-container button[type="submit"]:hover {
+  background: #34d399 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+}
+
+.hexclave-auth-container [class*="AuthDivider"] {
+  color: #404040 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.hexclave-auth-container [class*="SocialButton"] {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.hexclave-auth-container [class*="SocialButton"]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.hexclave-auth-container [class*="AuthLink"] {
+  color: #10b981 !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+}
+
