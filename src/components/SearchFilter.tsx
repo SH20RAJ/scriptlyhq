@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition, useState, useEffect } from "react";
 import { Search } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -133,23 +132,20 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
       <Link href={`/products/${prod.slug}`} className="block relative overflow-hidden">
         <AspectRatio ratio={4 / 3} className="bg-muted">
           {prod.thumbnail && (
-            <Image
+            <img
               src={prod.thumbnail}
               alt={prod.title}
-              fill
               loading="lazy"
-              className={`object-cover transition-transform duration-700 group-hover:scale-105 ${isHovered && prod.previewGif ? 'opacity-0' : 'opacity-100'}`}
+              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isHovered && prod.previewGif ? 'opacity-0' : 'opacity-100'}`}
             />
           )}
           {prod.previewGif && (
              <div className={`absolute inset-0 transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <Image
+                <img
                   src={prod.previewGif}
                   alt={`${prod.title} preview`}
-                  fill
-                  unoptimized
                   loading="lazy"
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
              </div>
           )}
