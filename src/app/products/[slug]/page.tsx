@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { marked } from "marked";
+import ShareButton from "../../../components/ShareButton";
 
 
 interface PageProps {
@@ -208,6 +209,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
                       </a>
                     </Button>
                   )}
+
+                  <ShareButton productTitle={product.title} productSlug={product.slug} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
