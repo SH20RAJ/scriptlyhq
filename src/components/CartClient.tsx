@@ -219,7 +219,7 @@ export default function CartClient() {
                   <Trash className="w-4 h-4" />
                 </Button>
               </div>
-            </Card>
+            </CardContent>
           </Card>
         ))}
 

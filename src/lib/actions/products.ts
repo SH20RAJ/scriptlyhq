@@ -146,7 +146,7 @@ export async function deleteProductAction(id: string) {
   return { success: true };
 }
 
-import { categories as categoriesTable } from "../../db/schema";
+import { categories as categoriesTable, subcategories } from "../../db/schema";
 
 export async function ensureCategoriesSeeded() {
   try {
@@ -164,6 +164,28 @@ export async function ensureCategoriesSeeded() {
         { id: "other", name: "Other", slug: "other" },
       ];
       await db.insert(categoriesTable).values(DEFAULT_CATEGORIES);
+    }
+
+    // Check if subcategories exist
+    const existingSubcategories = await db.query.subcategories.findFirst();
+    if (!existingSubcategories) {
+      console.log("Seeding default subcategories...");
+      const DEFAULT_SUBCATEGORIES = [
+        { id: "saas-landing-pages", name: "SaaS Landing Pages", slug: "saas-landing-pages", categoryId: "landing-pages" },
+        { id: "portfolio-landing-pages", name: "Portfolio Landing Pages", slug: "portfolio-landing-pages", categoryId: "landing-pages" },
+        { id: "nextjs-boilerplates", name: "Next.js Boilerplates", slug: "nextjs-boilerplates", categoryId: "saas-templates" },
+        { id: "react-boilerplates", name: "React Boilerplates", slug: "react-boilerplates", categoryId: "saas-templates" },
+        { id: "marketing-guides", name: "Marketing Guides", slug: "marketing-guides", categoryId: "ebooks" },
+        { id: "coding-tutorials", name: "Coding Tutorials", slug: "coding-tutorials", categoryId: "ebooks" },
+        { id: "chatgpt-prompts", name: "ChatGPT Prompts", slug: "chatgpt-prompts", categoryId: "ai-prompts" },
+        { id: "claude-prompts", name: "Claude Prompts", slug: "claude-prompts", categoryId: "ai-prompts" },
+        { id: "browser-extensions", name: "Browser Extensions", slug: "browser-extensions", categoryId: "scripts" },
+        { id: "automation-scripts", name: "Automation Scripts", slug: "automation-scripts", categoryId: "scripts" },
+        { id: "tailwind-kits", name: "Tailwind Kits", slug: "tailwind-kits", categoryId: "ui-kits" },
+        { id: "figma-templates", name: "Figma Templates", slug: "figma-templates", categoryId: "ui-kits" },
+        { id: "icons", name: "Icons", slug: "icons", categoryId: "other" },
+      ];
+      await db.insert(subcategories).values(DEFAULT_SUBCATEGORIES);
     }
 
     // Check if products exist
