@@ -278,8 +278,18 @@ export async function getCategoriesAction() {
   }
 }
 
-export async function getProductsAction(options?: { category?: string; search?: string }) {
+export async function getProductsAction(options?: { 
+  category?: string; 
+  search?: string;
+  tag?: string;
+  page?: number;
+  limit?: number;
+}) {
   try {
+    const page = options?.page || 1;
+    const limit = options?.limit || 12;
+    const offset = (page - 1) * limit;
+
     const allProducts = await db.query.products.findMany({
       orderBy: [desc(products.createdAt)],
     });
@@ -288,6 +298,13 @@ export async function getProductsAction(options?: { category?: string; search?: 
 
     if (options?.category && options.category !== "all") {
       filtered = filtered.filter((p) => p.category === options.category);
+    }
+
+    if (options?.tag) {
+      const tagTerm = options.tag.toLowerCase();
+      filtered = filtered.filter((p) => 
+        p.tags?.toLowerCase().split(",").map(t => t.trim()).includes(tagTerm)
+      );
     }
 
     if (options?.search) {
@@ -301,10 +318,23 @@ export async function getProductsAction(options?: { category?: string; search?: 
       );
     }
 
-    return filtered;
+    const total = filtered.length;
+    const paginated = filtered.slice(offset, offset + limit);
+
+    return {
+      products: paginated,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page
+    };
   } catch (err) {
     console.error("getProductsAction failed:", err);
-    return [];
+    return {
+      products: [],
+      total: 0,
+      totalPages: 0,
+      currentPage: 1
+    };
   }
 }
 

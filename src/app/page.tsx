@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { getProductsAction, getCategoriesAction } from "../lib/actions/products";
 import SearchFilter, { ProductCard } from "../components/SearchFilter";
+import { ProductPagination } from "../components/ProductPagination";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
@@ -10,6 +11,7 @@ interface PageProps {
   searchParams: Promise<{
     category?: string;
     search?: string;
+    page?: string;
   }>;
 }
 
@@ -17,11 +19,14 @@ export default async function Home({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const currentCategory = resolvedParams.category || "all";
   const currentSearch = resolvedParams.search || "";
+  const currentPage = parseInt(resolvedParams.page || "1");
 
   // Fetch products and categories using server actions
-  const productsList = await getProductsAction({
+  const { products: productsList, totalPages } = await getProductsAction({
     category: currentCategory,
     search: currentSearch,
+    page: currentPage,
+    limit: 12,
   });
 
   const categoriesList = await getCategoriesAction();
@@ -93,6 +98,8 @@ export default async function Home({ searchParams }: PageProps) {
               ))}
             </div>
           )}
+
+          <ProductPagination totalPages={totalPages} currentPage={currentPage} />
         </section>
       </div>
     </div>

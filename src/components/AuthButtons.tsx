@@ -3,6 +3,7 @@
 import { useUser, UserButton } from "@hexclave/next";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function AuthButtons() {
   const user = useUser();
@@ -24,40 +25,28 @@ export default function AuthButtons() {
 
   if (!user) {
     return (
-      <div className="flex items-center space-x-4">
-        <Link
-          href="/handler/sign-in"
-          className="text-sm text-neutral-400 hover:text-white transition-colors"
-        >
-          Sign In
-        </Link>
-        <Link
-          href="/handler/sign-up"
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors"
-        >
-          Get Started
-        </Link>
+      <div className="flex items-center space-x-2">
+        <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+          <Link href="/handler/sign-in">Sign In</Link>
+        </Button>
+        <Button asChild size="sm">
+          <Link href="/handler/sign-up">Get Started</Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center space-x-6">
+    <div className="flex items-center space-x-4">
       {isAdmin && (
-        <Link
-          href="/admin"
-          className="text-sm text-neutral-400 hover:text-white transition-colors"
-        >
-          Admin
-        </Link>
+        <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+          <Link href="/admin">Admin</Link>
+        </Button>
       )}
-      <Link
-        href="/dashboard"
-        className="text-sm text-neutral-400 hover:text-white transition-colors"
-      >
-        Downloads
-      </Link>
-      <div className="flex items-center border-l border-neutral-800 pl-6 h-4">
+      <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+        <Link href="/dashboard">Downloads</Link>
+      </Button>
+      <div className="flex items-center border-l border-border pl-4 h-4">
         <UserButton />
       </div>
     </div>

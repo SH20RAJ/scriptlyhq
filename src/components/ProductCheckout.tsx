@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { createRazorpayOrderAction, verifyPaymentAction } from "../lib/actions/orders";
 import { CreditCard, Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 declare global {
   interface Window {
@@ -32,27 +33,26 @@ export default function ProductCheckout({
 
   if (hasPurchased) {
     return (
-      <a
-        href={`/api/download/${productId}`}
-        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-3.5 bg-white hover:bg-neutral-200 active:scale-[0.98] text-black font-semibold rounded-lg transition-colors text-center"
-      >
-        <Download className="w-5 h-5" />
-        <span>Download Files</span>
-      </a>
+      <Button asChild className="w-full h-12 rounded-lg font-semibold">
+        <a href={`/api/download/${productId}`}>
+          <Download className="w-5 h-5 mr-2" />
+          <span>Download Files</span>
+        </a>
+      </Button>
     );
   }
 
   if (!userLoggedIn) {
     return (
-      <button
+      <Button
         onClick={() => {
           router.push(`/handler/sign-in?redirectTo=/products/${productSlug}`);
         }}
-        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-3.5 bg-white hover:bg-neutral-200 active:scale-[0.98] text-black font-semibold rounded-lg transition-colors cursor-pointer"
+        className="w-full h-12 rounded-lg font-semibold cursor-pointer"
       >
-        <CreditCard className="w-5 h-5" />
+        <CreditCard className="w-5 h-5 mr-2" />
         <span>Sign in to Buy</span>
-      </button>
+      </Button>
     );
   }
 
@@ -97,11 +97,10 @@ export default function ProductCheckout({
             email: orderData.userEmail,
           },
           theme: {
-            color: "#0a0a0a", // black
+            color: "#000000",
           },
         };
 
-        // Check if window.Razorpay exists
         if (typeof window.Razorpay === "undefined") {
           setError("Razorpay SDK failed to load. Please refresh the page.");
           return;
@@ -121,21 +120,21 @@ export default function ProductCheckout({
 
   return (
     <div className="w-full space-y-3">
-      <button
+      <Button
         onClick={handleCheckout}
         disabled={isPending}
-        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-3.5 bg-white hover:bg-neutral-200 active:scale-[0.98] disabled:scale-100 disabled:opacity-50 text-black font-semibold rounded-lg transition-colors cursor-pointer"
+        className="w-full h-12 rounded-lg font-semibold cursor-pointer"
       >
         {isPending ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
         ) : (
-          <CreditCard className="w-5 h-5" />
+          <CreditCard className="w-5 h-5 mr-2" />
         )}
         <span>Buy Now (₹{(price / 100).toLocaleString("en-IN")})</span>
-      </button>
+      </Button>
 
       {error && (
-        <p className="text-xs text-rose-400 bg-rose-500/5 border border-rose-500/10 px-3 py-2 rounded-lg text-center">
+        <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-lg text-center">
           {error}
         </p>
       )}

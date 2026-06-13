@@ -1,41 +1,38 @@
 import { MetadataRoute } from "next";
 import { db } from "../db";
-import { products } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { products, categories } from "../db/schema";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://scriptlyhq.com";
+  const baseUrl = "https://scriptlyhq.shraj.workers.dev";
 
-  // Fetch all published products to map
-  let productEntries: any[] = [];
-  try {
-    const publishedProducts = await db.query.products.findMany({
-      where: eq(products.published, true),
-    });
+  // Static routes
+  const routes = ["", "/search", "/dashboard"].map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
+    changeFrequency: "daily" as const,
+    priority: route === "" ? 1 : 0.8,
+  }));
 
-    productEntries = publishedProducts.map((prod) => ({
-      url: `${baseUrl}/products/${prod.slug}`,
-      lastModified: new Date(prod.updatedAt),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
-  } catch (error) {
-    console.error("Error generating sitemap product urls:", error);
-  }
+  // Dynamic products
+  const allProducts = await db.query.products.findMany({
+    where: (products, { eq }) => eq(products.published, true),
+  });
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: "daily" as const,
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/dashboard`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.5,
-    },
-    ...productEntries,
-  ];
+  const productRoutes = allProducts.map((product) => ({
+    url: `${baseUrl}/products/${product.slug}`,
+    lastModified: product.updatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  // Dynamic categories
+  const allCategories = await db.query.categories.findMany();
+  const categoryRoutes = allCategories.map((category) => ({
+    url: `${baseUrl}/?category=${category.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
+  return [...routes, ...productRoutes, ...categoryRoutes];
 }

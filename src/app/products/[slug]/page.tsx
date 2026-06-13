@@ -10,6 +10,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Metadata } from "next";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface PageProps {
   params: Promise<{
@@ -80,16 +84,20 @@ export default async function ProductDetailPage({ params }: PageProps) {
     ? product.tags.split(",").map((t) => t.trim())
     : [];
 
+  // Extract screenshots list
+  const screenshotsList = product.screenshots
+    ? product.screenshots.split(",").map((s) => s.trim())
+    : [];
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       {/* Back Button */}
-      <Link
-        href="/"
-        className="inline-flex items-center text-sm font-medium text-neutral-500 hover:text-white transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to browse
-      </Link>
+      <Button asChild variant="ghost" size="sm" className="-ml-2 text-muted-foreground hover:text-foreground">
+        <Link href="/">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to browse
+        </Link>
+      </Button>
 
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
@@ -97,43 +105,73 @@ export default async function ProductDetailPage({ params }: PageProps) {
         {/* Left Side: Images, Info, Description */}
         <div className="lg:col-span-7 space-y-12">
           
-          {/* Main Display Image */}
-          <div className="relative aspect-[4/3] w-full rounded-xl border border-neutral-800 bg-neutral-900 overflow-hidden">
-            {product.thumbnail ? (
-              <Image
-                src={product.thumbnail}
-                alt={product.title}
-                fill
-                priority
-                className="object-cover"
-              />
+          {/* Main Media (Video or Image) */}
+          <div className="space-y-6">
+            {product.videoUrl ? (
+              <AspectRatio ratio={16 / 9} className="rounded-xl border border-border bg-black overflow-hidden shadow-sm">
+                <iframe
+                  src={product.videoUrl.replace("watch?v=", "embed/").split("&")[0]}
+                  title={product.title}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </AspectRatio>
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-neutral-600 bg-black font-mono uppercase text-sm">
-                No Preview Available
+              <AspectRatio ratio={4 / 3} className="rounded-xl border border-border bg-muted overflow-hidden">
+                {product.thumbnail ? (
+                  <Image
+                    src={product.thumbnail}
+                    alt={product.title}
+                    fill
+                    priority
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-black font-mono uppercase text-sm">
+                    No Preview Available
+                  </div>
+                )}
+              </AspectRatio>
+            )}
+
+            {/* Screenshots Gallery */}
+            {screenshotsList.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {screenshotsList.map((src, i) => (
+                  <AspectRatio key={i} ratio={16 / 9} className="rounded-lg border border-border bg-muted overflow-hidden group cursor-zoom-in">
+                    <Image
+                      src={src}
+                      alt={`${product.title} screenshot ${i + 1}`}
+                      fill
+                      className="object-cover transition-transform group-hover:scale-105"
+                    />
+                  </AspectRatio>
+                ))}
               </div>
             )}
           </div>
 
           {/* Description Content */}
           <div className="space-y-6">
-            <h2 className="text-lg font-medium text-white">Overview</h2>
-            <div className="text-neutral-400 text-base leading-relaxed space-y-4 whitespace-pre-wrap">
+            <h2 className="text-lg font-medium text-foreground">Overview</h2>
+            <div className="text-muted-foreground text-base leading-relaxed space-y-4 whitespace-pre-wrap">
               {product.description}
             </div>
           </div>
 
           {/* Tags */}
           {tagsList.length > 0 && (
-            <div className="space-y-4 pt-6 border-t border-neutral-900">
-              <h3 className="text-sm font-medium text-white">Tags</h3>
+            <div className="space-y-4 pt-6">
+              <Separator className="mb-6" />
+              <h3 className="text-sm font-medium text-foreground">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {tagsList.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 rounded-md text-xs font-medium bg-neutral-900 border border-neutral-800 text-neutral-300"
-                  >
-                    {tag}
-                  </span>
+                  <Badge key={tag} variant="secondary" asChild>
+                    <Link href={`/tags/${encodeURIComponent(tag)}`}>
+                      {tag}
+                    </Link>
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -145,23 +183,23 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <div className="sticky top-24 space-y-8">
             
             <div className="space-y-4">
-              <span className="text-xs font-medium text-neutral-500 uppercase tracking-wide">
+              <Badge variant="outline" className="uppercase tracking-wide text-muted-foreground border-border">
                 {product.category}
-              </span>
-              <h1 className="text-3xl sm:text-4xl font-semibold text-white tracking-tight leading-snug">
+              </Badge>
+              <h1 className="text-3xl sm:text-4xl font-semibold text-foreground tracking-tight leading-snug">
                 {product.title}
               </h1>
-              <p className="text-base text-neutral-400 leading-relaxed">
+              <p className="text-base text-muted-foreground leading-relaxed">
                 {product.shortDescription}
               </p>
             </div>
 
             <div className="pt-4 space-y-6">
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-white">
+                <span className="text-4xl font-bold text-foreground">
                   ₹{(product.price / 100).toLocaleString("en-IN")}
                 </span>
-                <span className="text-sm text-neutral-500">INR</span>
+                <span className="text-sm text-muted-foreground">INR</span>
               </div>
 
               {/* Actions Panel */}
@@ -175,32 +213,36 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 />
                 
                 {product.demoUrl && (
-                  <a
-                    href={product.demoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center space-x-2 px-6 py-3 border border-neutral-800 hover:border-neutral-600 bg-transparent text-white transition-colors text-sm font-medium rounded-lg text-center cursor-pointer"
-                  >
-                    <span>View Live Demo</span>
-                    <ExternalLink className="w-4 h-4 ml-1" />
-                  </a>
+                  <Button asChild variant="outline" className="w-full h-11 rounded-lg">
+                    <a
+                      href={product.demoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <span>View Live Demo</span>
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  </Button>
                 )}
               </div>
             </div>
 
             {/* Product Meta */}
-            <div className="border-t border-neutral-900 pt-6 space-y-4 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-500">Version</span>
-                <span className="text-neutral-300 font-mono">v{product.version}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-500">Last updated</span>
-                <span className="text-neutral-300">{updatedDate}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-500">Access</span>
-                <span className="text-neutral-300">Instant Download</span>
+            <div className="space-y-4 pt-6">
+              <Separator />
+              <div className="space-y-4 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Version</span>
+                  <span className="text-foreground font-mono">v{product.version}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Last updated</span>
+                  <span className="text-foreground">{updatedDate}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Access</span>
+                  <span className="text-foreground">Instant Download</span>
+                </div>
               </div>
             </div>
           </div>

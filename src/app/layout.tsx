@@ -15,8 +15,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "ScriptlyHQ - Premium Digital Product Marketplace",
+	title: {
+		default: "ScriptlyHQ - Premium Digital Product Marketplace",
+		template: "%s | ScriptlyHQ",
+	},
 	description: "Discover and download high-quality Landing Pages, SaaS Templates, Ebooks, AI Prompts, UI Kits, and Development Scripts.",
+	metadataBase: new URL("https://scriptlyhq.shraj.workers.dev"),
+	manifest: "/manifest.json",
+	alternates: {
+		types: {
+			"application/rss+xml": "/rss",
+		},
+	},
 	openGraph: {
 		title: "ScriptlyHQ - Premium Digital Product Marketplace",
 		description: "Discover and download high-quality Landing Pages, SaaS Templates, Ebooks, AI Prompts, UI Kits, and Development Scripts.",
@@ -24,6 +34,23 @@ export const metadata: Metadata = {
 		locale: "en_US",
 		siteName: "ScriptlyHQ",
 	},
+	twitter: {
+		card: "summary_large_image",
+		title: "ScriptlyHQ",
+		description: "Premium Digital Product Marketplace",
+	},
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "default",
+		title: "ScriptlyHQ",
+	},
+};
+
+export const viewport = {
+	themeColor: "#000000",
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
 };
 
 import Navbar from "../components/Navbar";

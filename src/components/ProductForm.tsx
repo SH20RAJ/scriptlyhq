@@ -67,7 +67,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (data.success) {
         if (fieldName === "screenshots") {
           const current = screenshots ? screenshots.split(",").map(s => s.trim()) : [];

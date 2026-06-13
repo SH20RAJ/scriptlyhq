@@ -4,6 +4,9 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Download, Home, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface PageProps {
   searchParams: Promise<{
@@ -40,81 +43,83 @@ export default async function PurchaseSuccessPage({ searchParams }: PageProps) {
   const receipt = results[0];
 
   if (!receipt || receipt.status !== "completed") {
-    // If order not found or still pending, redirect to dashboard to poll/check status
     redirect("/dashboard");
   }
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-8">
+    <div className="max-w-2xl mx-auto px-4 py-20 text-center space-y-12">
       
       {/* Success Animation Header */}
       <div className="space-y-4">
-        <CheckCircle2 className="w-16 h-16 text-emerald-400 mx-auto animate-bounce" />
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">
-          Payment Successful!
+        <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+          <CheckCircle2 className="w-10 h-10 text-primary" />
+        </div>
+        <h1 className="text-3xl font-semibold text-foreground tracking-tight">
+          Purchase Confirmed
         </h1>
-        <p className="text-neutral-400 max-w-sm mx-auto text-sm">
-          Thank you for choosing ScriptlyHQ. Your payment was verified, and your downloads are unlocked.
+        <p className="text-muted-foreground max-w-sm mx-auto text-sm leading-relaxed">
+          Your payment has been processed and your digital assets are ready for download.
         </p>
       </div>
 
       {/* Invoice Card */}
-      <div className="p-6 rounded-2xl border border-neutral-900 bg-neutral-900/10 backdrop-blur-sm text-left space-y-4">
-        <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-wider border-b border-neutral-900 pb-2">
-          Receipt Details
-        </h2>
-        
-        <div className="space-y-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-neutral-500">Product:</span>
-            <span className="text-white font-semibold">{receipt.product.title}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-neutral-500">Order ID:</span>
-            <span className="font-mono text-xs text-neutral-300">{receipt.orderId}</span>
-          </div>
-          {receipt.paymentId && (
+      <Card className="border-border bg-card/50 text-left overflow-hidden">
+        <CardHeader className="bg-muted/30">
+          <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Transaction Receipt
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6 space-y-4">
+          <div className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-neutral-500">Transaction ID:</span>
-              <span className="font-mono text-xs text-neutral-300">{receipt.paymentId}</span>
+              <span className="text-muted-foreground">Product</span>
+              <span className="text-foreground font-medium">{receipt.product.title}</span>
             </div>
-          )}
-          <div className="flex justify-between border-t border-neutral-900 pt-3">
-            <span className="text-neutral-400 font-medium">Total Paid:</span>
-            <span className="text-lg font-black text-emerald-400">
-              ₹{(receipt.amount / 100).toLocaleString("en-IN")}
-            </span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Order ID</span>
+              <span className="font-mono text-xs text-foreground uppercase">{receipt.orderId.slice(0, 12)}...</span>
+            </div>
+            {receipt.paymentId && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Payment ID</span>
+                <span className="font-mono text-xs text-foreground">{receipt.paymentId}</span>
+              </div>
+            )}
+            <Separator className="my-2" />
+            <div className="flex justify-between items-baseline pt-2">
+              <span className="text-muted-foreground font-medium">Amount Paid</span>
+              <span className="text-2xl font-bold text-foreground">
+                ₹{(receipt.amount / 100).toLocaleString("en-IN")}
+              </span>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* CTA Buttons */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <a
-          href={`/api/download/${receipt.product.id}`}
-          className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 bg-emerald-400 hover:bg-emerald-300 text-neutral-950 font-bold rounded-xl shadow-lg shadow-emerald-500/10 transition-all active:scale-[0.98]"
-        >
-          <Download className="w-4 h-4" />
-          <span>Download Files</span>
-        </a>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <Button asChild size="lg" className="w-full sm:w-auto h-12 px-8">
+          <a href={`/api/download/${receipt.product.id}`}>
+            <Download className="w-4 h-4 mr-2" />
+            Download Files
+          </a>
+        </Button>
         
-        <Link
-          href="/dashboard"
-          className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 border border-neutral-800 hover:border-neutral-700 bg-neutral-900/30 text-neutral-300 hover:text-white font-semibold rounded-xl transition-all"
-        >
-          <span>Go to Purchases</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+        <Button asChild variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8">
+          <Link href="/dashboard">
+            View Purchases
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Link>
+        </Button>
       </div>
 
-      <div className="pt-4">
-        <Link
-          href="/"
-          className="inline-flex items-center text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
-        >
-          <Home className="w-3.5 h-3.5 mr-1.5" />
-          Back to Home
-        </Link>
+      <div className="pt-8">
+        <Button asChild variant="link" size="sm" className="text-muted-foreground hover:text-foreground">
+          <Link href="/">
+            <Home className="w-4 h-4 mr-2" />
+            Return to Marketplace
+          </Link>
+        </Button>
       </div>
     </div>
   );
