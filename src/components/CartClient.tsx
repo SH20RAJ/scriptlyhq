@@ -181,7 +181,7 @@ export default function CartClient() {
             <CardContent className="p-4 sm:p-6 flex gap-6 items-center">
               <div className="w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-xl overflow-hidden flex-shrink-0 relative border border-border/40">
                 {item.thumbnail ? (
-                  <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
+                  <Image src={item.thumbnail} alt={item.title} fill loading="lazy" className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[8px] font-black uppercase text-muted-foreground tracking-widest bg-muted/50">
                     {item.category}

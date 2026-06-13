@@ -136,6 +136,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                         src={src}
                         alt={`${product.title} screenshot ${i + 1}`}
                         fill
+                        loading="lazy"
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     </AspectRatio>

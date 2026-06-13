@@ -3,10 +3,9 @@
 import { useState, useTransition } from "react";
 import { createProductAction, updateProductAction } from "../lib/actions/products";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Upload, Loader2, Info } from "lucide-react";
+import { ArrowLeft, Save, Upload, Loader2, Info, Image as ImageIcon, Sparkles, Globe, FileUp } from "lucide-react";
 import Link from "next/link";
 import { marked } from "marked";
-
 
 interface ProductFormProps {
   categories: { id: string; name: string; slug: string }[];
@@ -128,13 +127,13 @@ export default function ProductForm({ categories, subcategories, initialData }: 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl">
       
       {/* Action Header */}
-      <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
+      <div className="flex items-center justify-between border-b border-neutral-900 pb-5">
         <Link
           href="/admin/products"
-          className="inline-flex items-center text-sm text-neutral-400 hover:text-white transition-colors"
+          className="inline-flex items-center text-sm font-semibold text-neutral-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to list
@@ -143,7 +142,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
         <button
           type="submit"
           disabled={isPending || !!uploading}
-          className="inline-flex items-center space-x-2 px-5 py-2.5 text-sm font-bold text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-lg transition-all cursor-pointer"
+          className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-xl transition-all cursor-pointer shadow-lg"
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -155,134 +154,164 @@ export default function ProductForm({ categories, subcategories, initialData }: 
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl border border-rose-500/10 bg-rose-500/5 text-rose-400 text-sm flex items-center gap-2">
+        <div className="p-4 rounded-xl border border-rose-500/10 bg-rose-500/5 text-rose-400 text-xs flex items-center gap-2">
           <Info className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Grid Inputs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Two-Column Editor Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Column */}
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Product Title *</label>
-            <input type="text" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
-          </div>
+        {/* Left Column: Core Fields */}
+        <div className="lg:col-span-7 space-y-6">
+          
+          <div className="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/10 space-y-6 backdrop-blur-sm">
+            <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-neutral-800/60 pb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-500" />
+              Core Details
+            </h3>
 
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Slug URL</label>
-            <input type="text" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="auto-generated-if-empty" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Category *</label>
-              <select name="category" required value={category} onChange={(e) => {
-                setCategory(e.target.value);
-                setSubcategory("");
-              }} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors">
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.slug}>{cat.name}</option>
-                ))}
-              </select>
+              <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Product Title *</label>
+              <input type="text" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Next.js SaaS Kit" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
             </div>
+
             <div className="space-y-2">
-              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Subcategory</label>
-              <select name="subcategory" value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors">
-                <option value="">No Subcategory</option>
-                {subcategories
-                  .filter((sub) => sub.categoryId === category || sub.categoryId === categories.find(c => c.slug === category)?.id)
-                  .map((sub) => (
-                    <option key={sub.id} value={sub.slug}>{sub.name}</option>
+              <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Slug URL</label>
+              <input type="text" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="auto-generated-if-empty" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors font-mono" />
+            </div>
+
+            {/* Category selection row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Category *</label>
+                <select name="category" value={category} onChange={(e) => {
+                  setCategory(e.target.value);
+                  setSubcategory("");
+                }} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:border-neutral-500 cursor-pointer">
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.slug}>{cat.name}</option>
                   ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Price (USD $) *</label>
-              <input type="number" name="price" step="0.01" min="0" required value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Short Description *</label>
-            <input type="text" name="shortDescription" required value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Full Description * (Markdown)</label>
-              <div className="flex bg-neutral-900 border border-neutral-800 rounded-lg p-0.5 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setDescTab("write")}
-                  className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${descTab === "write" ? "bg-neutral-800 text-white" : "text-neutral-400 hover:text-white"}`}
-                >
-                  Write
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDescTab("preview")}
-                  className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${descTab === "preview" ? "bg-neutral-800 text-white" : "text-neutral-400 hover:text-white"}`}
-                >
-                  Preview
-                </button>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Subcategory</label>
+                <select name="subcategory" value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:border-neutral-500 cursor-pointer">
+                  <option value="">No Subcategory</option>
+                  {subcategories
+                    .filter((sub) => sub.categoryId === category || sub.categoryId === categories.find(c => c.slug === category)?.id)
+                    .map((sub) => (
+                      <option key={sub.id} value={sub.slug}>{sub.name}</option>
+                    ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Price (USD $) *</label>
+                <input type="number" name="price" step="0.01" min="0" required value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
               </div>
             </div>
-            {descTab === "write" ? (
-              <textarea
-                name="description"
-                required
-                rows={10}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Markdown is supported... e.g. # Header, - Bullet Points"
-                className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors font-medium text-sm"
-              />
-            ) : (
-              <div 
-                dangerouslySetInnerHTML={{ __html: marked.parse(description || "*No description typed yet.*") as string }} 
-                className="markdown-content w-full px-4 py-3 min-h-[240px] rounded-xl border border-neutral-800 bg-neutral-950 text-white overflow-y-auto font-medium text-sm"
-              />
-            )}
+          </div>
+
+          <div className="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/10 space-y-6 backdrop-blur-sm">
+            <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-neutral-800/60 pb-3 flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-primary" />
+              Descriptions
+            </h3>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Short Description *</label>
+              <input type="text" name="shortDescription" required value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} placeholder="Keep it brief, shown on card views" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Full Description * (Markdown)</label>
+                <div className="flex bg-neutral-900 border border-neutral-800 rounded-lg p-0.5 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setDescTab("write")}
+                    className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${descTab === "write" ? "bg-neutral-800 text-white" : "text-neutral-400 hover:text-white"}`}
+                  >
+                    Write
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDescTab("preview")}
+                    className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${descTab === "preview" ? "bg-neutral-800 text-white" : "text-neutral-400 hover:text-white"}`}
+                  >
+                    Preview
+                  </button>
+                </div>
+              </div>
+              {descTab === "write" ? (
+                <textarea
+                  name="description"
+                  required
+                  rows={10}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Markdown is supported... e.g. # Header, - Bullet Points"
+                  className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors font-medium text-sm"
+                />
+              ) : (
+                <div 
+                  dangerouslySetInnerHTML={{ __html: marked.parse(description || "*No description typed yet.*") as string }} 
+                  className="markdown-content w-full px-4 py-3 min-h-[240px] rounded-xl border border-neutral-800 bg-neutral-950 text-white overflow-y-auto font-medium text-sm"
+                />
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Right Column - Media & Settings */}
-        <div className="space-y-6">
-          <div className="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/20 space-y-6">
-            <h3 className="text-sm font-bold text-white uppercase tracking-widest border-b border-neutral-800 pb-2">Media Assets</h3>
+        {/* Right Column: Media, Settings, Distribution */}
+        <div className="lg:col-span-5 space-y-6">
+          
+          <div className="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/10 space-y-6 backdrop-blur-sm">
+            <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-neutral-800/60 pb-3 flex items-center gap-2">
+              <FileUp className="w-4 h-4 text-amber-500" />
+              Media Assets
+            </h3>
             
-            {/* Thumbnail */}
+            {/* Thumbnail with visual preview */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-neutral-400 uppercase flex justify-between">
+              <label className="text-[10px] font-black text-neutral-400 uppercase flex justify-between">
                 Thumbnail URL *
-                <span className="text-[10px] lowercase font-normal opacity-60">jpg/png/webp</span>
+                <span className="text-[9px] lowercase font-normal opacity-60">jpg/png/webp</span>
               </label>
+              {thumbnailUrl && (
+                <div className="relative w-28 h-20 rounded-xl border border-neutral-800 overflow-hidden bg-neutral-950/60 mb-2">
+                  <img src={thumbnailUrl} alt="Thumbnail Preview" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+              )}
               <div className="flex gap-2">
-                <input type="url" value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+                <input type="url" value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="https://..." className="flex-1 px-4 py-2 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none" />
                 <div className="relative">
                   <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setThumbnailUrl, "thumbnail")} className="absolute inset-0 opacity-0 cursor-pointer" />
-                  <button type="button" className="px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors">
-                    {uploading === "thumbnail" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  <button type="button" className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors cursor-pointer">
+                    {uploading === "thumbnail" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Preview GIF */}
+            {/* Preview GIF with visual preview */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-neutral-400 uppercase flex justify-between">
+              <label className="text-[10px] font-black text-neutral-400 uppercase flex justify-between">
                 Preview GIF URL
-                <span className="text-[10px] lowercase font-normal opacity-60">shown on card hover</span>
+                <span className="text-[9px] lowercase font-normal opacity-60">Hover card animation</span>
               </label>
+              {previewGif && (
+                <div className="relative w-28 h-20 rounded-xl border border-neutral-800 overflow-hidden bg-neutral-950/60 mb-2">
+                  <img src={previewGif} alt="GIF Preview" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+              )}
               <div className="flex gap-2">
-                <input type="url" value={previewGif} onChange={(e) => setPreviewGif(e.target.value)} className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+                <input type="url" value={previewGif} onChange={(e) => setPreviewGif(e.target.value)} placeholder="https://..." className="flex-1 px-4 py-2 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none" />
                 <div className="relative">
                   <input type="file" accept="image/gif,image/webp" onChange={(e) => handleImageUpload(e, setPreviewGif, "previewGif")} className="absolute inset-0 opacity-0 cursor-pointer" />
-                  <button type="button" className="px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors">
-                    {uploading === "previewGif" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  <button type="button" className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors cursor-pointer">
+                    {uploading === "previewGif" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
@@ -290,16 +319,16 @@ export default function ProductForm({ categories, subcategories, initialData }: 
 
             {/* Screenshots */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-neutral-400 uppercase flex justify-between">
+              <label className="text-[10px] font-black text-neutral-400 uppercase flex justify-between">
                 Screenshots
-                <span className="text-[10px] lowercase font-normal opacity-60">comma separated urls</span>
+                <span className="text-[9px] lowercase font-normal opacity-60">Comma-separated URLs</span>
               </label>
               <div className="space-y-2">
-                <textarea value={screenshots} onChange={(e) => setScreenshots(e.target.value)} placeholder="URL1, URL2, ..." rows={3} className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none resize-none" />
+                <textarea value={screenshots} onChange={(e) => setScreenshots(e.target.value)} placeholder="URL1, URL2, ..." rows={3} className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none resize-none font-medium" />
                 <div className="relative w-full">
                   <input type="file" accept="image/*" multiple onChange={(e) => handleImageUpload(e, setScreenshots, "screenshots")} className="absolute inset-0 opacity-0 cursor-pointer" />
-                  <button type="button" className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2">
-                    {uploading === "screenshots" ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Upload className="w-3.5 h-3.5" /> Upload Screenshot</>}
+                  <button type="button" className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                    {uploading === "screenshots" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Upload className="w-3.5 h-3.5" /> Upload Screenshot</>}
                   </button>
                 </div>
               </div>
@@ -307,47 +336,52 @@ export default function ProductForm({ categories, subcategories, initialData }: 
 
             {/* Video URL */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-neutral-400 uppercase">Video URL (YouTube/Direct)</label>
-              <input type="url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+              <label className="text-[10px] font-black text-neutral-400 uppercase">Video Embed URL</label>
+              <input type="url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="e.g. https://youtube.com/watch?v=..." className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
             </div>
 
             {/* Download URL */}
-            <div className="space-y-2 pt-4 border-t border-neutral-800">
-              <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Product Download URL *</label>
-              <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} required placeholder="https://..." className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+            <div className="space-y-2 pt-4 border-t border-neutral-800/80">
+              <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Product File Package URL *</label>
+              <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} required placeholder="Private download URL (zip/pdf)" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
             </div>
           </div>
 
-          {/* Visibility & Settings */}
-          <div className="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/20 space-y-4">
+          {/* Settings & Publishing checkboxes */}
+          <div className="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/10 space-y-4 backdrop-blur-sm">
+            <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-neutral-800/60 pb-3 flex items-center gap-2">
+              <Globe className="w-4 h-4 text-blue-500" />
+              Settings & Tags
+            </h3>
+
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-neutral-300 uppercase">Featured</h4>
-                <p className="text-[10px] text-neutral-500">Show in home spotlight</p>
+                <h4 className="text-xs font-bold text-neutral-300 uppercase">Featured Spotlight</h4>
+                <p className="text-[9px] text-neutral-500">Spotlight this product on the home landing</p>
               </div>
-              <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="w-5 h-5 rounded accent-white cursor-pointer" />
+              <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
               <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-neutral-300 uppercase">Published</h4>
-                <p className="text-[10px] text-neutral-500">Visible to public</p>
+                <h4 className="text-xs font-bold text-neutral-300 uppercase">Publicly Published</h4>
+                <p className="text-[9px] text-neutral-500">Allow customers to view and purchase this item</p>
               </div>
-              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="w-5 h-5 rounded accent-white cursor-pointer" />
+              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
             </div>
             
             <div className="pt-4 border-t border-neutral-800 space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-neutral-400 uppercase">Tags</label>
-                <input type="text" name="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="nextjs, tailwind, auth" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+                <label className="text-[10px] font-black text-neutral-400 uppercase">Search Tags</label>
+                <input type="text" name="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="nextjs, tailwind, auth" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-neutral-400 uppercase">Demo URL</label>
-                <input type="url" name="demoUrl" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} placeholder="https://demo.example.com" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+                <label className="text-[10px] font-black text-neutral-400 uppercase">Demo Live URL</label>
+                <input type="url" name="demoUrl" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} placeholder="https://demo.example.com" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-neutral-400 uppercase">Version</label>
-                <input type="text" name="version" value={version} onChange={(e) => setVersion(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+                <label className="text-[10px] font-black text-neutral-400 uppercase">Version Tag</label>
+                <input type="text" name="version" value={version} onChange={(e) => setVersion(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-mono font-medium" />
               </div>
             </div>
           </div>
