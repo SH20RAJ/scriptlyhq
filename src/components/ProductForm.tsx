@@ -96,9 +96,12 @@ export default function ProductForm({ categories, subcategories, initialData }: 
     e.preventDefault();
     setError(null);
 
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    const isDraft = submitter?.getAttribute("data-draft") === "true";
+
     const formData = new FormData(e.currentTarget);
     formData.set("featured", featured ? "true" : "false");
-    formData.set("published", published ? "true" : "false");
+    formData.set("published", isDraft ? "false" : (published ? "true" : "false"));
     formData.set("thumbnail", thumbnailUrl);
     formData.set("previewGif", previewGif);
     formData.set("screenshots", screenshots);
@@ -139,18 +142,34 @@ export default function ProductForm({ categories, subcategories, initialData }: 
           Back to list
         </Link>
         
-        <button
-          type="submit"
-          disabled={isPending || !!uploading}
-          className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-xl transition-all cursor-pointer shadow-lg"
-        >
-          {isPending ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Save className="w-4 h-4" />
-          )}
-          <span>{isEdit ? "Update Product" : "Publish Product"}</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="submit"
+            data-draft="true"
+            disabled={isPending || !!uploading}
+            className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-neutral-400 border border-neutral-800 hover:text-white hover:bg-neutral-900 disabled:opacity-50 rounded-xl transition-all cursor-pointer"
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <FileUp className="w-4 h-4" />
+            )}
+            <span>Save Draft</span>
+          </button>
+
+          <button
+            type="submit"
+            disabled={isPending || !!uploading}
+            className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-xl transition-all cursor-pointer shadow-lg"
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            <span>{isEdit ? "Update Product" : "Publish Product"}</span>
+          </button>
+        </div>
       </div>
 
       {error && (
