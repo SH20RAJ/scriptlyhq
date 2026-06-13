@@ -7,10 +7,10 @@ import { getOrCreateDbUser } from "../../lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Download, ShoppingBag, CreditCard, ChevronRight, ExternalLink } from "lucide-react";
+import { Download, ShoppingBag, CreditCard, ExternalLink, Calendar, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 export default async function DashboardPage() {
@@ -43,134 +43,179 @@ export default async function DashboardPage() {
     .orderBy(desc(orders.createdAt));
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-      
-      {/* Welcome Header */}
-      <div className="space-y-2 border-b border-border pb-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-          My Purchases
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Authenticated as <span className="text-foreground font-medium">{user.email}</span>
-        </p>
-      </div>
-
-      {purchasedItems.length === 0 ? (
-        <div className="text-center py-24 border border-dashed border-border rounded-xl bg-card/30 space-y-4">
-          <ShoppingBag className="w-10 h-10 text-muted-foreground mx-auto" />
-          <h2 className="text-lg font-medium text-foreground">No purchases found</h2>
-          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-            You haven't purchased any digital assets yet.
-          </p>
-          <Button asChild className="mt-4">
-            <Link href="/">Browse Products</Link>
-          </Button>
+    <div className="flex flex-col min-h-screen">
+      <div className="container max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-12">
+        
+        {/* Welcome Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border/60 pb-10">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-foreground">
+              Inventory
+            </h1>
+            <p className="text-muted-foreground font-medium flex items-center gap-2">
+              Account: <span className="text-foreground">{user.email}</span>
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+             <Button asChild variant="outline" size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px]">
+                <Link href="/">Marketplace</Link>
+             </Button>
+             <Button asChild size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px]">
+                <Link href="/search">New Scripts</Link>
+             </Button>
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
-          {/* Main: Purchased Products */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="space-y-4">
-              {purchasedItems.map((item) => (
-                <Card key={item.orderId} className="border-border bg-card hover:border-muted-foreground/20 transition-colors">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                      <div className="flex items-center space-x-5">
+
+        {purchasedItems.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-32 border border-dashed border-border rounded-[2.5rem] bg-card/30 space-y-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+               <ShoppingBag className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <div className="space-y-2">
+               <h2 className="text-xl font-bold text-foreground">No Assets Unlocked</h2>
+               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                 Browse our curated library to start building your digital collection.
+               </p>
+            </div>
+            <Button asChild className="rounded-full h-11 px-8">
+              <Link href="/">Start Browsing</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            
+            {/* Main: Purchased Products */}
+            <div className="lg:col-span-8 space-y-8">
+              <div className="flex items-center gap-4 mb-4">
+                 <h2 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground">Recent Unlocks</h2>
+                 <div className="h-px flex-1 bg-border/40" />
+              </div>
+              
+              <div className="grid gap-6">
+                {purchasedItems.map((item) => (
+                  <Card key={item.orderId} className="border-border/50 bg-card hover:border-foreground/10 transition-all duration-300 rounded-[2rem] overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col sm:flex-row items-stretch">
                         {/* Thumbnail */}
-                        <div className="relative w-20 h-20 rounded-lg bg-muted border border-border overflow-hidden flex-shrink-0">
+                        <div className="relative w-full sm:w-48 h-48 bg-muted border-r border-border/40 overflow-hidden flex-shrink-0">
                           {item.product.thumbnail ? (
-                            <Image
-                              src={item.product.thumbnail}
-                              alt={item.product.title}
-                              fill
-                              className="object-cover"
-                            />
+                            <Image src={item.product.thumbnail} alt={item.product.title} fill className="object-cover transition-transform duration-700 hover:scale-110" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-muted-foreground uppercase">
+                            <div className="w-full h-full flex items-center justify-center text-[10px] font-black font-mono text-muted-foreground uppercase tracking-widest bg-muted/50">
                               {item.product.category}
                             </div>
                           )}
                         </div>
 
-                        <div className="space-y-1.5">
-                          <div className="flex items-center flex-wrap gap-2">
-                            <Link
-                              href={`/products/${item.product.slug}`}
-                              className="font-medium text-foreground hover:underline underline-offset-4 decoration-muted-foreground transition-all text-lg"
-                            >
-                              {item.product.title}
-                            </Link>
-                            <Badge variant="secondary" className="text-[10px] font-mono">
-                              v{item.product.version}
-                            </Badge>
+                        <div className="flex-1 p-8 flex flex-col justify-between gap-6">
+                          <div className="space-y-4">
+                            <div className="flex items-center flex-wrap gap-2">
+                              <Badge variant="outline" className="text-[9px] font-black uppercase border-primary/20 text-primary rounded-full px-2">
+                                {item.product.category}
+                              </Badge>
+                              <Badge variant="secondary" className="text-[9px] font-mono rounded-full px-2">
+                                v{item.product.version}
+                              </Badge>
+                            </div>
+                            <div className="space-y-2">
+                              <Link href={`/products/${item.product.slug}`}>
+                                <h3 className="text-xl font-extrabold text-foreground tracking-tight hover:underline underline-offset-4 decoration-border">
+                                  {item.product.title}
+                                </h3>
+                              </Link>
+                              <p className="text-sm text-muted-foreground font-medium line-clamp-1">
+                                {item.product.shortDescription}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-sm text-muted-foreground line-clamp-1 max-w-md">
-                            {item.product.shortDescription}
-                          </p>
+
+                          <div className="flex items-center flex-wrap gap-3">
+                            <Button asChild size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px] shadow-xl shadow-primary/10">
+                              <a href={`/api/download/${item.product.id}`}>
+                                <Download className="w-3.5 h-3.5 mr-2" />
+                                Get Files
+                              </a>
+                            </Button>
+                            {item.product.demoUrl && (
+                              <Button asChild variant="outline" size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px]">
+                                <a href={item.product.demoUrl} target="_blank" rel="noopener noreferrer">
+                                  Live Demo
+                                </a>
+                              </Button>
+                            )}
+                            <Button asChild variant="ghost" size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px]">
+                               <Link href={`/products/${item.product.slug}`}>Product Page</Link>
+                            </Button>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-3 w-full sm:w-auto">
-                        {item.product.demoUrl && (
-                          <Button asChild variant="outline" size="sm">
-                            <a href={item.product.demoUrl} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                              Demo
-                            </a>
-                          </Button>
-                        )}
-                        <Button asChild size="sm">
-                          <a href={`/api/download/${item.product.id}`}>
-                            <Download className="w-3.5 h-3.5 mr-1.5" />
-                            Download
-                          </a>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Sidebar: Order Summary */}
-          <div className="lg:col-span-4 space-y-6">
-            <Card className="border-border bg-card/50">
-              <CardHeader>
-                <CardTitle className="text-lg font-medium flex items-center gap-2">
-                  <CreditCard className="w-4 h-4" />
-                  Order History
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  {purchasedItems.map((item, idx) => (
-                    <div key={item.orderId} className="space-y-2">
-                      {idx > 0 && <Separator className="mb-4" />}
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="space-y-0.5">
-                          <p className="text-sm font-medium text-foreground line-clamp-1">{item.product.title}</p>
-                          <p className="text-[10px] text-muted-foreground font-mono">
-                            {new Date(item.purchaseDate).toLocaleDateString("en-US", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric"
-                            })}
+            {/* Sidebar: Activity/Receipts */}
+            <div className="lg:col-span-4 space-y-8">
+              <div className="flex items-center gap-4 mb-4">
+                 <h2 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground">Activity</h2>
+                 <div className="h-px flex-1 bg-border/40" />
+              </div>
+
+              <Card className="border-border/50 bg-card/50 rounded-[2rem]">
+                <CardHeader className="p-8 pb-4">
+                  <CardTitle className="text-lg font-bold flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                       <CreditCard className="w-4 h-4 text-primary" />
+                    </div>
+                    Billing History
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 pt-4 space-y-8">
+                  <div className="space-y-6">
+                    {purchasedItems.map((item, idx) => (
+                      <div key={item.orderId} className="group flex justify-between items-start gap-4">
+                        <div className="space-y-1.5 flex-1">
+                          <p className="text-xs font-bold text-foreground line-clamp-1 uppercase tracking-tight group-hover:underline underline-offset-2">
+                            {item.product.title}
                           </p>
+                          <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-bold">
+                             <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.purchaseDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                             <span className="flex items-center gap-1 uppercase tracking-tighter opacity-60">TX: {item.orderId.slice(0, 8)}</span>
+                          </div>
                         </div>
-                        <p className="text-sm font-semibold text-foreground">
+                        <p className="text-sm font-black text-foreground tabular-nums">
                           ₹{(item.amount / 100).toLocaleString("en-IN")}
                         </p>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                  
+                  <Separator className="bg-border/60" />
+                  
+                  <div className="flex items-center justify-between font-black uppercase tracking-widest text-[10px]">
+                     <span className="text-muted-foreground">Total Invested</span>
+                     <span className="text-foreground text-sm">
+                        ₹{(purchasedItems.reduce((acc, curr) => acc + curr.amount, 0) / 100).toLocaleString("en-IN")}
+                     </span>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Support Card */}
+              <Card className="border-primary/10 bg-primary/5 rounded-[2rem] p-8 space-y-4">
+                 <CardTitle className="text-sm font-black uppercase tracking-widest">Need help?</CardTitle>
+                 <CardDescription className="text-xs font-medium leading-relaxed">
+                   Having trouble with a download or license? Reach out to our technical support team.
+                 </CardDescription>
+                 <Button className="w-full rounded-full h-9 text-[10px] font-black uppercase tracking-widest bg-foreground text-background hover:opacity-90 transition-opacity">
+                    Contact Support
+                 </Button>
+              </Card>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
