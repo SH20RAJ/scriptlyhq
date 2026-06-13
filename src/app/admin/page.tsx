@@ -53,7 +53,7 @@ export default async function AdminDashboardPage() {
             <DollarSign className="w-4 h-4 text-emerald-500" />
           </CardHeader>
           <CardContent className="p-6 pt-0">
-            <div className="text-2xl font-black tracking-tight">₹{(totalRevenue / 100).toLocaleString("en-IN")}</div>
+            <div className="text-2xl font-black tracking-tight">${(totalRevenue / 100).toFixed(2)}</div>
             <p className="text-[10px] text-emerald-500 font-bold mt-1 flex items-center gap-1">
                <TrendingUp className="w-3 h-3" /> Net Earnings
             </p>
@@ -124,7 +124,7 @@ export default async function AdminDashboardPage() {
                       {purchase.productTitle}
                     </TableCell>
                     <TableCell className="px-8 py-5 font-black text-sm tabular-nums">
-                      ₹{(purchase.amount / 100).toLocaleString("en-IN")}
+                      ${(purchase.amount / 100).toFixed(2)}
                     </TableCell>
                     <TableCell className="px-8 py-5">
                        <Badge variant="outline" className={`text-[9px] font-black uppercase rounded-full px-2 h-5 border-0 ${
