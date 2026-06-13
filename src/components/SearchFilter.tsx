@@ -158,7 +158,7 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
                 </h3>
              </Link>
              <span className="text-sm font-black text-foreground tabular-nums">
-                ₹{(prod.price / 100).toLocaleString("en-IN")}
+                ${(prod.price / 100).toFixed(2)}
              </span>
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed font-medium">
