@@ -90,7 +90,7 @@ export default async function AdminProductsPage() {
 
                   {/* Price */}
                   <TableCell className="px-6 font-medium text-foreground">
-                    ₹{(prod.price / 100).toLocaleString("en-IN")}
+                    ${(prod.price / 100).toFixed(2)}
                   </TableCell>
 
                   {/* Status Icons */}
