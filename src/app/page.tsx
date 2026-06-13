@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getProductsAction, getCategoriesAction } from "../lib/actions/products";
 import SearchFilter from "../components/SearchFilter";
 import Link from "next/link";
