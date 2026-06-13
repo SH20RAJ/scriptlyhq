@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { marked } from "marked";
+
 
 interface PageProps {
   params: Promise<{
@@ -71,6 +73,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   const tagsList = product.tags ? product.tags.split(",").map((t) => t.trim()) : [];
   const screenshotsList = product.screenshots ? product.screenshots.split(",").map((s) => s.trim()) : [];
+
+  const htmlDescription = await marked.parse(product.description || "");
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -131,9 +136,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
             <div className="space-y-8">
               <div className="space-y-4">
                 <h2 className="text-xl font-bold tracking-tight">Overview</h2>
-                <div className="text-muted-foreground text-base leading-relaxed space-y-4 whitespace-pre-wrap font-medium">
-                  {product.description}
-                </div>
+                <div 
+                  dangerouslySetInnerHTML={{ __html: htmlDescription }}
+                  className="markdown-content text-base leading-relaxed space-y-4 font-medium"
+                />
               </div>
 
               {tagsList.length > 0 && (
@@ -170,9 +176,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
               <div className="space-y-6">
                 <div className="flex items-baseline gap-2">
                   <span className="text-5xl font-black tracking-tighter tabular-nums">
-                    ₹{(product.price / 100).toLocaleString("en-IN")}
+                    ${(product.price / 100).toFixed(2)}
                   </span>
-                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">INR</span>
+                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">USD</span>
                 </div>
 
                 <div className="space-y-4">
