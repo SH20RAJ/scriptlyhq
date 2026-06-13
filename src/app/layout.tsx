@@ -33,16 +33,34 @@ export const metadata: Metadata = {
 		type: "website",
 		locale: "en_US",
 		siteName: "ScriptHQ by Strivio",
+		images: [
+			{
+				url: "/og-image.png",
+				width: 1200,
+				height: 630,
+				alt: "ScriptHQ Premium Digital Product Marketplace",
+			},
+		],
 	},
 	twitter: {
 		card: "summary_large_image",
 		title: "ScriptHQ by Strivio",
 		description: "Premium Digital Product Marketplace",
+		images: ["/og-image.png"],
 	},
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
 		title: "ScriptHQ by Strivio",
+	},
+	icons: {
+		icon: [
+			{ url: "/favicon.svg", type: "image/svg+xml" },
+			{ url: "/favicon.png", type: "image/png", sizes: "32x32" },
+		],
+		apple: [
+			{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+		],
 	},
 };
 
