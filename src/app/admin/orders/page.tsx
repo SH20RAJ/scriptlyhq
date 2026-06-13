@@ -90,7 +90,7 @@ export default async function AdminOrdersPage() {
                     {ord.discountApplied > 0 ? (
                       <div className="space-y-1">
                         <span className="font-black text-emerald-500 tabular-nums">
-                          ₹{(ord.discountApplied / 100).toLocaleString("en-IN")}
+                          ${(ord.discountApplied / 100).toFixed(2)}
                         </span>
                         {ord.couponCode && (
                           <Badge variant="outline" className="text-[8px] font-black uppercase rounded-full tracking-wider px-1.5 h-4 border-emerald-500/20 text-emerald-500 bg-emerald-500/5 block w-max">
@@ -104,7 +104,7 @@ export default async function AdminOrdersPage() {
                   </TableCell>
 
                   <TableCell className="px-8 py-6 font-black text-sm tabular-nums">
-                    ₹{(ord.amount / 100).toLocaleString("en-IN")}
+                    ${(ord.amount / 100).toFixed(2)}
                   </TableCell>
 
                   <TableCell className="px-8 py-6">
