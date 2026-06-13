@@ -16,6 +16,8 @@ export default async function AdminOrdersPage() {
       status: orders.status,
       createdAt: orders.createdAt,
       paymentId: orders.razorpayPaymentId,
+      couponCode: orders.couponCode,
+      discountApplied: orders.discountApplied,
       productTitle: products.title,
       customerEmail: users.email,
       customerName: users.name,
@@ -45,7 +47,8 @@ export default async function AdminOrdersPage() {
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Reference</TableHead>
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Customer</TableHead>
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Product</TableHead>
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Amount</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Discount</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Amount Paid</TableHead>
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status</TableHead>
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">Date</TableHead>
               </TableRow>
@@ -81,6 +84,23 @@ export default async function AdminOrdersPage() {
 
                   <TableCell className="px-8 py-6 font-black text-xs uppercase tracking-tight text-foreground/80">
                     {ord.productTitle}
+                  </TableCell>
+
+                  <TableCell className="px-8 py-6 text-sm font-bold text-muted-foreground">
+                    {ord.discountApplied > 0 ? (
+                      <div className="space-y-1">
+                        <span className="font-black text-emerald-500 tabular-nums">
+                          ₹{(ord.discountApplied / 100).toLocaleString("en-IN")}
+                        </span>
+                        {ord.couponCode && (
+                          <Badge variant="outline" className="text-[8px] font-black uppercase rounded-full tracking-wider px-1.5 h-4 border-emerald-500/20 text-emerald-500 bg-emerald-500/5 block w-max">
+                            {ord.couponCode}
+                          </Badge>
+                        )}
+                      </div>
+                    ) : (
+                      <span>—</span>
+                    )}
                   </TableCell>
 
                   <TableCell className="px-8 py-6 font-black text-sm tabular-nums">
