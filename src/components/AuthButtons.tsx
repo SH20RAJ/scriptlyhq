@@ -24,16 +24,16 @@ export default function AuthButtons() {
 
   if (!user) {
     return (
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-4">
         <Link
           href="/handler/sign-in"
-          className="text-sm font-medium text-neutral-300 hover:text-white transition-colors"
+          className="text-sm text-neutral-400 hover:text-white transition-colors"
         >
           Sign In
         </Link>
         <Link
           href="/handler/sign-up"
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 rounded-md transition-all duration-200 shadow-md shadow-emerald-500/10 active:scale-95"
+          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black bg-white hover:bg-neutral-200 rounded-lg transition-colors"
         >
           Get Started
         </Link>
@@ -42,22 +42,22 @@ export default function AuthButtons() {
   }
 
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center space-x-6">
       {isAdmin && (
         <Link
           href="/admin"
-          className="text-sm font-medium text-amber-400 hover:text-amber-300 hover:underline transition-all"
+          className="text-sm text-neutral-400 hover:text-white transition-colors"
         >
-          Admin Panel
+          Admin
         </Link>
       )}
       <Link
         href="/dashboard"
-        className="text-sm font-medium text-neutral-300 hover:text-white transition-colors"
+        className="text-sm text-neutral-400 hover:text-white transition-colors"
       >
-        My Downloads
+        Downloads
       </Link>
-      <div className="flex items-center border-l border-neutral-800 pl-4 h-6">
+      <div className="flex items-center border-l border-neutral-800 pl-6 h-4">
         <UserButton />
       </div>
     </div>

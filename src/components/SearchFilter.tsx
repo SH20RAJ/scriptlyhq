@@ -55,27 +55,27 @@ export default function SearchFilter({
         }}
         className="relative flex items-center group"
       >
-        <Search className="absolute left-4 w-5 h-5 text-neutral-400 group-focus-within:text-emerald-400 transition-colors" />
+        <Search className="absolute left-4 w-4 h-4 text-neutral-500 group-focus-within:text-white transition-colors" />
         <input
           type="text"
-          placeholder="Search products (press Enter to search)..."
+          placeholder="Search products..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          className="w-full pl-12 pr-4 py-4 rounded-xl border border-neutral-800 bg-neutral-900/50 backdrop-blur-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all shadow-inner"
+          className="w-full pl-12 pr-4 py-3 rounded-lg border border-neutral-800 bg-black text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
         />
         {isPending && (
-          <div className="absolute right-4 w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+          <div className="absolute right-4 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
         )}
       </form>
 
       {/* Category Tabs */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none mask-image">
+      <div className="flex items-center space-x-4 overflow-x-auto pb-2 scrollbar-none mask-image">
         <button
           onClick={() => handleCategorySelect("all")}
-          className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 border ${
+          className={`text-sm font-medium transition-colors whitespace-nowrap ${
             currentCategory === "all"
-              ? "bg-neutral-100 text-neutral-950 border-neutral-100 shadow-md scale-105"
-              : "bg-neutral-900/30 text-neutral-400 border-neutral-800 hover:border-neutral-700 hover:text-neutral-200"
+              ? "text-white"
+              : "text-neutral-500 hover:text-neutral-300"
           }`}
         >
           All Items
@@ -84,10 +84,10 @@ export default function SearchFilter({
           <button
             key={cat.id}
             onClick={() => handleCategorySelect(cat.slug)}
-            className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 whitespace-nowrap border ${
+            className={`text-sm font-medium transition-colors whitespace-nowrap ${
               currentCategory === cat.slug
-                ? "bg-neutral-100 text-neutral-950 border-neutral-100 shadow-md scale-105"
-                : "bg-neutral-900/30 text-neutral-400 border-neutral-800 hover:border-neutral-700 hover:text-neutral-200"
+                ? "text-white"
+                : "text-neutral-500 hover:text-neutral-300"
             }`}
           >
             {cat.name}

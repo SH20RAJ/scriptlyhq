@@ -34,10 +34,10 @@ export default function ProductCheckout({
     return (
       <a
         href={`/api/download/${productId}`}
-        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-4 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-neutral-950 font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all text-center"
+        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-3.5 bg-white hover:bg-neutral-200 active:scale-[0.98] text-black font-semibold rounded-lg transition-colors text-center"
       >
         <Download className="w-5 h-5" />
-        <span>Download Product Files</span>
+        <span>Download Files</span>
       </a>
     );
   }
@@ -48,7 +48,7 @@ export default function ProductCheckout({
         onClick={() => {
           router.push(`/handler/sign-in?redirectTo=/products/${productSlug}`);
         }}
-        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 active:scale-[0.98] text-neutral-950 font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
+        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-3.5 bg-white hover:bg-neutral-200 active:scale-[0.98] text-black font-semibold rounded-lg transition-colors cursor-pointer"
       >
         <CreditCard className="w-5 h-5" />
         <span>Sign in to Buy</span>
@@ -97,7 +97,7 @@ export default function ProductCheckout({
             email: orderData.userEmail,
           },
           theme: {
-            color: "#10b981", // emerald-500
+            color: "#0a0a0a", // black
           },
         };
 
@@ -124,7 +124,7 @@ export default function ProductCheckout({
       <button
         onClick={handleCheckout}
         disabled={isPending}
-        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 active:scale-[0.98] disabled:scale-100 disabled:opacity-50 text-neutral-950 font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
+        className="w-full inline-flex items-center justify-center space-x-2 px-6 py-3.5 bg-white hover:bg-neutral-200 active:scale-[0.98] disabled:scale-100 disabled:opacity-50 text-black font-semibold rounded-lg transition-colors cursor-pointer"
       >
         {isPending ? (
           <Loader2 className="w-5 h-5 animate-spin" />

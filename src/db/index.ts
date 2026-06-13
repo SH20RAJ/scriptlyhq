@@ -1,18 +1,18 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
 import * as schema from "./schema";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var db: ReturnType<typeof drizzle<typeof schema>> | undefined;
-}
+const getDbInstance = () => {
+  const connectionString = process.env.DATABASE_URL || "postgres://localhost:5432/scriptlyhq";
+  const client = neon(connectionString);
+  return drizzle(client, { schema });
+};
 
-const connectionString = process.env.DATABASE_URL || "postgres://localhost:5432/scriptlyhq";
+// Create a proxy that forwards all database calls to a fresh per-request/query instance
+export const db = new Proxy({} as ReturnType<typeof getDbInstance>, {
+  get(target, prop, receiver) {
+    const instance = getDbInstance();
+    return Reflect.get(instance, prop, receiver);
+  }
+});
 
-// For serverless/development environments, reuse the connection
-const pool = new Pool({ connectionString });
-export const db = globalThis.db || drizzle(pool, { schema });
-
-if (process.env.NODE_ENV !== "production") {
-  globalThis.db = db;
-}
