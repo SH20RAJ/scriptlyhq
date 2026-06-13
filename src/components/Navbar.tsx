@@ -5,21 +5,31 @@ import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
-          <span className="text-lg font-semibold tracking-tight text-foreground">
-            ScriptHQ
-          </span>
-        </Link>
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 max-w-7xl mx-auto items-center justify-between px-4">
+        <div className="flex items-center gap-6 md:gap-10">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="inline-block font-bold sm:text-xl tracking-tighter">
+              ScriptHQ
+            </span>
+          </Link>
+          <nav className="hidden md:flex gap-6">
+            <Link
+              href="/"
+              className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Browse
+            </Link>
+            <Link
+              href="/search"
+              className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Search
+            </Link>
+          </nav>
+        </div>
 
-        <nav className="flex items-center space-x-4">
-          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex text-muted-foreground hover:text-foreground">
-            <Link href="/">Browse</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex text-muted-foreground hover:text-foreground">
-            <Link href="/search">Search</Link>
-          </Button>
+        <div className="flex items-center justify-end space-x-4">
           <Suspense fallback={
             <div className="flex items-center space-x-2 animate-pulse">
               <div className="w-16 h-8 bg-muted rounded-md" />
@@ -28,7 +38,7 @@ export default function Navbar() {
           }>
             <AuthButtons />
           </Suspense>
-        </nav>
+        </div>
       </div>
     </header>
   );

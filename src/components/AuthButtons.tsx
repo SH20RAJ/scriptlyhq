@@ -11,7 +11,6 @@ export default function AuthButtons() {
 
   useEffect(() => {
     if (user) {
-      // Check if user is admin by fetching role via server action
       fetch("/api/auth/role")
         .then((res) => res.json())
         .then((data: any) => {
@@ -26,11 +25,11 @@ export default function AuthButtons() {
   if (!user) {
     return (
       <div className="flex items-center space-x-2">
-        <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+        <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex px-3">
           <Link href="/handler/sign-in">Sign In</Link>
         </Button>
-        <Button asChild size="sm">
-          <Link href="/handler/sign-up">Get Started</Link>
+        <Button asChild size="sm" className="px-4 font-semibold tracking-tight">
+          <Link href="/handler/sign-up">Sign Up</Link>
         </Button>
       </div>
     );
@@ -39,14 +38,20 @@ export default function AuthButtons() {
   return (
     <div className="flex items-center space-x-4">
       {isAdmin && (
-        <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-          <Link href="/admin">Admin</Link>
-        </Button>
+        <Link
+          href="/admin"
+          className="hidden md:inline-flex text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Admin
+        </Link>
       )}
-      <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-        <Link href="/dashboard">Downloads</Link>
-      </Button>
-      <div className="flex items-center border-l border-border pl-4 h-4">
+      <Link
+        href="/dashboard"
+        className="hidden md:inline-flex text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+      >
+        Dashboard
+      </Link>
+      <div className="flex items-center border-l border-border pl-4 h-5">
         <UserButton />
       </div>
     </div>
