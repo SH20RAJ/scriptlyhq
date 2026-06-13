@@ -8,7 +8,7 @@ import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import ProductCheckout from "../../../components/ProductCheckout";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, ShieldCheck, Zap } from "lucide-react";
 import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ interface PageProps {
   }>;
 }
 
-// Dynamic SEO metadata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await db.query.products.findFirst({
@@ -29,16 +28,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
   if (!product) {
-    return {
-      title: "Product Not Found | ScriptlyHQ",
-    };
+    return { title: "Product Not Found | ScriptHQ" };
   }
 
   return {
-    title: `${product.title} - ScriptlyHQ`,
+    title: `${product.title} - ScriptHQ`,
     description: product.shortDescription,
     openGraph: {
-      title: `${product.title} - ScriptlyHQ`,
+      title: `${product.title} - ScriptHQ`,
       description: product.shortDescription,
       images: product.thumbnail ? [{ url: product.thumbnail }] : [],
     },
@@ -51,11 +48,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
     where: eq(products.slug, slug),
   });
 
-  if (!product) {
-    notFound();
-  }
+  if (!product) notFound();
 
-  // Get current session user to check if they have purchased
   const user = await getOrCreateDbUser();
   let hasPurchased = false;
 
@@ -67,181 +61,163 @@ export default async function ProductDetailPage({ params }: PageProps) {
         eq(orders.status, "completed")
       ),
     });
-    if (purchase) {
-      hasPurchased = true;
-    }
+    if (purchase) hasPurchased = true;
   }
 
-  // Format date
   const updatedDate = new Date(product.updatedAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
-    day: "numeric",
   });
 
-  // Extract tags list
-  const tagsList = product.tags
-    ? product.tags.split(",").map((t) => t.trim())
-    : [];
-
-  // Extract screenshots list
-  const screenshotsList = product.screenshots
-    ? product.screenshots.split(",").map((s) => s.trim())
-    : [];
+  const tagsList = product.tags ? product.tags.split(",").map((t) => t.trim()) : [];
+  const screenshotsList = product.screenshots ? product.screenshots.split(",").map((s) => s.trim()) : [];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-      {/* Back Button */}
-      <Button asChild variant="ghost" size="sm" className="-ml-2 text-muted-foreground hover:text-foreground">
-        <Link href="/">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to browse
-        </Link>
-      </Button>
+    <div className="flex flex-col min-h-screen">
+      <div className="container max-w-7xl mx-auto px-4 py-8">
+        <Button asChild variant="ghost" size="sm" className="-ml-3 text-muted-foreground hover:text-foreground mb-8">
+          <Link href="/">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Library
+          </Link>
+        </Button>
 
-      {/* Main Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-        
-        {/* Left Side: Images, Info, Description */}
-        <div className="lg:col-span-7 space-y-12">
-          
-          {/* Main Media (Video or Image) */}
-          <div className="space-y-6">
-            {product.videoUrl ? (
-              <AspectRatio ratio={16 / 9} className="rounded-xl border border-border bg-black overflow-hidden shadow-sm">
-                <iframe
-                  src={product.videoUrl.replace("watch?v=", "embed/").split("&")[0]}
-                  title={product.title}
-                  className="absolute inset-0 w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </AspectRatio>
-            ) : (
-              <AspectRatio ratio={4 / 3} className="rounded-xl border border-border bg-muted overflow-hidden">
-                {product.thumbnail ? (
-                  <Image
-                    src={product.thumbnail}
-                    alt={product.title}
-                    fill
-                    priority
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-black font-mono uppercase text-sm">
-                    No Preview Available
-                  </div>
-                )}
-              </AspectRatio>
-            )}
-
-            {/* Screenshots Gallery */}
-            {screenshotsList.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {screenshotsList.map((src, i) => (
-                  <AspectRatio key={i} ratio={16 / 9} className="rounded-lg border border-border bg-muted overflow-hidden group cursor-zoom-in">
-                    <Image
-                      src={src}
-                      alt={`${product.title} screenshot ${i + 1}`}
-                      fill
-                      className="object-cover transition-transform group-hover:scale-105"
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+          {/* Main Content */}
+          <div className="lg:col-span-7 space-y-12">
+            <div className="space-y-6">
+              {product.videoUrl ? (
+                <div className="rounded-3xl border border-border/60 bg-black overflow-hidden shadow-2xl shadow-primary/5">
+                  <AspectRatio ratio={16 / 9}>
+                    <iframe
+                      src={product.videoUrl.replace("watch?v=", "embed/").split("&")[0]}
+                      title={product.title}
+                      className="absolute inset-0 w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
                     />
                   </AspectRatio>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              ) : (
+                <div className="rounded-3xl border border-border/60 bg-muted overflow-hidden shadow-sm">
+                  <AspectRatio ratio={4 / 3}>
+                    {product.thumbnail ? (
+                      <Image src={product.thumbnail} alt={product.title} fill priority className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground font-bold uppercase tracking-widest text-xs">
+                        No Preview
+                      </div>
+                    )}
+                  </AspectRatio>
+                </div>
+              )}
 
-          {/* Description Content */}
-          <div className="space-y-6">
-            <h2 className="text-lg font-medium text-foreground">Overview</h2>
-            <div className="text-muted-foreground text-base leading-relaxed space-y-4 whitespace-pre-wrap">
-              {product.description}
+              {screenshotsList.length > 0 && (
+                <div className="grid grid-cols-3 gap-4">
+                  {screenshotsList.map((src, i) => (
+                    <AspectRatio key={i} ratio={16 / 9} className="rounded-xl border border-border/40 bg-muted overflow-hidden group cursor-zoom-in shadow-sm">
+                      <Image
+                        src={src}
+                        alt={`${product.title} screenshot ${i + 1}`}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    </AspectRatio>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold tracking-tight">Overview</h2>
+                <div className="text-muted-foreground text-base leading-relaxed space-y-4 whitespace-pre-wrap font-medium">
+                  {product.description}
+                </div>
+              </div>
+
+              {tagsList.length > 0 && (
+                <div className="pt-8 border-t border-border/40">
+                  <div className="flex flex-wrap gap-2">
+                    {tagsList.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="rounded-full px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider bg-muted/50 hover:bg-muted transition-colors cursor-pointer" asChild>
+                        <Link href={`/tags/${encodeURIComponent(tag)}`}>{tag}</Link>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Tags */}
-          {tagsList.length > 0 && (
-            <div className="space-y-4 pt-6">
-              <Separator className="mb-6" />
-              <h3 className="text-sm font-medium text-foreground">Tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {tagsList.map((tag) => (
-                  <Badge key={tag} variant="secondary" asChild>
-                    <Link href={`/tags/${encodeURIComponent(tag)}`}>
-                      {tag}
-                    </Link>
+          {/* Sidebar */}
+          <div className="lg:col-span-5">
+            <div className="sticky top-28 space-y-10">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Badge variant="outline" className="rounded-full px-3 text-[10px] uppercase font-black tracking-[0.2em] border-primary/20 text-primary">
+                    {product.category}
                   </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Side: Sticky Details & Purchase Options */}
-        <div className="lg:col-span-5">
-          <div className="sticky top-24 space-y-8">
-            
-            <div className="space-y-4">
-              <Badge variant="outline" className="uppercase tracking-wide text-muted-foreground border-border">
-                {product.category}
-              </Badge>
-              <h1 className="text-3xl sm:text-4xl font-semibold text-foreground tracking-tight leading-snug">
-                {product.title}
-              </h1>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                {product.shortDescription}
-              </p>
-            </div>
-
-            <div className="pt-4 space-y-6">
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-foreground">
-                  ₹{(product.price / 100).toLocaleString("en-IN")}
-                </span>
-                <span className="text-sm text-muted-foreground">INR</span>
+                  <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-foreground leading-[1.1]">
+                    {product.title}
+                  </h1>
+                </div>
+                <p className="text-lg text-muted-foreground leading-relaxed font-medium">
+                  {product.shortDescription}
+                </p>
               </div>
 
-              {/* Actions Panel */}
-              <div className="space-y-3">
-                <ProductCheckout
-                  productId={product.id}
-                  productSlug={product.slug}
-                  price={product.price}
-                  hasPurchased={hasPurchased}
-                  userLoggedIn={!!user}
-                />
-                
-                {product.demoUrl && (
-                  <Button asChild variant="outline" className="w-full h-11 rounded-lg">
-                    <a
-                      href={product.demoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <span>View Live Demo</span>
-                      <ExternalLink className="w-4 h-4 ml-2" />
-                    </a>
-                  </Button>
-                )}
-              </div>
-            </div>
+              <div className="space-y-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-black tracking-tighter tabular-nums">
+                    ₹{(product.price / 100).toLocaleString("en-IN")}
+                  </span>
+                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">INR</span>
+                </div>
 
-            {/* Product Meta */}
-            <div className="space-y-4 pt-6">
-              <Separator />
-              <div className="space-y-4 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Version</span>
+                <div className="space-y-4">
+                  <ProductCheckout
+                    productId={product.id}
+                    productSlug={product.slug}
+                    price={product.price}
+                    hasPurchased={hasPurchased}
+                    userLoggedIn={!!user}
+                  />
+                  
+                  {product.demoUrl && (
+                    <Button asChild variant="outline" className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-[11px]">
+                      <a href={product.demoUrl} target="_blank" rel="noopener noreferrer">
+                        Live Preview
+                        <ExternalLink className="w-3.5 h-3.5 ml-2" />
+                      </a>
+                    </Button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                      Secure Payment
+                   </div>
+                   <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      <Zap className="w-4 h-4 text-amber-500" />
+                      Instant Access
+                   </div>
+                </div>
+              </div>
+
+              <div className="pt-8 border-t border-border/40 space-y-4">
+                <div className="flex items-center justify-between text-[11px] uppercase font-bold tracking-widest">
+                  <span className="text-muted-foreground">Latest Build</span>
                   <span className="text-foreground font-mono">v{product.version}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Last updated</span>
+                <div className="flex items-center justify-between text-[11px] uppercase font-bold tracking-widest">
+                  <span className="text-muted-foreground">Released</span>
                   <span className="text-foreground">{updatedDate}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Access</span>
-                  <span className="text-foreground">Instant Download</span>
+                <div className="flex items-center justify-between text-[11px] uppercase font-bold tracking-widest">
+                  <span className="text-muted-foreground">Type</span>
+                  <span className="text-foreground">Commercial License</span>
                 </div>
               </div>
             </div>
