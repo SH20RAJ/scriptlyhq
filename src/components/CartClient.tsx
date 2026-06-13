@@ -27,8 +27,8 @@ export default function CartClient() {
     setMounted(true);
   }, []);
 
-  // Compute Automatic Offer: 20% off > ₹5,000 (500000 paise)
-  const autoOfferDiscount = cartSubtotal >= 500000 ? Math.round(cartSubtotal * 0.20) : 0;
+  // Compute Automatic Offer: 20% off > $60.00 (6000 cents)
+  const autoOfferDiscount = cartSubtotal >= 6000 ? Math.round(cartSubtotal * 0.20) : 0;
   const amountAfterAuto = cartSubtotal - autoOfferDiscount;
 
   // Validate coupon using SWR
@@ -62,7 +62,7 @@ export default function CartClient() {
     }
   }
 
-  const finalTotal = Math.max(amountAfterAuto - couponDiscount, 100); // min ₹1.00 for Razorpay
+  const finalTotal = Math.max(amountAfterAuto - couponDiscount, 100); // min $1.00 for Razorpay
   const totalSavings = autoOfferDiscount + couponDiscount;
 
   const handleApplyCoupon = (e: React.FormEvent) => {
@@ -97,7 +97,7 @@ export default function CartClient() {
 
         const options = {
           key: orderData.key,
-          amount: orderData.amount,
+          amount: orderData.amountInRupeesPaise,
           currency: "INR",
           name: "ScriptHQ",
           description: orderData.productName,
@@ -199,13 +199,13 @@ export default function CartClient() {
                   </Link>
                 </h3>
                 <div className="text-sm font-black text-foreground sm:hidden leading-none pt-1">
-                  ₹{(item.price / 100).toLocaleString("en-IN")}
+                  ${(item.price / 100).toFixed(2)}
                 </div>
               </div>
 
               <div className="hidden sm:block text-right">
                 <div className="text-base font-black text-foreground tabular-nums">
-                  ₹{(item.price / 100).toLocaleString("en-IN")}
+                  ${(item.price / 100).toFixed(2)}
                 </div>
               </div>
 
@@ -250,14 +250,14 @@ export default function CartClient() {
           <div className="space-y-4 text-sm font-medium">
             <div className="flex justify-between items-center text-muted-foreground">
               <span>Cart Subtotal</span>
-              <span className="text-foreground font-black tabular-nums">₹{(cartSubtotal / 100).toLocaleString("en-IN")}</span>
+              <span className="text-foreground font-black tabular-nums">${(cartSubtotal / 100).toFixed(2)}</span>
             </div>
 
             {/* Automatic Discount Display */}
             {autoOfferDiscount > 0 && (
               <div className="flex justify-between items-center text-emerald-500 font-bold">
                 <span>Auto Offer (20% Off)</span>
-                <span className="tabular-nums">- ₹{(autoOfferDiscount / 100).toLocaleString("en-IN")}</span>
+                <span className="tabular-nums">- ${(autoOfferDiscount / 100).toFixed(2)}</span>
               </div>
             )}
 
@@ -265,7 +265,7 @@ export default function CartClient() {
             {couponDiscount > 0 && (
               <div className="flex justify-between items-center text-emerald-500 font-bold">
                 <span>Coupon Discount</span>
-                <span className="tabular-nums">- ₹{(couponDiscount / 100).toLocaleString("en-IN")}</span>
+                <span className="tabular-nums">- ${(couponDiscount / 100).toFixed(2)}</span>
               </div>
             )}
 
@@ -273,15 +273,15 @@ export default function CartClient() {
               <span className="text-base font-black text-foreground">Total</span>
               <div className="text-right">
                 <span className="text-3xl font-black text-foreground tracking-tighter tabular-nums">
-                  ₹{(finalTotal / 100).toLocaleString("en-IN")}
+                  ${(finalTotal / 100).toFixed(2)}
                 </span>
-                <span className="text-[10px] font-bold text-muted-foreground block uppercase tracking-widest mt-0.5">INR</span>
+                <span className="text-[10px] font-bold text-muted-foreground block uppercase tracking-widest mt-0.5">USD</span>
               </div>
             </div>
 
             {totalSavings > 0 && (
               <div className="text-xs font-black text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl text-center">
-                You are saving ₹{(totalSavings / 100).toLocaleString("en-IN")} on this order!
+                You are saving ${(totalSavings / 100).toFixed(2)} on this order!
               </div>
             )}
           </div>
@@ -354,7 +354,7 @@ export default function CartClient() {
               ) : (
                 <CreditCard className="w-4 h-4 mr-2" />
               )}
-              <span>Checkout (₹{(finalTotal / 100).toLocaleString("en-IN")})</span>
+              <span>Pay ${(finalTotal / 100).toFixed(2)} (≈ ₹${Math.round((finalTotal / 100) * 83).toLocaleString("en-IN")})</span>
             </Button>
 
             {checkoutError && (

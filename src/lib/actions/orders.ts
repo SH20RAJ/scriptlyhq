@@ -53,12 +53,12 @@ export async function createRazorpayOrderAction({
     throw new Error("None of the selected products were found.");
   }
 
-  // Calculate Subtotal (paise)
+  // Calculate Subtotal (USD cents)
   const subtotal = selectedProducts.reduce((sum, p) => sum + p.price, 0);
 
-  // 1. Calculate Automatic 20% Discount over ₹5,000 (500000 paise)
+  // 1. Calculate Automatic 20% Discount over $60.00 (6000 cents)
   let autoDiscount = 0;
-  if (subtotal >= 500000) {
+  if (subtotal >= 6000) {
     autoDiscount = Math.round(subtotal * 0.20);
   }
 
@@ -86,7 +86,11 @@ export async function createRazorpayOrderAction({
   }
 
   const totalDiscount = autoDiscount + couponDiscount;
-  const finalAmount = Math.max(subtotal - totalDiscount, 100); // minimum ₹1.00 for Razorpay
+  const finalAmount = Math.max(subtotal - totalDiscount, 100); // minimum $1.00 for checkout
+
+  // Convert USD cents to INR paise (1 USD = 83 INR, so 1 cent = 83 paise)
+  const EXCHANGE_RATE = 83;
+  const finalAmountInRupeesPaise = finalAmount * EXCHANGE_RATE;
 
   // Generate Razorpay Order
   let rzpOrderId = "rzp_order_mock_" + crypto.randomBytes(8).toString("hex");
@@ -96,7 +100,7 @@ export async function createRazorpayOrderAction({
     try {
       const razorpay = getRazorpay();
       const rzpOrder = await razorpay.orders.create({
-        amount: finalAmount,
+        amount: finalAmountInRupeesPaise,
         currency: "INR",
         receipt: crypto.randomUUID(),
       });
@@ -106,7 +110,7 @@ export async function createRazorpayOrderAction({
     }
   }
 
-  // Proportionally distribute the discounts and paid amounts among orders
+  // Proportionally distribute the discounts and paid amounts among orders (in USD cents)
   const insertedOrders = [];
   let distributedAmountSum = 0;
   let distributedDiscountSum = 0;
@@ -150,7 +154,8 @@ export async function createRazorpayOrderAction({
   return {
     success: true,
     razorpayOrderId: rzpOrderId,
-    amount: finalAmount,
+    amount: finalAmount, // USD cents
+    amountInRupeesPaise: finalAmountInRupeesPaise, // INR paise
     key: process.env.RAZORPAY_KEY_ID || "rzp_test_mockkeyid123",
     productName: selectedProducts.length === 1 ? selectedProducts[0].title : `${selectedProducts.length} items in Cart`,
     userEmail: user.email,
