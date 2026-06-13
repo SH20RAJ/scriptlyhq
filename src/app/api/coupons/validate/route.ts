@@ -28,10 +28,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (amount < coupon.minPurchaseAmount) {
-      const minAmountInRupees = (coupon.minPurchaseAmount / 100).toLocaleString("en-IN");
+      const minAmountInUSD = (coupon.minPurchaseAmount / 100).toFixed(2);
       return NextResponse.json({
         success: false,
-        message: `This coupon requires a minimum purchase of ₹${minAmountInRupees}.`,
+        message: `This coupon requires a minimum purchase of $${minAmountInUSD} USD.`,
       });
     }
 
