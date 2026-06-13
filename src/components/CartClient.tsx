@@ -97,8 +97,8 @@ export default function CartClient() {
 
         const options = {
           key: orderData.key,
-          amount: orderData.amountInRupeesPaise,
-          currency: "INR",
+          amount: orderData.amount,
+          currency: "USD",
           name: "ScriptHQ",
           description: orderData.productName,
           order_id: orderData.razorpayOrderId,
@@ -354,7 +354,7 @@ export default function CartClient() {
               ) : (
                 <CreditCard className="w-4 h-4 mr-2" />
               )}
-              <span>Pay ${(finalTotal / 100).toFixed(2)} (≈ ₹${Math.round((finalTotal / 100) * 83).toLocaleString("en-IN")})</span>
+              <span>Pay ${(finalTotal / 100).toFixed(2)}</span>
             </Button>
 
             {checkoutError && (

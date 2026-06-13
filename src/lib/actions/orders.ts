@@ -88,10 +88,6 @@ export async function createRazorpayOrderAction({
   const totalDiscount = autoDiscount + couponDiscount;
   const finalAmount = Math.max(subtotal - totalDiscount, 100); // minimum $1.00 for checkout
 
-  // Convert USD cents to INR paise (1 USD = 83 INR, so 1 cent = 83 paise)
-  const EXCHANGE_RATE = 83;
-  const finalAmountInRupeesPaise = finalAmount * EXCHANGE_RATE;
-
   // Generate Razorpay Order
   let rzpOrderId = "rzp_order_mock_" + crypto.randomBytes(8).toString("hex");
   const isMockKeys = (process.env.RAZORPAY_KEY_ID || "").startsWith("rzp_test_mock");
@@ -100,8 +96,8 @@ export async function createRazorpayOrderAction({
     try {
       const razorpay = getRazorpay();
       const rzpOrder = await razorpay.orders.create({
-        amount: finalAmountInRupeesPaise,
-        currency: "INR",
+        amount: finalAmount, // USD cents
+        currency: "USD",
         receipt: crypto.randomUUID(),
       });
       rzpOrderId = rzpOrder.id;
@@ -155,7 +151,6 @@ export async function createRazorpayOrderAction({
     success: true,
     razorpayOrderId: rzpOrderId,
     amount: finalAmount, // USD cents
-    amountInRupeesPaise: finalAmountInRupeesPaise, // INR paise
     key: process.env.RAZORPAY_KEY_ID || "rzp_test_mockkeyid123",
     productName: selectedProducts.length === 1 ? selectedProducts[0].title : `${selectedProducts.length} items in Cart`,
     userEmail: user.email,
