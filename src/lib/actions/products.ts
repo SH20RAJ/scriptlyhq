@@ -12,7 +12,7 @@ export async function createProductAction(formData: FormData) {
     throw new Error("Unauthorized: Admin access required.");
   }
 
-  const title = formData.get("title") as string;
+  const title = (formData.get("title") as string) || "Draft Product";
   let slug = formData.get("slug") as string;
   if (!slug) {
     slug = title
@@ -20,14 +20,21 @@ export async function createProductAction(formData: FormData) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
   }
+  if (!slug) {
+    slug = "draft-product-" + crypto.randomUUID().slice(0, 8);
+  }
   
-  const shortDescription = formData.get("shortDescription") as string;
-  const description = formData.get("description") as string;
-  const category = formData.get("category") as string;
+  const shortDescription = (formData.get("shortDescription") as string) || "No description provided.";
+  const description = (formData.get("description") as string) || "No full description provided yet.";
+  const category = (formData.get("category") as string) || "templates";
   const subcategory = formData.get("subcategory") as string;
   const tags = formData.get("tags") as string;
   const demoUrl = (formData.get("demoUrl") as string) || null;
-  const price = Math.round(parseFloat(formData.get("price") as string) * 100); // convert to paise
+  
+  const priceInput = formData.get("price") as string;
+  const priceParsed = parseFloat(priceInput);
+  const price = isNaN(priceParsed) ? 0 : Math.round(priceParsed * 100);
+
   const version = (formData.get("version") as string) || "1.0.0";
   const featured = formData.get("featured") === "true";
   const published = formData.get("published") === "true";
@@ -72,16 +79,30 @@ export async function updateProductAction(id: string, formData: FormData) {
     throw new Error("Unauthorized: Admin access required.");
   }
 
-  const title = formData.get("title") as string;
-  const slug = formData.get("slug") as string;
-  const shortDescription = formData.get("shortDescription") as string;
-  const description = formData.get("description") as string;
-  const category = formData.get("category") as string;
+  const title = (formData.get("title") as string) || "Draft Product";
+  let slug = formData.get("slug") as string;
+  if (!slug) {
+    slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
+  if (!slug) {
+    slug = "draft-product-" + crypto.randomUUID().slice(0, 8);
+  }
+  
+  const shortDescription = (formData.get("shortDescription") as string) || "No description provided.";
+  const description = (formData.get("description") as string) || "No full description provided yet.";
+  const category = (formData.get("category") as string) || "templates";
   const subcategory = formData.get("subcategory") as string;
   const tags = formData.get("tags") as string;
   const demoUrl = (formData.get("demoUrl") as string) || null;
-  const price = Math.round(parseFloat(formData.get("price") as string) * 100);
-  const version = formData.get("version") as string;
+  
+  const priceInput = formData.get("price") as string;
+  const priceParsed = parseFloat(priceInput);
+  const price = isNaN(priceParsed) ? 0 : Math.round(priceParsed * 100);
+
+  const version = (formData.get("version") as string) || "1.0.0";
   const featured = formData.get("featured") === "true";
   const published = formData.get("published") === "true";
 

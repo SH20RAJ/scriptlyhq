@@ -271,7 +271,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
 
             <div className="space-y-2">
               <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Product Title *</label>
-              <input type="text" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Next.js SaaS Kit" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
+              <input type="text" name="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Next.js SaaS Kit" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
             </div>
 
             <div className="space-y-2">
@@ -305,7 +305,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Price (USD $) *</label>
-                <input type="number" name="price" step="0.01" min="0" required value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
+                <input type="number" name="price" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
               </div>
             </div>
           </div>
@@ -318,7 +318,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
 
             <div className="space-y-2">
               <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Short Description *</label>
-              <input type="text" name="shortDescription" required value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} placeholder="Keep it brief, shown on card views" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
+              <input type="text" name="shortDescription" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} placeholder="Keep it brief, shown on card views" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
             </div>
 
             <div className="space-y-3">
@@ -344,7 +344,6 @@ export default function ProductForm({ categories, subcategories, initialData }: 
               {descTab === "write" ? (
                 <textarea
                   name="description"
-                  required
                   rows={10}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -440,7 +439,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
             {/* Download URL */}
             <div className="space-y-2 pt-4 border-t border-neutral-800/80">
               <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Product File Package URL *</label>
-              <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} required placeholder="Private download URL (zip/pdf)" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
+              <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="Private download URL (zip/pdf)" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
             </div>
           </div>
 

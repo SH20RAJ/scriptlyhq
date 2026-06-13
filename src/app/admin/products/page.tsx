@@ -27,7 +27,7 @@ interface PageProps {
 export default async function AdminProductsPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const currentPage = parseInt(resolvedParams.page || "1", 10) || 1;
-  const limit = 10;
+  const limit = 50;
   const offset = (currentPage - 1) * limit;
 
   // Query total product count
