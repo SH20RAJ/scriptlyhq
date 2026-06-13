@@ -32,6 +32,9 @@ export async function createProductAction(formData: FormData) {
   const published = formData.get("published") === "true";
 
   const thumbnailUrl = formData.get("thumbnail") as string;
+  const previewGif = formData.get("previewGif") as string;
+  const screenshots = formData.get("screenshots") as string; // JSON or comma-separated
+  const videoUrl = formData.get("videoUrl") as string;
   const fileUrl = formData.get("fileUrl") as string;
 
   const id = crypto.randomUUID();
@@ -45,6 +48,9 @@ export async function createProductAction(formData: FormData) {
     category,
     tags: tags || null,
     thumbnail: thumbnailUrl || null,
+    previewGif: previewGif || null,
+    screenshots: screenshots || null,
+    videoUrl: videoUrl || null,
     demoUrl,
     fileUrl: fileUrl || null,
     price,
@@ -77,6 +83,9 @@ export async function updateProductAction(id: string, formData: FormData) {
   const published = formData.get("published") === "true";
 
   const thumbnailUrl = formData.get("thumbnail") as string;
+  const previewGif = formData.get("previewGif") as string;
+  const screenshots = formData.get("screenshots") as string;
+  const videoUrl = formData.get("videoUrl") as string;
   const fileUrl = formData.get("fileUrl") as string;
 
   const existing = await db.query.products.findFirst({
@@ -97,6 +106,9 @@ export async function updateProductAction(id: string, formData: FormData) {
       category,
       tags: tags || null,
       thumbnail: thumbnailUrl || null,
+      previewGif: previewGif || null,
+      screenshots: screenshots || null,
+      videoUrl: videoUrl || null,
       demoUrl,
       fileUrl: fileUrl || null,
       price,

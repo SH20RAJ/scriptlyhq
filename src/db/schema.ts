@@ -24,8 +24,11 @@ export const products = pgTable("products", {
   category: text("category").notNull(), // References categories.slug or stored as string
   tags: text("tags"), // Comma-separated tags
   thumbnail: text("thumbnail"), // URL/Path to thumbnail image
+  previewGif: text("preview_gif"), // URL to preview GIF on hover
+  screenshots: text("screenshots"), // JSON string or comma-separated URLs
+  videoUrl: text("video_url"), // YouTube embed or direct video URL
   demoUrl: text("demo_url"),
-  fileUrl: text("file_url"), // Local secure file path
+  fileUrl: text("file_url"), // URL to product file
   price: integer("price").notNull(), // Price in paise (INR)
   version: text("version").default("1.0.0").notNull(),
   featured: boolean("featured").default(false).notNull(),

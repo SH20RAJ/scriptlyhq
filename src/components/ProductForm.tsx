@@ -17,6 +17,9 @@ interface ProductFormProps {
     category: string;
     tags: string | null;
     thumbnail: string | null;
+    previewGif: string | null;
+    screenshots: string | null;
+    videoUrl: string | null;
     fileUrl: string | null;
     demoUrl: string | null;
     price: number; // in paise
@@ -30,6 +33,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<string | null>(null);
 
   const [title, setTitle] = useState(initialData?.title || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
@@ -42,8 +46,44 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   const [demoUrl, setDemoUrl] = useState(initialData?.demoUrl || "");
   const [featured, setFeatured] = useState(initialData?.featured || false);
   const [published, setPublished] = useState(initialData ? initialData.published : true);
+  
   const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnail || "");
+  const [previewGif, setPreviewGif] = useState(initialData?.previewGif || "");
+  const [screenshots, setScreenshots] = useState(initialData?.screenshots || "");
+  const [videoUrl, setVideoUrl] = useState(initialData?.videoUrl || "");
   const [fileUrl, setFileUrl] = useState(initialData?.fileUrl || "");
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetSetter: (val: string) => void, fieldName: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(fieldName);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const apiKey = "c0c864f0d9aadb0f7de371582b301397";
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (fieldName === "screenshots") {
+          const current = screenshots ? screenshots.split(",").map(s => s.trim()) : [];
+          targetSetter([...current, data.data.url].join(", "));
+        } else {
+          targetSetter(data.data.url);
+        }
+      } else {
+        setError("Image upload failed: " + (data.error?.message || "Unknown error"));
+      }
+    } catch (err) {
+      setError("Image upload failed. Please try again.");
+    } finally {
+      setUploading(null);
+    }
+  };
 
   const isEdit = !!initialData;
 
@@ -54,6 +94,11 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
     const formData = new FormData(e.currentTarget);
     formData.set("featured", featured ? "true" : "false");
     formData.set("published", published ? "true" : "false");
+    formData.set("thumbnail", thumbnailUrl);
+    formData.set("previewGif", previewGif);
+    formData.set("screenshots", screenshots);
+    formData.set("videoUrl", videoUrl);
+    formData.set("fileUrl", fileUrl);
 
     startTransition(async () => {
       try {
@@ -76,7 +121,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
       
       {/* Action Header */}
       <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
@@ -90,8 +135,8 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         
         <button
           type="submit"
-          disabled={isPending}
-          className="inline-flex items-center space-x-2 px-5 py-2.5 text-sm font-bold text-neutral-950 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-50 disabled:scale-100 rounded-xl transition-all cursor-pointer"
+          disabled={isPending || !!uploading}
+          className="inline-flex items-center space-x-2 px-5 py-2.5 text-sm font-bold text-black bg-white hover:bg-neutral-200 disabled:opacity-50 rounded-lg transition-all cursor-pointer"
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -110,225 +155,148 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
       )}
 
       {/* Grid Inputs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        {/* Title */}
-        <div className="space-y-2 col-span-1">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Product Title *
-          </label>
-          <input
-            type="text"
-            name="title"
-            required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Next.js SaaS Boilerplate"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Slug */}
-        <div className="space-y-2 col-span-1">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Slug URL</span>
-            <span className="text-[10px] text-neutral-500 font-normal normal-case">
-              (Auto-generated if empty)
-            </span>
-          </label>
-          <input
-            type="text"
-            name="slug"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="e.g. nextjs-saas-boilerplate"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Category */}
-        <div className="space-y-2 col-span-1">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Category *
-          </label>
-          <select
-            name="category"
-            required
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          >
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.slug} className="bg-neutral-950">
-                {cat.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Price (Rupees) */}
-        <div className="space-y-2 col-span-1">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Price (INR ₹) *
-          </label>
-          <input
-            type="number"
-            name="price"
-            step="0.01"
-            min="0"
-            required
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="e.g. 499.00"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Short Description */}
-        <div className="space-y-2 col-span-2">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Short Tagline / Description *
-          </label>
-          <input
-            type="text"
-            name="shortDescription"
-            required
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-            placeholder="A short tagline shown on the listings grid (1-2 sentences)"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Full Description */}
-        <div className="space-y-2 col-span-2">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Full Description Markdown / Copy *
-          </label>
-          <textarea
-            name="description"
-            required
-            rows={8}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Write details about features, dependencies, how to use it, etc."
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Tags */}
-        <div className="space-y-2 col-span-2">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Tags</span>
-            <span className="text-[10px] text-neutral-500 font-normal normal-case">
-              (Comma-separated list)
-            </span>
-          </label>
-          <input
-            type="text"
-            name="tags"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="e.g. nextjs, typescript, tailwind, auth"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Version */}
-        <div className="space-y-2 col-span-1">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Asset Version
-          </label>
-          <input
-            type="text"
-            name="version"
-            value={version}
-            onChange={(e) => setVersion(e.target.value)}
-            placeholder="e.g. 1.0.0"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Demo URL */}
-        <div className="space-y-2 col-span-1">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Live Preview Demo URL
-          </label>
-          <input
-            type="url"
-            name="demoUrl"
-            value={demoUrl}
-            onChange={(e) => setDemoUrl(e.target.value)}
-            placeholder="https://example.com/demo"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Thumbnail URL Input */}
-        <div className="space-y-2 col-span-1 p-5 border border-neutral-900 bg-neutral-900/10 rounded-xl">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Thumbnail Image URL *
-          </label>
-          <input
-            type="url"
-            name="thumbnail"
-            required
-            value={thumbnailUrl}
-            onChange={(e) => setThumbnailUrl(e.target.value)}
-            placeholder="https://example.com/thumbnail.jpg"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Product Download URL Input */}
-        <div className="space-y-2 col-span-1 p-5 border border-neutral-900 bg-neutral-900/10 rounded-xl">
-          <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-            Product Download URL (ZIP/File) *
-          </label>
-          <input
-            type="url"
-            name="fileUrl"
-            required
-            value={fileUrl}
-            onChange={(e) => setFileUrl(e.target.value)}
-            placeholder="https://example.com/product.zip"
-            className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-100 placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-
-        {/* Feature Switches */}
-        <div className="flex items-center justify-between p-4 border border-neutral-900 bg-neutral-900/10 rounded-xl col-span-1">
-          <div className="space-y-0.5">
-            <h4 className="text-xs font-bold text-neutral-300 uppercase tracking-wider">
-              Mark as Featured
-            </h4>
-            <p className="text-[10px] text-neutral-500">
-              Pushes this item to the home page spotlight grid.
-            </p>
+        {/* Left Column */}
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Product Title *</label>
+            <input type="text" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
           </div>
-          <input
-            type="checkbox"
-            checked={featured}
-            onChange={(e) => setFeatured(e.target.checked)}
-            className="w-5 h-5 rounded accent-emerald-500 cursor-pointer"
-          />
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Slug URL</label>
+            <input type="text" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="auto-generated-if-empty" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Category *</label>
+              <select name="category" required value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors">
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.slug}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Price (INR ₹) *</label>
+              <input type="number" name="price" step="0.01" min="0" required value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Short Description *</label>
+            <input type="text" name="shortDescription" required value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Full Description *</label>
+            <textarea name="description" required rows={10} value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-black text-white focus:outline-none focus:border-neutral-600 transition-colors" />
+          </div>
         </div>
 
-        <div className="flex items-center justify-between p-4 border border-neutral-900 bg-neutral-900/10 rounded-xl col-span-1">
-          <div className="space-y-0.5">
-            <h4 className="text-xs font-bold text-neutral-300 uppercase tracking-wider">
-              Publish Status
-            </h4>
-            <p className="text-[10px] text-neutral-500">
-              Make this item visible to general public browsing.
-            </p>
+        {/* Right Column - Media & Settings */}
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/20 space-y-6">
+            <h3 className="text-sm font-bold text-white uppercase tracking-widest border-b border-neutral-800 pb-2">Media Assets</h3>
+            
+            {/* Thumbnail */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-neutral-400 uppercase flex justify-between">
+                Thumbnail URL *
+                <span className="text-[10px] lowercase font-normal opacity-60">jpg/png/webp</span>
+              </label>
+              <div className="flex gap-2">
+                <input type="url" value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+                <div className="relative">
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setThumbnailUrl, "thumbnail")} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  <button type="button" className="px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors">
+                    {uploading === "thumbnail" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview GIF */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-neutral-400 uppercase flex justify-between">
+                Preview GIF URL
+                <span className="text-[10px] lowercase font-normal opacity-60">shown on card hover</span>
+              </label>
+              <div className="flex gap-2">
+                <input type="url" value={previewGif} onChange={(e) => setPreviewGif(e.target.value)} className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+                <div className="relative">
+                  <input type="file" accept="image/gif,image/webp" onChange={(e) => handleImageUpload(e, setPreviewGif, "previewGif")} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  <button type="button" className="px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors">
+                    {uploading === "previewGif" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Screenshots */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-neutral-400 uppercase flex justify-between">
+                Screenshots
+                <span className="text-[10px] lowercase font-normal opacity-60">comma separated urls</span>
+              </label>
+              <div className="space-y-2">
+                <textarea value={screenshots} onChange={(e) => setScreenshots(e.target.value)} placeholder="URL1, URL2, ..." rows={3} className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none resize-none" />
+                <div className="relative w-full">
+                  <input type="file" accept="image/*" multiple onChange={(e) => handleImageUpload(e, setScreenshots, "screenshots")} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  <button type="button" className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2">
+                    {uploading === "screenshots" ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Upload className="w-3.5 h-3.5" /> Upload Screenshot</>}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Video URL */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-neutral-400 uppercase">Video URL (YouTube/Direct)</label>
+              <input type="url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+            </div>
+
+            {/* Download URL */}
+            <div className="space-y-2 pt-4 border-t border-neutral-800">
+              <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Product Download URL *</label>
+              <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} required placeholder="https://..." className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+            </div>
           </div>
-          <input
-            type="checkbox"
-            checked={published}
-            onChange={(e) => setPublished(e.target.checked)}
-            className="w-5 h-5 rounded accent-emerald-500 cursor-pointer"
-          />
+
+          {/* Visibility & Settings */}
+          <div className="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/20 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <h4 className="text-xs font-bold text-neutral-300 uppercase">Featured</h4>
+                <p className="text-[10px] text-neutral-500">Show in home spotlight</p>
+              </div>
+              <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="w-5 h-5 rounded accent-white cursor-pointer" />
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
+              <div className="space-y-0.5">
+                <h4 className="text-xs font-bold text-neutral-300 uppercase">Published</h4>
+                <p className="text-[10px] text-neutral-500">Visible to public</p>
+              </div>
+              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="w-5 h-5 rounded accent-white cursor-pointer" />
+            </div>
+            
+            <div className="pt-4 border-t border-neutral-800 space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-neutral-400 uppercase">Tags</label>
+                <input type="text" name="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="nextjs, tailwind, auth" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-neutral-400 uppercase">Demo URL</label>
+                <input type="url" name="demoUrl" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} placeholder="https://demo.example.com" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-neutral-400 uppercase">Version</label>
+                <input type="text" name="version" value={version} onChange={(e) => setVersion(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </form>
