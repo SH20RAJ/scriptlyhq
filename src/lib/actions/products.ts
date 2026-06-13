@@ -179,7 +179,7 @@ export async function ensureCategoriesSeeded() {
           description: "This starter kit helps you launch your SaaS product in hours, not weeks.\n\n### Features:\n- Next.js 15 App Router\n- Tailwind CSS styling\n- Drizzle ORM and Postgres database client\n- Full user authentication flow\n- Pre-built landing pages and dashboard",
           category: "saas-templates",
           tags: "nextjs,saas,boilerplate,drizzle",
-          thumbnail: null,
+          thumbnail: "/thumbnails/saas_starter.png",
           demoUrl: "https://demo.scriptlyhq.com/saas-starter",
           fileUrl: "/mock/saas-starter.zip",
           price: 100, // ₹1.00
@@ -195,7 +195,7 @@ export async function ensureCategoriesSeeded() {
           description: "Learn how we scaled ScriptlyHQ from 0 to 10k users in 3 months.\n\n### What's inside:\n- SEO and Content Marketing frameworks\n- Viral referral loops setup\n- Cold email templates that convert\n- Interactive marketing tactics checklist",
           category: "ebooks",
           tags: "marketing,growth,ebook,guide",
-          thumbnail: null,
+          thumbnail: "/thumbnails/growth_guide.png",
           demoUrl: null,
           fileUrl: "/mock/growth-guide.pdf",
           price: 300, // ₹3.00
@@ -211,7 +211,7 @@ export async function ensureCategoriesSeeded() {
           description: "Get copy that sells. Tested on GPT-4 and Claude 3.5 Sonnet to produce conversion rates 2x higher than standard drafts.\n\n### Includes:\n- Headline writing prompts\n- Full page copy outline generator\n- Call-to-action variants creator",
           category: "ai-prompts",
           tags: "ai,prompt,gpt,claude,marketing",
-          thumbnail: null,
+          thumbnail: "/thumbnails/copywriter_prompt.png",
           demoUrl: null,
           fileUrl: "/mock/copywriter-prompt.txt",
           price: 400, // ₹4.00
@@ -227,7 +227,7 @@ export async function ensureCategoriesSeeded() {
           description: "Launch browser extensions instantly. Clean structure with options page, popup UI, and background scripts.\n\n### Features:\n- Manifest V3 compliant\n- React + TypeScript popup\n- Tailwind CSS for premium styles\n- Message passing utilities",
           category: "scripts",
           tags: "chrome,extension,javascript,react",
-          thumbnail: null,
+          thumbnail: "/thumbnails/chrome_boilerplate.png",
           demoUrl: "https://demo.scriptlyhq.com/chrome-extension",
           fileUrl: "/mock/chrome-boilerplate.zip",
           price: 1000, // ₹10.00
@@ -243,7 +243,7 @@ export async function ensureCategoriesSeeded() {
           description: "Wow your users with modern, elegant design layouts. Includes charts, navigations, form inputs, and modal designs.\n\n### Inclusions:\n- Fully responsive grid layouts\n- Smooth CSS backdrop blur overrides\n- Light and dark theme variables support",
           category: "ui-kits",
           tags: "tailwind,ui,glassmorphism,css",
-          thumbnail: null,
+          thumbnail: "/thumbnails/glass_ui.png",
           demoUrl: "https://demo.scriptlyhq.com/glassmorphism",
           fileUrl: "/mock/glass-ui-kit.zip",
           price: 4900, // ₹49.00

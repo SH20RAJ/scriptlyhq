@@ -5,7 +5,7 @@ import { products } from "../../../db/schema";
 import { desc } from "drizzle-orm";
 import Link from "next/link";
 import { deleteProductAction } from "../../../lib/actions/products";
-import { Plus, Edit2, Trash2, Globe, Sparkles, AlertCircle } from "lucide-react";
+import { Plus, Globe, Sparkles, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
+import { AdminActions } from "./AdminActions";
 
 export default async function AdminProductsPage() {
   const productsList = await db.query.products.findMany({
@@ -114,34 +115,7 @@ export default async function AdminProductsPage() {
 
                   {/* Action Buttons */}
                   <TableCell className="px-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button asChild variant="outline" size="icon-sm" className="h-8 w-8">
-                        <Link href={`/admin/products/${prod.id}/edit`}>
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </Link>
-                      </Button>
-                      
-                      <form
-                        action={async () => {
-                          "use server";
-                          await deleteProductAction(prod.id);
-                        }}
-                      >
-                        <Button
-                          type="submit"
-                          variant="outline"
-                          size="icon-sm"
-                          className="h-8 w-8 text-destructive hover:bg-destructive/10 border-destructive/20"
-                          onClick={(e) => {
-                            if (!confirm("Are you sure you want to delete this product?")) {
-                              e.preventDefault();
-                            }
-                          }}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </form>
-                    </div>
+                    <AdminActions productId={prod.id} />
                   </TableCell>
                 </TableRow>
               ))}
