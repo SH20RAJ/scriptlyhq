@@ -21,7 +21,7 @@ interface Coupon {
 }
 
 export default function AdminCouponsClient() {
-  const { data, error, mutate, isLoading } = useSWR("/api/admin/coupons", fetcher);
+  const { data, error, mutate, isLoading } = useSWR<any>("/api/admin/coupons", fetcher);
   const [codeInput, setCodeInput] = useState("");
   const [discountType, setDiscountType] = useState<"percentage" | "fixed">("percentage");
   const [valueInput, setValueInput] = useState("");
@@ -63,7 +63,7 @@ export default function AdminCouponsClient() {
         }),
       });
 
-      const result = await res.json();
+      const result = (await res.json()) as any;
       if (!res.ok || !result.success) {
         setFormError(result.error || "Failed to create coupon code.");
       } else {

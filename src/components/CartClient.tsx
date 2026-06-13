@@ -36,7 +36,7 @@ export default function CartClient() {
     ? `/api/coupons/validate?code=${encodeURIComponent(appliedCode)}&amount=${amountAfterAuto}` 
     : null;
 
-  const { data: couponData, error: swrError, isLoading: couponLoading } = useSWR(
+  const { data: couponData, error: swrError, isLoading: couponLoading } = useSWR<any>(
     swrKey,
     fetcher,
     { revalidateOnFocus: false, shouldRetryOnError: false }

@@ -24,7 +24,7 @@ interface Category {
 }
 
 export default function AdminCategoriesClient() {
-  const { data, error, mutate, isLoading } = useSWR("/api/admin/categories", fetcher);
+  const { data, error, mutate, isLoading } = useSWR<any>("/api/admin/categories", fetcher);
   const [catNameInput, setCatNameInput] = useState("");
   const [catSlugInput, setCatSlugInput] = useState("");
 
@@ -68,7 +68,7 @@ export default function AdminCategoriesClient() {
         }),
       });
 
-      const result = await res.json();
+      const result = (await res.json()) as any;
       if (!res.ok || !result.success) {
         setFormError(result.error || "Failed to create category or subcategory.");
       } else {
