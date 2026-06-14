@@ -8,7 +8,6 @@ import { ProductCard } from "../../../components/SearchFilter";
 import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import ProductCheckout from "../../../components/ProductCheckout";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft, ExternalLink, ShieldCheck, Zap } from "lucide-react";
 import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
@@ -17,9 +16,9 @@ import { Separator } from "@/components/ui/separator";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { marked } from "marked";
 import ShareButton from "../../../components/ShareButton";
-import { Tweet } from "react-tweet";
 import { isAdmin } from "../../../lib/auth-utils";
 import AdminToolbar from "./AdminToolbar";
+import TweetEmbed from "../../../components/TweetEmbed";
 
 
 interface PageProps {
@@ -119,9 +118,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               {product.videoUrl ? (
                 tweetId ? (
                   <div className="rounded-3xl border border-border/60 bg-black/20 overflow-hidden shadow-2xl shadow-primary/5 flex justify-center p-4">
-                    <div className="w-full max-w-[550px]">
-                      <Tweet id={tweetId} />
-                    </div>
+                    <TweetEmbed id={tweetId} />
                   </div>
                 ) : (
                   <div className="rounded-3xl border border-border/60 bg-black overflow-hidden shadow-2xl shadow-primary/5">
@@ -150,7 +147,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 <div className="rounded-3xl border border-border/60 bg-muted overflow-hidden shadow-sm">
                   <AspectRatio ratio={4 / 3}>
                     {product.thumbnail ? (
-                      <Image src={product.thumbnail} alt={product.title} fill priority className="object-cover" />
+                      <img src={product.thumbnail} alt={product.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-muted-foreground font-bold uppercase tracking-widest text-xs">
                         No Preview
@@ -164,12 +161,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 <div className="grid grid-cols-3 gap-4">
                   {screenshotsList.map((src, i) => (
                     <AspectRatio key={i} ratio={16 / 9} className="rounded-xl border border-border/40 bg-muted overflow-hidden group cursor-zoom-in shadow-sm">
-                      <Image
+                      <img
                         src={src}
                         alt={`${product.title} screenshot ${i + 1}`}
-                        fill
                         loading="lazy"
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     </AspectRatio>
                   ))}
@@ -233,10 +229,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   />
                   
                   {product.demoUrl && (
-                    <Button asChild variant="outline" className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-[11px]">
-                      <a href={product.demoUrl} target="_blank" rel="noopener noreferrer">
+                    <Button asChild className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-[11px] bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-400 hover:to-blue-500 text-white border-0 shadow-xl shadow-emerald-500/10 transition-all duration-300 group/preview cursor-pointer">
+                      <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                         Live Preview
-                        <ExternalLink className="w-3.5 h-3.5 ml-2" />
+                        <ExternalLink className="w-3.5 h-3.5 ml-2 group-hover/preview:translate-x-0.5 group-hover/preview:-translate-y-0.5 transition-transform" />
                       </a>
                     </Button>
                   )}

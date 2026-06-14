@@ -6,7 +6,6 @@ import { eq, and, desc } from "drizzle-orm";
 import { getOrCreateDbUser } from "../../lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Download, ShoppingBag, CreditCard, ExternalLink, Calendar, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -99,7 +98,7 @@ export default async function DashboardPage() {
                         {/* Thumbnail */}
                         <div className="relative w-full sm:w-48 h-48 bg-muted border-r border-border/40 overflow-hidden flex-shrink-0">
                           {item.product.thumbnail ? (
-                            <Image src={item.product.thumbnail} alt={item.product.title} fill loading="lazy" className="object-cover transition-transform duration-700 hover:scale-110" />
+                            <img src={item.product.thumbnail} alt={item.product.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-[10px] font-black font-mono text-muted-foreground uppercase tracking-widest bg-muted/50">
                               {item.product.category}
