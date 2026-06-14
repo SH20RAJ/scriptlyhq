@@ -19,6 +19,7 @@ import ShareButton from "../../../components/ShareButton";
 import { isAdmin } from "../../../lib/auth-utils";
 import AdminToolbar from "./AdminToolbar";
 import TweetEmbed from "../../../components/TweetEmbed";
+import ProductScreenshots from "../../../components/ProductScreenshots";
 
 
 interface PageProps {
@@ -158,18 +159,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               )}
 
               {screenshotsList.length > 0 && (
-                <div className="grid grid-cols-3 gap-4">
-                  {screenshotsList.map((src, i) => (
-                    <AspectRatio key={i} ratio={16 / 9} className="rounded-xl border border-border/40 bg-muted overflow-hidden group cursor-zoom-in shadow-sm">
-                      <img
-                        src={src}
-                        alt={`${product.title} screenshot ${i + 1}`}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                    </AspectRatio>
-                  ))}
-                </div>
+                <ProductScreenshots screenshots={screenshotsList} productTitle={product.title} />
               )}
             </div>
 
