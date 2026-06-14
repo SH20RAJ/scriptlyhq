@@ -17,27 +17,42 @@ export default function ShippingPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">1. Delivery Method</h2>
           <p>
-            ScriptlyStore sells downloadable digital assets. There is no physical shipping involved. All purchased templates, code scripts, prompts, and kit files are delivered instantly after payment confirmation.
+            ScriptlyStore sells downloadable digital assets, including website templates, SaaS boilerplates, ebooks, development scripts, UI kits, and prompts. <strong>There is no physical shipping or dispatch involved.</strong> Consequently, there are zero shipping charges, delivery fees, packaging costs, or customs duties applied to any order.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">2. How to Access Purchases</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">2. Delivery Timeline</h2>
           <p>
-            Upon successful payment capture, you will be redirected to the **Purchase Success** screen. You can also download your files directly from your customer account **Dashboard** at `/dashboard` at any time.
+            All purchases are delivered electronically. Upon successful payment capture through <strong>Razorpay</strong>, access to your purchased digital files is unlocked <strong>instantly</strong>. You will be redirected to the purchase success screen to download your items immediately, and a transaction receipt containing download instructions will be sent to your registered email address.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">3. Verification Issues</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">3. How to Access Purchases</h2>
           <p>
-            If your payment was completed but downloads are not active, please wait up to 15 minutes for payment verification webhooks to sync. If access remains locked, contact support@scriptly.store with your transaction ID.
+            You can access all your purchased files at any time by logging into your customer account <strong>Dashboard</strong> at <a href="/dashboard" className="underline hover:text-foreground">/dashboard</a>. If you do not have an active account, one will be created under the email address utilized at checkout.
           </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">4. Technical Delays & Resolution</h2>
+          <p>
+            In rare instances, network latency or webhook delays might defer order activation. If your payment was captured but downloads are not visible:
+          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Wait up to 10-15 minutes and refresh your dashboard.</li>
+            <li>Verify that the transaction amount was successfully debited from your card or bank account.</li>
+            <li>If the download remains locked after 15 minutes, please contact support@scriptly.store. We will verify the transaction and manually grant access within <strong>24 hours</strong>.</li>
+          </ul>
         </section>
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            Questions? Contact support@scriptly.store.
+            For delivery support or inquiries, please contact support@scriptly.store or call us at +91 81783 85203.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            <strong>Registered Office:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India.
           </p>
         </section>
       </div>

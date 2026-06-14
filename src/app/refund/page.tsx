@@ -22,26 +22,39 @@ export default function RefundPage() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">2. Exceptions</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">2. Refund Exceptions</h2>
           <p>
             We only issue refunds under the following unique conditions:
           </p>
           <ul className="list-disc pl-5 space-y-2">
-            <li>**Double Purchase**: If you accidentally purchased the same product twice within 24 hours.</li>
-            <li>**Corrupt or Defective File**: If the provided ZIP package is corrupt and cannot be opened or contains missing files (requires support verification).</li>
+            <li><strong>Double Purchase:</strong> If you accidentally purchased the same product twice within 24 hours.</li>
+            <li><strong>Corrupt or Defective File:</strong> If the provided ZIP package is corrupt and cannot be opened or contains missing files (requires support verification).</li>
           </ul>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">3. Request Process</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">3. Request Process & Refund Timelines</h2>
           <p>
-            To request a refund under valid exception cases, email support@scriptly.store with your transaction receipt, registered email, and detailed reasoning within 7 days of purchase. Approved refunds will be processed via Razorpay within 5-7 business days back to your original payment method.
+            To request a refund under valid exception cases, email support@scriptly.store with your transaction receipt, registered email, and detailed reasoning within 7 days of purchase. 
+          </p>
+          <p>
+            Once verified and approved, refunds are processed via our payment processor, <strong>Razorpay</strong>, back to your original payment method. The refund amount will typically reflect in your account within <strong>5-7 business days</strong>.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">4. Cancellation Policy</h2>
+          <p>
+            Since all products are digital and delivered immediately upon payment capture, cancellations of successful orders are not supported. If you want to delete your account or cancel your registration with ScriptlyStore, you can contact us at support@scriptly.store.
           </p>
         </section>
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            Questions? Contact support@scriptly.store.
+            For support queries, please email support@scriptly.store or call us at +91 81783 85203.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            <strong>Registered Office:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India.
           </p>
         </section>
       </div>

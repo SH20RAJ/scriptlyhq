@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Mail, MapPin, ShieldCheck, HelpCircle } from "lucide-react";
+import { Mail, MapPin, ShieldCheck, HelpCircle, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
@@ -38,6 +38,18 @@ export default function ContactPage() {
                 <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Email</p>
                 <a href="mailto:support@scriptly.store" className="text-sm font-bold text-foreground hover:underline">
                   support@scriptly.store
+                </a>
+              </div>
+            </div>
+
+            <div className="flex gap-4 items-start">
+              <div className="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Phone className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Phone Support</p>
+                <a href="tel:+918178385203" className="text-sm font-bold text-foreground hover:underline">
+                  +91 81783 85203
                 </a>
               </div>
             </div>

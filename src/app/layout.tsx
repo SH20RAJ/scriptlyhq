@@ -72,6 +72,7 @@ export const viewport = {
 };
 
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { stack } from "../lib/stack";
 import { CartProvider } from "../components/CartContext";
 
@@ -93,6 +94,7 @@ export default function RootLayout({
 							<main className="flex-1">
 								{children}
 							</main>
+							<Footer />
 						</CartProvider>
 					</HexclaveTheme>
 				</HexclaveProvider>
