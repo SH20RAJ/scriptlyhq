@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { Mail, MapPin, ShieldCheck, HelpCircle, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Contact Us | ScriptlyStore",
@@ -99,6 +100,28 @@ export default function ContactPage() {
               <p className="text-xs leading-relaxed">Our templates are boilerplates. You can customize them or reach out to builders directly through contact coordinates.</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Customization & SaaS Development Banner */}
+      <div className="max-w-3xl mx-auto bg-gradient-to-r from-primary/10 via-blue-500/5 to-emerald-500/5 border border-primary/20 rounded-3xl p-8 space-y-6 text-center shadow-xl shadow-primary/5">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-foreground tracking-tight">Need Custom Development or AI Automation?</h2>
+          <p className="text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Looking to customize a boilerplate, build custom templates, or want to launch a brand new SaaS, website, landing page, or AI automation flow? Let's collaborate.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+          <Button asChild variant="outline" className="rounded-xl font-bold uppercase tracking-wider text-[10px] border-primary/20 hover:bg-primary/10 h-10 px-6 cursor-pointer">
+            <a href="https://www.linkedin.com/in/sh20raj" target="_blank" rel="noopener noreferrer">
+              Connect on LinkedIn
+            </a>
+          </Button>
+          <Button asChild className="rounded-xl font-bold uppercase tracking-wider text-[10px] bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6 cursor-pointer">
+            <a href="mailto:sh20raj@gmail.com">
+              Email sh20raj@gmail.com
+            </a>
+          </Button>
         </div>
       </div>
     </div>
