@@ -36,8 +36,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Email</p>
-                <a href="mailto:support@strivio.world" className="text-sm font-bold text-foreground hover:underline">
-                  support@strivio.world
+                <a href="mailto:support@scriptly.store" className="text-sm font-bold text-foreground hover:underline">
+                  support@scriptly.store
                 </a>
               </div>
             </div>

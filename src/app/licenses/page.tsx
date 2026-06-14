@@ -46,7 +46,7 @@ export default function LicensesPage() {
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            Questions? Contact legal@strivio.world.
+            Questions? Contact legal@scriptly.store.
           </p>
         </section>
       </div>

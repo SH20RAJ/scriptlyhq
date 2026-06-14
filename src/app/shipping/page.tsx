@@ -31,13 +31,13 @@ export default function ShippingPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">3. Verification Issues</h2>
           <p>
-            If your payment was completed but downloads are not active, please wait up to 15 minutes for payment verification webhooks to sync. If access remains locked, contact support@strivio.world with your transaction ID.
+            If your payment was completed but downloads are not active, please wait up to 15 minutes for payment verification webhooks to sync. If access remains locked, contact support@scriptly.store with your transaction ID.
           </p>
         </section>
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            Questions? Contact support@strivio.world.
+            Questions? Contact support@scriptly.store.
           </p>
         </section>
       </div>

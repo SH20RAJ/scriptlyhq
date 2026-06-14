@@ -49,7 +49,7 @@ export default function PrivacyPage() {
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            Questions? Contact privacy@strivio.world.
+            Questions? Contact privacy@scriptly.store.
           </p>
         </section>
       </div>

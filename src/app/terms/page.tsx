@@ -48,7 +48,7 @@ export default function TermsPage() {
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            ScriptlyStore is a product of Strivio Inc. For legal inquiries, please contact legal@strivio.world.
+            ScriptlyStore is a product of Strivio Inc. For legal inquiries, please contact legal@scriptly.store.
           </p>
         </section>
       </div>

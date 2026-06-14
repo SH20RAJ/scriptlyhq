@@ -35,13 +35,13 @@ export default function RefundPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">3. Request Process</h2>
           <p>
-            To request a refund under valid exception cases, email support@strivio.world with your transaction receipt, registered email, and detailed reasoning within 7 days of purchase. Approved refunds will be processed via Razorpay within 5-7 business days back to your original payment method.
+            To request a refund under valid exception cases, email support@scriptly.store with your transaction receipt, registered email, and detailed reasoning within 7 days of purchase. Approved refunds will be processed via Razorpay within 5-7 business days back to your original payment method.
           </p>
         </section>
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            Questions? Contact support@strivio.world.
+            Questions? Contact support@scriptly.store.
           </p>
         </section>
       </div>
