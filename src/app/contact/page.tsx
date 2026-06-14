@@ -37,8 +37,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Email</p>
-                <a href="mailto:support@scriptly.store" className="text-sm font-bold text-foreground hover:underline">
-                  support@scriptly.store
+                <a href="mailto:mail@scriptly.store" className="text-sm font-bold text-foreground hover:underline">
+                  mail@scriptly.store
                 </a>
               </div>
             </div>
@@ -118,8 +118,8 @@ export default function ContactPage() {
             </a>
           </Button>
           <Button asChild className="rounded-xl font-bold uppercase tracking-wider text-[10px] bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-6 cursor-pointer">
-            <a href="mailto:sh20raj@gmail.com">
-              Email sh20raj@gmail.com
+            <a href="mailto:mail@scriptly.store">
+              Email mail@scriptly.store
             </a>
           </Button>
         </div>

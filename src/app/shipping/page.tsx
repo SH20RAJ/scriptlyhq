@@ -43,13 +43,13 @@ export default function ShippingPage() {
           <ul className="list-disc pl-5 space-y-2">
             <li>Wait up to 10-15 minutes and refresh your dashboard.</li>
             <li>Verify that the transaction amount was successfully debited from your card or bank account.</li>
-            <li>If the download remains locked after 15 minutes, please contact support@scriptly.store. We will verify the transaction and manually grant access within <strong>24 hours</strong>.</li>
+            <li>If the download remains locked after 15 minutes, please contact mail@scriptly.store. We will verify the transaction and manually grant access within <strong>24 hours</strong>.</li>
           </ul>
         </section>
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            For delivery support or inquiries, please contact support@scriptly.store or call us at +91 81783 85203.
+            For delivery support or inquiries, please contact mail@scriptly.store or call us at +91 81783 85203.
           </p>
           <p className="text-xs text-muted-foreground">
             <strong>Registered Office:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India.

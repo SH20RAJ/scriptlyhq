@@ -90,8 +90,8 @@ export default function TermsPage() {
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
             ScriptlyStore is a digital marketplace owned and operated by Strivio Inc. 
-            For legal inquiries, contact legal@scriptly.store. 
-            For support queries, please reach out to support@scriptly.store or call us at +91 81783 85203.
+            For legal inquiries, contact mail@scriptly.store. 
+            For support queries, please reach out to mail@scriptly.store or call us at +91 81783 85203.
           </p>
           <p className="text-xs text-muted-foreground">
             <strong>Registered Office:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India.

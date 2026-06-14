@@ -71,13 +71,13 @@ export default function PrivacyPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">7. Your Rights</h2>
           <p>
-            You have the right to request access to the personal data we hold about you, request corrections to any inaccuracies, or request the deletion of your account and related data. To exercise these rights, please contact support@scriptly.store.
+            You have the right to request access to the personal data we hold about you, request corrections to any inaccuracies, or request the deletion of your account and related data. To exercise these rights, please contact mail@scriptly.store.
           </p>
         </section>
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            If you have questions about this Privacy Policy or how your data is handled, please contact our data team at privacy@scriptly.store.
+            If you have questions about this Privacy Policy or how your data is handled, please contact our data team at mail@scriptly.store.
           </p>
           <p className="text-xs text-muted-foreground">
             <strong>Address:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India | Support Phone: +91 81783 85203

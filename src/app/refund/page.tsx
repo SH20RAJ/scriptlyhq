@@ -35,7 +35,7 @@ export default function RefundPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">3. Request Process & Refund Timelines</h2>
           <p>
-            To request a refund under valid exception cases, email support@scriptly.store with your transaction receipt, registered email, and detailed reasoning within 7 days of purchase. 
+            To request a refund under valid exception cases, email mail@scriptly.store with your transaction receipt, registered email, and detailed reasoning within 7 days of purchase. 
           </p>
           <p>
             Once verified and approved, refunds are processed via our payment processor, <strong>Razorpay</strong>, back to your original payment method. The refund amount will typically reflect in your account within <strong>5-7 business days</strong>.
@@ -45,13 +45,13 @@ export default function RefundPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">4. Cancellation Policy</h2>
           <p>
-            Since all products are digital and delivered immediately upon payment capture, cancellations of successful orders are not supported. If you want to delete your account or cancel your registration with ScriptlyStore, you can contact us at support@scriptly.store.
+            Since all products are digital and delivered immediately upon payment capture, cancellations of successful orders are not supported. If you want to delete your account or cancel your registration with ScriptlyStore, you can contact us at mail@scriptly.store.
           </p>
         </section>
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            For support queries, please email support@scriptly.store or call us at +91 81783 85203.
+            For support queries, please email mail@scriptly.store or call us at +91 81783 85203.
           </p>
           <p className="text-xs text-muted-foreground">
             <strong>Registered Office:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India.
