@@ -59,13 +59,13 @@ export default async function Home({ searchParams }: PageProps) {
 
           <div className="space-y-6">
             <h1 className="text-4xl sm:text-6xl md:text-7.5xl font-black tracking-tight text-white leading-[1.05]">
-              The premium marketplace <br />
+              Ship 10x Faster with <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500">
-                for digital craft.
+                Premium Source Code.
               </span>
             </h1>
             <p className="max-w-2xl mx-auto text-sm sm:text-lg text-neutral-400 font-medium leading-relaxed">
-              Curated collection of SaaS boilerplates, browser scripts, browser extensions, automation packages, and developer assets designed to help builders ship in hours.
+              Discover ready-to-deploy Next.js SaaS boilerplates, browser extensions, scrapers, and automation scripts built to make you money. Sell your code and keep 95% of your sales!
             </p>
           </div>
           
@@ -273,9 +273,9 @@ export default async function Home({ searchParams }: PageProps) {
                 </p>
               </div>
               <div className="space-y-2">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Are payments split in Beta?</h3>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">How do payouts and profit splits work?</h3>
                 <p className="text-xs leading-relaxed text-neutral-400">
-                  Scriptly Store holds transactions during Beta. Creators accrue balances under a 50/50 profit split structure settled via manual checks.
+                  Scriptly Store is developer-first: you keep 95% of all gross sales (the platform only charges a flat 5% fee). Payouts are manually settled during our Beta phase (currently at 99% operational capacity, moving to 100% automated soon).
                 </p>
               </div>
               <div className="space-y-2">

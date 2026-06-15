@@ -6,6 +6,9 @@ export const users = pgTable("users", {
   name: text("name"),
   role: text("role").default("user").notNull(), // 'user' or 'admin'
   storeName: text("store_name"),
+  payoutMethod: text("payout_method"),
+  paypalEmail: text("paypal_email"),
+  payoutDetails: text("payout_details"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -86,4 +89,15 @@ export const downloads = pgTable("downloads", {
   productId: text("product_id").references(() => products.id, { onDelete: "cascade" }).notNull(),
   orderId: text("order_id").references(() => orders.id, { onDelete: "cascade" }).notNull(),
   downloadedAt: timestamp("downloaded_at").defaultNow().notNull(),
+});
+
+export const payouts = pgTable("payouts", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  amount: integer("amount").notNull(), // Payout amount in USD cents
+  status: text("status").default("processed").notNull(), // 'pending', 'processed'
+  payoutMethod: text("payout_method"),
+  paypalEmail: text("paypal_email"),
+  payoutDetails: text("payout_details"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });

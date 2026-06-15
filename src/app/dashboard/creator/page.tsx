@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CreatorProductsTable from "../../../components/CreatorProductsTable";
 import StoreNameEditor from "../../../components/StoreNameEditor";
 import CreatorCouponsManager from "../../../components/CreatorCouponsManager";
+import PayoutSettingsEditor from "../../../components/PayoutSettingsEditor";
 
 export default async function CreatorConsolePage() {
   const user = await getOrCreateDbUser();
@@ -49,7 +50,7 @@ export default async function CreatorConsolePage() {
     grossSales = salesHistory.reduce((sum, item) => sum + item.amount, 0);
   }
 
-  const creatorShare = Math.round(grossSales * 0.5);
+  const creatorShare = Math.round(grossSales * 0.95);
 
   // Fetch creator's specific store coupons
   const storeCoupons = await db
@@ -99,10 +100,10 @@ export default async function CreatorConsolePage() {
         <div className="p-5 rounded-2xl border border-amber-500/10 bg-amber-500/5 text-amber-400 text-xs flex gap-3.5 items-start">
           <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-500" />
           <div className="space-y-1">
-            <h4 className="font-bold text-amber-300 uppercase tracking-wide">Beta Payout Policy & Profit Split</h4>
-            <p className="leading-relaxed text-neutral-400">
-              During the initial Beta phase, automated payouts are disabled. All transaction charges are collected centrally by Scriptly Store. 
-              We calculate a <strong>50/50 profit split</strong> for creator listings. If you qualify for payouts, earnings splits will be settled manually. Contact admin support to request manual balances.
+            <h4 className="font-bold text-amber-300 uppercase tracking-wide">Beta Payout Policy & Profit Split (95/5)</h4>
+            <p className="leading-relaxed text-neutral-400 font-medium">
+              During the initial Beta phase, automated payouts are disabled. Transactions are processed centrally by Scriptly Store. We operate a creator-first model: <strong>you keep 95% of your sales</strong> (platform charges a flat 5% service fee).
+              Payout settlement is currently at 99% manual configuration; we are working to make it 100% automated soon. Specify your payout method and optional PayPal email below to receive manual settlements.
             </p>
           </div>
         </div>
@@ -151,7 +152,7 @@ export default async function CreatorConsolePage() {
           <Card className="border-purple-900/40 bg-purple-500/5 rounded-2xl shadow-lg shadow-purple-500/5">
             <CardHeader className="pb-2">
               <span className="text-xs font-black uppercase tracking-wider text-purple-400 flex items-center justify-between">
-                Your Share (50%)
+                Your Share (95%)
                 <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
               </span>
             </CardHeader>
@@ -172,7 +173,14 @@ export default async function CreatorConsolePage() {
             <div className="lg:col-span-4">
               <StoreNameEditor initialStoreName={user.storeName} />
             </div>
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-4">
+              <PayoutSettingsEditor
+                initialPayoutMethod={user.payoutMethod}
+                initialPaypalEmail={user.paypalEmail}
+                initialPayoutDetails={user.payoutDetails}
+              />
+            </div>
+            <div className="lg:col-span-4">
               <CreatorCouponsManager initialCoupons={storeCoupons} />
             </div>
           </div>
@@ -222,7 +230,7 @@ export default async function CreatorConsolePage() {
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-white">${(sale.amount / 100).toFixed(2)}</p>
-                          <p className="text-[10px] text-purple-400 font-semibold">+${((sale.amount * 0.5) / 100).toFixed(2)}</p>
+                          <p className="text-[10px] text-purple-400 font-semibold">+${((sale.amount * 0.95) / 100).toFixed(2)}</p>
                         </div>
                       </div>
                     ))}

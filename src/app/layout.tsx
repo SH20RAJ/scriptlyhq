@@ -16,10 +16,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: {
-		default: "ScriptlyStore - Premium Digital Product Marketplace",
+		default: "ScriptlyStore - Ready-To-Deploy Next.js SaaS Boilerplates & Developer Scripts",
 		template: "%s | ScriptlyStore",
 	},
-	description: "Discover and download high-quality Landing Pages, SaaS Templates, Ebooks, AI Prompts, UI Kits, and Development Scripts.",
+	description: "Ship 10x faster with ready-to-use Next.js SaaS templates, automation scripts, scraper boilerplates, extensions, and AI prompts. Sell your code & keep 95% of sales!",
+	keywords: [
+		"Next.js boilerplates",
+		"SaaS templates",
+		"source code marketplace",
+		"developer scripts",
+		"automation tools",
+		"Chrome extensions",
+		"AI prompts",
+		"sell digital products",
+		"developer side hustles",
+		"make money programming"
+	],
 	metadataBase: new URL("https://scriptly.store"),
 	manifest: "/manifest.json",
 	alternates: {
@@ -28,8 +40,8 @@ export const metadata: Metadata = {
 		},
 	},
 	openGraph: {
-		title: "ScriptlyStore - Premium Digital Product Marketplace",
-		description: "Discover and download high-quality Landing Pages, SaaS Templates, Ebooks, AI Prompts, UI Kits, and Development Scripts.",
+		title: "ScriptlyStore - Ready-To-Deploy Next.js SaaS Boilerplates & Developer Scripts",
+		description: "Get instant access to ready-to-use Next.js SaaS templates, automation scripts, extensions, and AI prompts. Sell your code and keep 95% of sales!",
 		type: "website",
 		locale: "en_US",
 		siteName: "ScriptlyStore",
@@ -38,14 +50,14 @@ export const metadata: Metadata = {
 				url: "/og-image.png",
 				width: 1200,
 				height: 630,
-				alt: "ScriptlyStore Premium Digital Product Marketplace",
+				alt: "ScriptlyStore Ready-To-Deploy Next.js SaaS Boilerplates & Developer Scripts",
 			},
 		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "ScriptlyStore",
-		description: "Premium Digital Product Marketplace",
+		title: "ScriptlyStore - Next.js SaaS Boilerplates & Developer Scripts",
+		description: "Get instant access to ready-to-use Next.js SaaS templates, automation scripts, and AI prompts. Sell your code and keep 95% of sales!",
 		images: ["/og-image.png"],
 	},
 	appleWebApp: {

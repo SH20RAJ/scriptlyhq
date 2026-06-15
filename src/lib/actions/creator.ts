@@ -100,3 +100,31 @@ export async function deleteCreatorCouponAction(couponId: string) {
   revalidatePath("/dashboard/creator");
   return { success: true };
 }
+
+export async function updateCreatorPayoutSettingsAction(
+  payoutMethod: string,
+  paypalEmail: string,
+  payoutDetails: string
+) {
+  const user = await getOrCreateDbUser();
+  if (!user) {
+    throw new Error("Unauthorized: Sign in required.");
+  }
+
+  const emailTrimmed = paypalEmail?.trim() || "";
+  const detailsTrimmed = payoutDetails?.trim() || "";
+  const method = payoutMethod || null;
+
+  await db
+    .update(users)
+    .set({
+      payoutMethod: method,
+      paypalEmail: emailTrimmed || null,
+      payoutDetails: detailsTrimmed || null,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id));
+
+  revalidatePath("/dashboard/creator");
+  return { success: true };
+}
