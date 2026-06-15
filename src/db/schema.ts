@@ -42,6 +42,8 @@ export const products = pgTable("products", {
   version: text("version").default("1.0.0").notNull(),
   featured: boolean("featured").default(false).notNull(),
   published: boolean("published").default(true).notNull(),
+  creatorId: text("creator_id").references(() => users.id, { onDelete: "set null" }),
+  status: text("status").default("pending"), // 'pending', 'approved', 'rejected'
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

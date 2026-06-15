@@ -38,6 +38,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Product Not Found | ScriptlyStore" };
   }
 
+  const user = await getOrCreateDbUser();
+  const isUserAdmin = user?.role === "admin";
+  const isUserCreator = user !== null && product.creatorId === user.id;
+  const isAccessible = product.published && product.status === "approved";
+
+  if (!isAccessible && !isUserAdmin && !isUserCreator) {
+    return { title: "Product Not Found | ScriptlyStore" };
+  }
+
   return {
     title: `${product.title} - ScriptlyStore`,
     description: product.shortDescription,
@@ -57,20 +66,28 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   if (!product) notFound();
 
-  const authorized = await isAdmin();
-  if (!product.published && !authorized) notFound();
+  const user = await getOrCreateDbUser();
+  const isUserAdmin = user?.role === "admin";
+  const isUserCreator = user !== null && product.creatorId === user.id;
+  const isAccessible = product.published && product.status === "approved";
 
-  // Fetch related products (same category, not current product, published)
+  if (!isAccessible && !isUserAdmin && !isUserCreator) {
+    notFound();
+  }
+
+  const authorized = isUserAdmin;
+
+  // Fetch related products (same category, not current product, published/approved)
   const relatedProducts = await db.query.products.findMany({
     where: and(
       eq(products.category, product.category),
       ne(products.id, product.id),
-      eq(products.published, true)
+      eq(products.published, true),
+      eq(products.status, "approved")
     ),
     limit: 3,
   });
 
-  const user = await getOrCreateDbUser();
   let hasPurchased = false;
 
   if (user) {

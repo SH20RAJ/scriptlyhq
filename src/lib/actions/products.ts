@@ -3,14 +3,16 @@
 import { db } from "../../db";
 import { products } from "../../db/schema";
 import { eq, desc } from "drizzle-orm";
-import { isAdmin } from "../auth-utils";
+import { isAdmin, getOrCreateDbUser } from "../auth-utils";
 import { revalidatePath } from "next/cache";
 
 export async function createProductAction(formData: FormData) {
-  const authorized = await isAdmin();
-  if (!authorized) {
-    throw new Error("Unauthorized: Admin access required.");
+  const user = await getOrCreateDbUser();
+  if (!user) {
+    throw new Error("Unauthorized: Sign in required.");
   }
+
+  const isUserAdmin = user.role === "admin";
 
   const title = (formData.get("title") as string) || "Draft Product";
   let slug = formData.get("slug") as string;
@@ -36,8 +38,12 @@ export async function createProductAction(formData: FormData) {
   const price = isNaN(priceParsed) ? 0 : Math.round(priceParsed * 100);
 
   const version = (formData.get("version") as string) || "1.0.0";
-  const featured = formData.get("featured") === "true";
-  const published = formData.get("published") === "true";
+  
+  // Rules: Creators cannot set featured or publish directly.
+  const featured = isUserAdmin ? (formData.get("featured") === "true") : false;
+  const published = isUserAdmin ? (formData.get("published") === "true") : false;
+  const status = isUserAdmin ? (published ? "approved" : "pending") : "pending";
+  const creatorId = isUserAdmin ? (formData.get("creatorId") as string || null) : user.id;
 
   const thumbnailUrl = formData.get("thumbnail") as string;
   const previewGif = formData.get("previewGif") as string;
@@ -66,6 +72,8 @@ export async function createProductAction(formData: FormData) {
     version,
     featured,
     published,
+    creatorId,
+    status,
   });
 
   revalidatePath("/");
@@ -74,9 +82,22 @@ export async function createProductAction(formData: FormData) {
 }
 
 export async function updateProductAction(id: string, formData: FormData) {
-  const authorized = await isAdmin();
-  if (!authorized) {
-    throw new Error("Unauthorized: Admin access required.");
+  const user = await getOrCreateDbUser();
+  if (!user) {
+    throw new Error("Unauthorized: Sign in required.");
+  }
+
+  const existing = await db.query.products.findFirst({
+    where: eq(products.id, id),
+  });
+
+  if (!existing) {
+    throw new Error("Product not found");
+  }
+
+  const isUserAdmin = user.role === "admin";
+  if (!isUserAdmin && existing.creatorId !== user.id) {
+    throw new Error("Unauthorized: You do not own this product.");
   }
 
   const title = (formData.get("title") as string) || "Draft Product";
@@ -103,22 +124,22 @@ export async function updateProductAction(id: string, formData: FormData) {
   const price = isNaN(priceParsed) ? 0 : Math.round(priceParsed * 100);
 
   const version = (formData.get("version") as string) || "1.0.0";
-  const featured = formData.get("featured") === "true";
-  const published = formData.get("published") === "true";
+
+  // Rules: Creators cannot set featured. Editing approved product resets it to pending/unpublished.
+  const featured = isUserAdmin ? (formData.get("featured") === "true") : false;
+  const published = isUserAdmin ? (formData.get("published") === "true") : false;
+  
+  // If user is admin, allow status from formData or sync with published status.
+  // If user is creator, status resets to pending on edit.
+  const status = isUserAdmin 
+    ? (formData.get("status") as string || (published ? "approved" : "pending"))
+    : "pending";
 
   const thumbnailUrl = formData.get("thumbnail") as string;
   const previewGif = formData.get("previewGif") as string;
   const screenshots = formData.get("screenshots") as string;
   const videoUrl = formData.get("videoUrl") as string;
   const fileUrl = formData.get("fileUrl") as string;
-
-  const existing = await db.query.products.findFirst({
-    where: eq(products.id, id),
-  });
-
-  if (!existing) {
-    throw new Error("Product not found");
-  }
 
   await db
     .update(products)
@@ -140,6 +161,7 @@ export async function updateProductAction(id: string, formData: FormData) {
       version,
       featured,
       published,
+      status,
       updatedAt: new Date(),
     })
     .where(eq(products.id, id));
@@ -151,9 +173,9 @@ export async function updateProductAction(id: string, formData: FormData) {
 }
 
 export async function deleteProductAction(id: string) {
-  const authorized = await isAdmin();
-  if (!authorized) {
-    throw new Error("Unauthorized: Admin access required.");
+  const user = await getOrCreateDbUser();
+  if (!user) {
+    throw new Error("Unauthorized: Sign in required.");
   }
 
   const existing = await db.query.products.findFirst({
@@ -162,6 +184,11 @@ export async function deleteProductAction(id: string) {
 
   if (!existing) {
     throw new Error("Product not found");
+  }
+
+  const isUserAdmin = user.role === "admin";
+  if (!isUserAdmin && existing.creatorId !== user.id) {
+    throw new Error("Unauthorized: You do not own this product.");
   }
 
   await db.delete(products).where(eq(products.id, id));
@@ -172,8 +199,8 @@ export async function deleteProductAction(id: string) {
 }
 
 export async function toggleProductPublishAction(id: string) {
-  const authorized = await isAdmin();
-  if (!authorized) {
+  const isUserAdmin = await isAdmin();
+  if (!isUserAdmin) {
     throw new Error("Unauthorized: Admin access required.");
   }
 
@@ -185,10 +212,14 @@ export async function toggleProductPublishAction(id: string) {
     throw new Error("Product not found");
   }
 
+  const newPublished = !existing.published;
+  const newStatus = newPublished ? "approved" : existing.status;
+
   await db
     .update(products)
     .set({
-      published: !existing.published,
+      published: newPublished,
+      status: newStatus,
       updatedAt: new Date(),
     })
     .where(eq(products.id, id));
@@ -378,7 +409,7 @@ export async function getProductsAction(options?: {
       orderBy: [desc(products.createdAt)],
     });
 
-    let filtered = allProducts.filter((p) => p.published);
+    let filtered = allProducts.filter((p) => p.published && p.status === "approved");
 
     if (options?.category && options.category !== "all") {
       filtered = filtered.filter((p) => p.category === options.category);
@@ -420,5 +451,47 @@ export async function getProductsAction(options?: {
       currentPage: 1
     };
   }
+}
+
+export async function approveProductAction(id: string) {
+  const isUserAdmin = await isAdmin();
+  if (!isUserAdmin) {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+
+  await db
+    .update(products)
+    .set({
+      status: "approved",
+      published: true,
+      updatedAt: new Date(),
+    })
+    .where(eq(products.id, id));
+
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+  revalidatePath("/admin/approvals");
+  return { success: true };
+}
+
+export async function rejectProductAction(id: string) {
+  const isUserAdmin = await isAdmin();
+  if (!isUserAdmin) {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+
+  await db
+    .update(products)
+    .set({
+      status: "rejected",
+      published: false,
+      updatedAt: new Date(),
+    })
+    .where(eq(products.id, id));
+
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+  revalidatePath("/admin/approvals");
+  return { success: true };
 }
 

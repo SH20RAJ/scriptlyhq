@@ -1,9 +1,12 @@
 import { isAdmin } from "../../lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, ShoppingCart, Package, Home, ShieldAlert, FolderKanban, Gift } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, Home, ShieldAlert, FolderKanban, Gift, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { db } from "../../db";
+import { products } from "../../db/schema";
+import { eq, sql } from "drizzle-orm";
 
 export default async function AdminLayout({
   children,
@@ -15,6 +18,13 @@ export default async function AdminLayout({
   if (!authorized) {
     redirect("/");
   }
+
+  // Fetch pending script count for badge
+  const [pendingCountResult] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(products)
+    .where(eq(products.status, "pending"));
+  const pendingCount = pendingCountResult?.count || 0;
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -32,6 +42,19 @@ export default async function AdminLayout({
               <Link href="/admin">
                 <LayoutDashboard className="w-4 h-4 mr-3" />
                 Overview
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="w-full justify-start font-normal text-muted-foreground hover:text-foreground">
+              <Link href="/admin/approvals" className="flex items-center justify-between w-full">
+                <span className="flex items-center">
+                  <CheckSquare className="w-4 h-4 mr-3" />
+                  Approvals
+                </span>
+                {pendingCount > 0 && (
+                  <span className="px-2 py-0.5 text-[9px] font-black bg-rose-500 text-white rounded-full">
+                    {pendingCount}
+                  </span>
+                )}
               </Link>
             </Button>
             <Button asChild variant="ghost" className="w-full justify-start font-normal text-muted-foreground hover:text-foreground">

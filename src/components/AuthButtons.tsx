@@ -46,6 +46,12 @@ export default function AuthButtons() {
         </Link>
       )}
       <Link
+        href="/dashboard/creator"
+        className="hidden md:inline-flex text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+      >
+        Creator Console
+      </Link>
+      <Link
         href="/dashboard"
         className="hidden md:inline-flex text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
       >

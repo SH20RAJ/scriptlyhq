@@ -11,6 +11,7 @@ import { Tweet } from "react-tweet";
 interface ProductFormProps {
   categories: { id: string; name: string; slug: string }[];
   subcategories: { id: string; name: string; slug: string; categoryId: string }[];
+  isCreatorConsole?: boolean;
   initialData?: {
     id: string;
     title: string;
@@ -33,7 +34,7 @@ interface ProductFormProps {
   };
 }
 
-export default function ProductForm({ categories, subcategories, initialData }: ProductFormProps) {
+export default function ProductForm({ categories, subcategories, isCreatorConsole = false, initialData }: ProductFormProps) {
   const isEdit = !!initialData;
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -201,7 +202,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
           if (!isEdit) {
             localStorage.removeItem("scriptlystore_new_product_draft");
           }
-          router.push("/admin/products");
+          router.push(isCreatorConsole ? "/dashboard/creator" : "/admin/products");
           router.refresh();
         }
       } catch (err: any) {
@@ -218,7 +219,7 @@ export default function ProductForm({ categories, subcategories, initialData }: 
       <div className="flex items-center justify-between border-b border-neutral-900 pb-5">
         <div className="flex items-center gap-6">
           <Link
-            href="/admin/products"
+            href={isCreatorConsole ? "/dashboard/creator" : "/admin/products"}
             className="inline-flex items-center text-sm font-semibold text-neutral-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -263,9 +264,11 @@ export default function ProductForm({ categories, subcategories, initialData }: 
               <Save className="w-4 h-4" />
             )}
             <span>
-              {isEdit 
-                ? (initialData?.published ? "Update Product" : "Publish Now") 
-                : "Publish Product"}
+              {isCreatorConsole
+                ? (isEdit ? "Update Submission" : "Submit for Approval")
+                : (isEdit 
+                    ? (initialData?.published ? "Update Product" : "Publish Now") 
+                    : "Publish Product")}
             </span>
           </button>
         </div>
@@ -478,21 +481,35 @@ export default function ProductForm({ categories, subcategories, initialData }: 
               Settings & Tags
             </h3>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-neutral-300 uppercase">Featured Spotlight</h4>
-                <p className="text-[9px] text-neutral-500">Spotlight this product on the home landing</p>
-              </div>
-              <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
-            </div>
+            {!isCreatorConsole ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <h4 className="text-xs font-bold text-neutral-300 uppercase">Featured Spotlight</h4>
+                    <p className="text-[9px] text-neutral-500">Spotlight this product on the home landing</p>
+                  </div>
+                  <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
+                </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
-              <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-neutral-300 uppercase">Publicly Published</h4>
-                <p className="text-[9px] text-neutral-500">Allow customers to view and purchase this item</p>
+                <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
+                  <div className="space-y-0.5">
+                    <h4 className="text-xs font-bold text-neutral-300 uppercase">Publicly Published</h4>
+                    <p className="text-[9px] text-neutral-500">Allow customers to view and purchase this item</p>
+                  </div>
+                  <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
+                </div>
+              </>
+            ) : (
+              <div className="p-4 rounded-xl border border-amber-500/10 bg-amber-500/5 text-amber-400 text-xs flex items-start gap-2">
+                <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-amber-300 uppercase text-[10px] mb-1">Approval Moderation</h4>
+                  <p className="text-[10px] leading-relaxed text-neutral-400">
+                    To maintain library quality, all submitted scripts are saved as unlisted drafts and audited by Scriptly moderators before public release.
+                  </p>
+                </div>
               </div>
-              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
-            </div>
+            )}
             
             <div className="pt-4 border-t border-neutral-800 space-y-4">
               <div className="space-y-2">
