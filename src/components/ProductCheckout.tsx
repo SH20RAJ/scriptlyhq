@@ -24,12 +24,14 @@ interface ProductCheckoutProps {
   };
   hasPurchased: boolean;
   userLoggedIn: boolean;
+  isFree?: boolean;
 }
 
 export default function ProductCheckout({
   product,
   hasPurchased,
   userLoggedIn,
+  isFree = false,
 }: ProductCheckoutProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -62,6 +64,11 @@ export default function ProductCheckout({
 
         if (!orderData.success) {
           setError("Failed to initialize order. Please try again.");
+          return;
+        }
+
+        if (orderData.isFreeCheckout && orderData.redirectUrl) {
+          router.push(orderData.redirectUrl);
           return;
         }
 
@@ -137,7 +144,7 @@ export default function ProductCheckout({
           ) : (
             <CreditCard className="w-4 h-4 mr-2" />
           )}
-          <span>{userLoggedIn ? `Buy Now` : "Sign in to Buy"}</span>
+          <span>{userLoggedIn ? (isFree ? "Claim Free" : `Buy Now`) : "Sign in to Buy"}</span>
         </Button>
 
         <Button

@@ -1,15 +1,17 @@
 export const dynamic = "force-dynamic";
 
 import { db } from "../../../db";
-import { products, orders } from "../../../db/schema";
+import { products, orders, coupons } from "../../../db/schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Package, Sparkles, AlertTriangle, Plus, LayoutGrid, Coins, Activity, ArrowRightLeft } from "lucide-react";
+import { Package, Sparkles, AlertTriangle, Plus, LayoutGrid, Coins, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CreatorProductsTable from "../../../components/CreatorProductsTable";
+import StoreNameEditor from "../../../components/StoreNameEditor";
+import CreatorCouponsManager from "../../../components/CreatorCouponsManager";
 
 export default async function CreatorConsolePage() {
   const user = await getOrCreateDbUser();
@@ -49,9 +51,23 @@ export default async function CreatorConsolePage() {
 
   const creatorShare = Math.round(grossSales * 0.5);
 
+  // Fetch creator's specific store coupons
+  const storeCoupons = await db
+    .select({
+      id: coupons.id,
+      code: coupons.code,
+      discountType: coupons.discountType,
+      discountValue: coupons.discountValue,
+      minPurchaseAmount: coupons.minPurchaseAmount,
+      active: coupons.active,
+    })
+    .from(coupons)
+    .where(eq(coupons.creatorId, user.id))
+    .orderBy(desc(coupons.createdAt));
+
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="container max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-10">
+      <div className="container max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-12">
         
         {/* Welcome / Heading Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900 pb-10">
@@ -63,7 +79,7 @@ export default async function CreatorConsolePage() {
               </span>
             </h1>
             <p className="text-neutral-400 font-medium">
-              Manage your uploaded scripts, monitor revenue, and request publishing approvals.
+              Manage your uploaded scripts, configure discounts, monitor store-level coupons, and request publishing approvals.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -95,10 +111,10 @@ export default async function CreatorConsolePage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card className="border-neutral-900 bg-neutral-950/40 rounded-2xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
                 Total Uploads
                 <LayoutGrid className="w-4 h-4 text-neutral-600" />
-              </CardTitle>
+              </span>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black text-white">{creatorProducts.length}</div>
@@ -108,10 +124,10 @@ export default async function CreatorConsolePage() {
 
           <Card className="border-neutral-900 bg-neutral-950/40 rounded-2xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
                 Total Unlocks
                 <Package className="w-4 h-4 text-neutral-600" />
-              </CardTitle>
+              </span>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black text-white">{totalSold}</div>
@@ -121,10 +137,10 @@ export default async function CreatorConsolePage() {
 
           <Card className="border-neutral-900 bg-neutral-950/40 rounded-2xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
                 Gross Revenue
                 <Coins className="w-4 h-4 text-neutral-600" />
-              </CardTitle>
+              </span>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black text-white">${(grossSales / 100).toFixed(2)}</div>
@@ -134,10 +150,10 @@ export default async function CreatorConsolePage() {
 
           <Card className="border-purple-900/40 bg-purple-500/5 rounded-2xl shadow-lg shadow-purple-500/5">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-wider text-purple-400 flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-purple-400 flex items-center justify-between">
                 Your Share (50%)
                 <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-              </CardTitle>
+              </span>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black text-white">${(creatorShare / 100).toFixed(2)}</div>
@@ -145,6 +161,22 @@ export default async function CreatorConsolePage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Store Naming Settings */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-4">
+            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-neutral-500">Storefront & Promotions</h2>
+            <div className="h-px flex-1 bg-neutral-900" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-4">
+              <StoreNameEditor initialStoreName={user.storeName} />
+            </div>
+            <div className="lg:col-span-8">
+              <CreatorCouponsManager initialCoupons={storeCoupons} />
+            </div>
+          </div>
+        </section>
 
         {/* Main Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -166,10 +198,10 @@ export default async function CreatorConsolePage() {
 
             <Card className="border-neutral-900 bg-neutral-950/40 rounded-2xl">
               <CardHeader className="pb-4">
-                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <span className="text-sm font-bold flex items-center gap-2">
                   <Activity className="w-4 h-4 text-purple-400" />
                   Earning Ledger
-                </CardTitle>
+                </span>
               </CardHeader>
               <CardContent className="space-y-6">
                 {salesHistory.length === 0 ? (

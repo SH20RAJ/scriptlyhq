@@ -1,13 +1,14 @@
 export const dynamic = "force-dynamic";
 
 import { db } from "../../../db";
-import { products, orders } from "../../../db/schema";
+import { products, orders, users } from "../../../db/schema";
 import { eq, and, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { ProductCard } from "../../../components/SearchFilter";
 import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import ProductCheckout from "../../../components/ProductCheckout";
 import Link from "next/link";
+import { getProductEffectivePrice } from "../../../lib/price-utils";
 import { ArrowLeft, ExternalLink, ShieldCheck, Zap } from "lucide-react";
 import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
@@ -78,6 +79,17 @@ export default async function ProductDetailPage({ params }: PageProps) {
   }
 
   const authorized = isUserAdmin;
+
+  // Load creator store name
+  let storeName: string | null = null;
+  if (product.creatorId) {
+    const creatorRecord = await db.query.users.findFirst({
+      where: eq(users.id, product.creatorId),
+    });
+    storeName = creatorRecord?.storeName || null;
+  }
+
+  const promo = getProductEffectivePrice(product);
 
   // Fetch related products (same category, not current product, published/approved)
   const relatedProducts = await db.query.products.findMany({
@@ -176,9 +188,16 @@ export default async function ProductDetailPage({ params }: PageProps) {
               <div className="space-y-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Badge variant="outline" className="rounded-full px-3 text-[10px] uppercase font-black tracking-[0.2em] border-primary/20 text-primary">
-                      {product.category}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="rounded-full px-3 text-[10px] uppercase font-black tracking-[0.2em] border-primary/20 text-primary">
+                        {product.category}
+                      </Badge>
+                      {storeName && (
+                        <Badge variant="secondary" className="rounded-full px-3 text-[10px] uppercase font-bold tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                          Store: {storeName}
+                        </Badge>
+                      )}
+                    </div>
                     <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-foreground leading-[1.1]">
                       {product.title}
                     </h1>
@@ -191,11 +210,50 @@ export default async function ProductDetailPage({ params }: PageProps) {
               </div>
 
               <div className="space-y-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-black tracking-tighter tabular-nums">
-                    ${(product.price / 100).toFixed(2)}
-                  </span>
-                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">USD</span>
+                <div className="flex flex-col gap-2">
+                  {promo.isFree ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-black tracking-tighter text-emerald-500 uppercase">
+                        FREE
+                      </span>
+                      {promo.price > 0 && (
+                        <span className="text-xl font-bold text-muted-foreground line-through decoration-destructive/60 tabular-nums">
+                          ${(promo.price / 100).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  ) : promo.hasDiscount ? (
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-5xl font-black tracking-tighter text-foreground tabular-nums">
+                          ${(promo.effectivePrice / 100).toFixed(2)}
+                        </span>
+                        <span className="text-xl font-bold text-muted-foreground line-through decoration-destructive/60 tabular-nums">
+                          ${(promo.price / 100).toFixed(2)}
+                        </span>
+                        <Badge variant="destructive" className="rounded-md px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                          -{promo.discountPercent}% OFF
+                        </Badge>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-black tracking-tighter tabular-nums">
+                        ${(product.price / 100).toFixed(2)}
+                      </span>
+                      <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">USD</span>
+                    </div>
+                  )}
+
+                  {/* Countdown Warning / Banner */}
+                  {promo.isPromoActive && promo.promoEnd && (
+                    <div className="mt-2 text-xs font-bold text-amber-500 flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl">
+                      <span className="animate-pulse w-2.5 h-2.5 rounded-full bg-amber-500" />
+                      <span>
+                        Limited time offer! Ends on {new Date(promo.promoEnd).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-4">
@@ -203,6 +261,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     product={product}
                     hasPurchased={hasPurchased}
                     userLoggedIn={!!user}
+                    isFree={promo.isFree}
                   />
                   
                   {product.demoUrl && (

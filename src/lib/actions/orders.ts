@@ -6,6 +6,7 @@ import { db } from "../../db";
 import { products, orders, coupons } from "../../db/schema";
 import { eq, inArray } from "drizzle-orm";
 import crypto from "crypto";
+import { getProductEffectivePrice } from "../price-utils";
 
 let razorpayInstance: any = null;
 
@@ -45,13 +46,23 @@ export async function createRazorpayOrderAction({
   }
 
   // Fetch all selected products
-  const selectedProducts = await db.query.products.findMany({
+  const rawProducts = await db.query.products.findMany({
     where: inArray(products.id, idsToFetch),
   });
 
-  if (selectedProducts.length === 0) {
+  if (rawProducts.length === 0) {
     throw new Error("None of the selected products were found.");
   }
+
+  // Apply active promotions to products
+  const selectedProducts = rawProducts.map(p => {
+    const promo = getProductEffectivePrice(p);
+    return {
+      ...p,
+      originalPrice: p.price,
+      price: promo.effectivePrice, // Use promotion price (discounted or 0 if free)
+    };
+  });
 
   // Calculate Subtotal (USD cents)
   const subtotal = selectedProducts.reduce((sum, p) => sum + p.price, 0);
@@ -74,19 +85,76 @@ export async function createRazorpayOrderAction({
       where: eq(coupons.code, codeUpper),
     });
 
-    if (coupon && coupon.active && amountAfterAuto >= coupon.minPurchaseAmount) {
-      validatedCouponCode = coupon.code;
-      if (coupon.discountType === "percentage") {
-        couponDiscount = Math.round(amountAfterAuto * (coupon.discountValue / 100));
-      } else if (coupon.discountType === "fixed") {
-        // cap fixed discount at the remaining amount
-        couponDiscount = Math.min(coupon.discountValue, amountAfterAuto);
+    if (coupon && coupon.active) {
+      if (coupon.creatorId) {
+        // Find cart products belonging to this coupon creator
+        const creatorItems = selectedProducts.filter(p => p.creatorId === coupon.creatorId);
+        const creatorSubtotal = creatorItems.reduce((sum, p) => sum + p.price, 0);
+
+        if (creatorSubtotal > 0 && amountAfterAuto >= coupon.minPurchaseAmount) {
+          validatedCouponCode = coupon.code;
+          if (coupon.discountType === "percentage") {
+            couponDiscount = Math.round(creatorSubtotal * (coupon.discountValue / 100));
+          } else if (coupon.discountType === "fixed") {
+            couponDiscount = Math.min(coupon.discountValue, creatorSubtotal);
+          }
+        }
+      } else {
+        // Global coupon
+        if (amountAfterAuto >= coupon.minPurchaseAmount) {
+          validatedCouponCode = coupon.code;
+          if (coupon.discountType === "percentage") {
+            couponDiscount = Math.round(amountAfterAuto * (coupon.discountValue / 100));
+          } else if (coupon.discountType === "fixed") {
+            couponDiscount = Math.min(coupon.discountValue, amountAfterAuto);
+          }
+        }
       }
     }
   }
 
   const totalDiscount = autoDiscount + couponDiscount;
-  const finalAmount = Math.max(subtotal - totalDiscount, 100); // minimum $1.00 for checkout
+  const finalAmount = Math.max(subtotal - totalDiscount, 0);
+
+  // Check if checkout is free
+  if (finalAmount === 0) {
+    const freeOrderId = "free_checkout_" + crypto.randomBytes(8).toString("hex");
+    const insertedOrders = [];
+
+    for (let i = 0; i < selectedProducts.length; i++) {
+      const product = selectedProducts[i];
+      const orderId = crypto.randomUUID();
+
+      await db.insert(orders).values({
+        id: orderId,
+        userId: user.id,
+        productId: product.id,
+        razorpayOrderId: freeOrderId,
+        razorpayPaymentId: "free_pay_" + crypto.randomBytes(8).toString("hex"),
+        amount: 0,
+        status: "completed", // Completed instantly
+        couponCode: validatedCouponCode,
+        discountApplied: product.originalPrice - product.price + Math.round(totalDiscount / selectedProducts.length),
+      });
+
+      insertedOrders.push({ id: orderId, productTitle: product.title });
+    }
+
+    return {
+      success: true,
+      isFreeCheckout: true,
+      razorpayOrderId: freeOrderId,
+      redirectUrl: `/purchase-success?orderId=${insertedOrders[0].id}`,
+      amount: 0,
+      key: "",
+      productName: selectedProducts.length === 1 ? selectedProducts[0].title : `${selectedProducts.length} items in Cart`,
+      userEmail: user.email,
+      userName: user.name || "",
+      isMock: true,
+    };
+  }
+
+  const razorpayAmount = Math.max(finalAmount, 100); // Minimum $1.00 for checkout
 
   // Fetch live exchange rate from USD to INR, fallback to 95 if API fails
   let usdToInrRate = 95;
@@ -105,7 +173,7 @@ export async function createRazorpayOrderAction({
     console.error("Failed to fetch live USD to INR exchange rate. Falling back to 95.", err);
   }
 
-  const finalAmountInInrPaise = Math.round(finalAmount * usdToInrRate);
+  const finalAmountInInrPaise = Math.round(razorpayAmount * usdToInrRate);
 
   // Generate Razorpay Order
   let rzpOrderId = "rzp_order_mock_" + crypto.randomBytes(8).toString("hex");
@@ -138,13 +206,12 @@ export async function createRazorpayOrderAction({
     let itemAmount = 0;
 
     if (isLast) {
-      // absorb rounding errors on the last product
       itemDiscount = totalDiscount - distributedDiscountSum;
-      itemAmount = finalAmount - distributedAmountSum;
+      itemAmount = razorpayAmount - distributedAmountSum;
     } else {
       const ratio = product.price / subtotal;
       itemDiscount = Math.round(totalDiscount * ratio);
-      itemAmount = Math.round(finalAmount * ratio);
+      itemAmount = Math.round(razorpayAmount * ratio);
 
       distributedDiscountSum += itemDiscount;
       distributedAmountSum += itemAmount;
@@ -160,7 +227,7 @@ export async function createRazorpayOrderAction({
       amount: itemAmount,
       status: "pending",
       couponCode: validatedCouponCode,
-      discountApplied: itemDiscount,
+      discountApplied: itemDiscount + (product.originalPrice - product.price),
     });
 
     insertedOrders.push({ id: orderId, productTitle: product.title });

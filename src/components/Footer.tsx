@@ -27,6 +27,7 @@ export default function Footer() {
               <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
               <li><Link href="/refund" className="hover:text-foreground transition-colors">Refund Policy</Link></li>
               <li><Link href="/shipping" className="hover:text-foreground transition-colors">Shipping Policy</Link></li>
+              <li><Link href="/dmca" className="hover:text-foreground transition-colors">DMCA Policy</Link></li>
             </ul>
           </div>
           <div className="space-y-4">

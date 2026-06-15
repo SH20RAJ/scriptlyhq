@@ -16,6 +16,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 
 import { useCart } from "./CartContext";
+import { getProductEffectivePrice } from "../lib/price-utils";
 
 export default function SearchFilter({
   categories,
@@ -109,6 +110,7 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
   const [isHovered, setIsHovered] = useState(false);
   const { addToCart, isInCart } = useCart();
   const inCart = isInCart(prod.id);
+  const promo = getProductEffectivePrice(prod);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -172,9 +174,24 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
                   {prod.title}
                 </h3>
              </Link>
-             <span className="text-sm font-black text-foreground tabular-nums">
-                ${(prod.price / 100).toFixed(2)}
-             </span>
+             {promo.isFree ? (
+               <span className="text-sm font-black text-emerald-500 uppercase">
+                  Free
+               </span>
+             ) : promo.hasDiscount ? (
+               <div className="flex flex-col items-end">
+                 <span className="text-sm font-black text-foreground tabular-nums">
+                    ${(promo.effectivePrice / 100).toFixed(2)}
+                 </span>
+                 <span className="text-[10px] font-bold text-muted-foreground line-through tabular-nums leading-none">
+                    ${(promo.price / 100).toFixed(2)}
+                 </span>
+               </div>
+             ) : (
+               <span className="text-sm font-black text-foreground tabular-nums">
+                  ${(prod.price / 100).toFixed(2)}
+               </span>
+             )}
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed font-medium">
             {prod.shortDescription}

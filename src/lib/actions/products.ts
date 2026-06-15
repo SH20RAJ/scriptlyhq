@@ -45,6 +45,14 @@ export async function createProductAction(formData: FormData) {
   const status = isUserAdmin ? (published ? "approved" : "pending") : "pending";
   const creatorId = isUserAdmin ? (formData.get("creatorId") as string || null) : user.id;
 
+  const isFree = formData.get("isFree") === "true";
+  const discountPercentVal = parseInt(formData.get("discountPercent") as string || "0", 10);
+  const discountPercent = isNaN(discountPercentVal) ? 0 : discountPercentVal;
+  const promoStartStr = formData.get("promoStart") as string;
+  const promoEndStr = formData.get("promoEnd") as string;
+  const promoStart = promoStartStr ? new Date(promoStartStr) : null;
+  const promoEnd = promoEndStr ? new Date(promoEndStr) : null;
+
   const thumbnailUrl = formData.get("thumbnail") as string;
   const previewGif = formData.get("previewGif") as string;
   const screenshots = formData.get("screenshots") as string; // JSON or comma-separated
@@ -74,6 +82,10 @@ export async function createProductAction(formData: FormData) {
     published,
     creatorId,
     status,
+    isFree,
+    discountPercent,
+    promoStart,
+    promoEnd,
   });
 
   revalidatePath("/");
@@ -135,6 +147,14 @@ export async function updateProductAction(id: string, formData: FormData) {
     ? (formData.get("status") as string || (published ? "approved" : "pending"))
     : "pending";
 
+  const isFree = formData.get("isFree") === "true";
+  const discountPercentVal = parseInt(formData.get("discountPercent") as string || "0", 10);
+  const discountPercent = isNaN(discountPercentVal) ? 0 : discountPercentVal;
+  const promoStartStr = formData.get("promoStart") as string;
+  const promoEndStr = formData.get("promoEnd") as string;
+  const promoStart = promoStartStr ? new Date(promoStartStr) : null;
+  const promoEnd = promoEndStr ? new Date(promoEndStr) : null;
+
   const thumbnailUrl = formData.get("thumbnail") as string;
   const previewGif = formData.get("previewGif") as string;
   const screenshots = formData.get("screenshots") as string;
@@ -162,6 +182,10 @@ export async function updateProductAction(id: string, formData: FormData) {
       featured,
       published,
       status,
+      isFree,
+      discountPercent,
+      promoStart,
+      promoEnd,
       updatedAt: new Date(),
     })
     .where(eq(products.id, id));

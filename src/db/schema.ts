@@ -5,6 +5,7 @@ export const users = pgTable("users", {
   email: text("email").notNull(),
   name: text("name"),
   role: text("role").default("user").notNull(), // 'user' or 'admin'
+  storeName: text("store_name"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -46,6 +47,10 @@ export const products = pgTable("products", {
   status: text("status").default("pending"), // 'pending', 'approved', 'rejected'
   rating: text("rating").default("5.0").notNull(), // Average rating (e.g. '4.8')
   ratingCount: integer("rating_count").default(1).notNull(), // Internal count
+  isFree: boolean("is_free").default(false).notNull(),
+  discountPercent: integer("discount_percent").default(0).notNull(),
+  promoStart: timestamp("promo_start"),
+  promoEnd: timestamp("promo_end"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -57,6 +62,7 @@ export const coupons = pgTable("coupons", {
   discountValue: integer("discount_value").notNull(),
   minPurchaseAmount: integer("min_purchase_amount").default(0).notNull(),
   active: boolean("active").default(true).notNull(),
+  creatorId: text("creator_id").references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -50,38 +50,62 @@ export default function TermsPage() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">5. Pricing & Payments</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">5. Creator Storefronts & Script Uploads</h2>
+          <p>
+            ScriptlyStore permits approved users ("Creators") to upload digital scripts, tools, and boilerplates to the platform. 
+          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><strong>Store Naming:</strong> Creators may choose a store name to represent their catalog. Store names must not infringe upon trademarks, brands, or third-party intellectual property. Strivio Inc. reserves the right to rename or suspend stores violating this policy.</li>
+            <li><strong>Beta Listings & Payouts:</strong> In the current Beta release, all customer payments are processed directly by ScriptlyStore. Payout allocations (e.g. 50/50 split or other metrics) will be settled in accordance with separate agreements or manual console credits.</li>
+            <li><strong>Moderation:</strong> All creator uploads are unlisted by default. They are subject to code security reviews and copyright verification by our administration panel before approval.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">6. Store-Specific Coupons & Promotions</h2>
+          <p>
+            Creators may generate promotional discount codes ("Coupons") for their storefronts.
+          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><strong>Coupon Scope:</strong> Store-specific coupons created by a Creator will apply discount calculations solely to items listed under that Creator's storefront.</li>
+            <li><strong>Free Listings & Date Interval Promotions:</strong> Creators and Administrators can specify date ranges for percentage discounts or mark items as "Free." Free checkouts bypass payment processors entirely, creating direct download permissions.</li>
+            <li><strong>Misuse Prevention:</strong> Generating fraudulent coupons or exploiting checkout discount calculations to circumvent standard platform billing is strictly prohibited and will result in immediate storefront termination.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">7. Pricing & Payments</h2>
           <p>
             All prices listed on ScriptlyStore are in Indian Rupees (INR) or United States Dollars (USD), as indicated, and are subject to change without notice. 
           </p>
           <p>
-            Payments are securely processed via <strong>Razorpay</strong>. By placing an order, you authorize us and our payment processor to charge the designated payment method for the total order amount. Strivio Inc. does not store or process cardholder or bank credentials on its servers.
+            Payments are securely processed via <strong>Razorpay</strong>. By placing an order, you authorize us and our payment processor to charge the designated payment method for the total order amount. Strivio Inc. does not store or process cardholder or bank credentials on its servers. Free checkouts bypass Razorpay processing entirely.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">6. Refunds & Cancellation</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">8. Refunds & Cancellation</h2>
           <p>
             Due to the immediate delivery and downloadable nature of digital products, all purchases are non-refundable and final. Please review product details, documentation, and compatibility requirements carefully before purchasing. Refund exceptions are only handled under the strict guidelines specified in our <a href="/refund" className="underline hover:text-foreground">Cancellation & Refund Policy</a>.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">7. Intellectual Property</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">9. Intellectual Property & UGC Rights</h2>
           <p>
-            All content on this website, including but not limited to text, design, graphics, logo, code, and interfaces, is the intellectual property of Strivio Inc. and is protected by copyright and intellectual property laws. Unauthorized duplication, extraction, or copying of website designs is strictly forbidden.
+            All website infrastructure is the property of Strivio Inc. Creators retain ownership of their uploaded scripts and files, but grant ScriptlyStore a worldwide, royalty-free license to host, display, and distribute the files to authorized purchasers. All uploads must be free of malware and must not infringe on third-party copyrights.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">8. Limitation of Liability</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">10. Limitation of Liability</h2>
           <p>
             To the maximum extent permitted by applicable law, Strivio Inc. and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use or inability to use our products or services, even if advised of the possibility of such damages.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">9. Governing Law & Jurisdiction</h2>
+          <h2 className="text-xl font-bold text-foreground tracking-tight">11. Governing Law & Jurisdiction</h2>
           <p>
             These Terms of Service and any transactions entered into on this website are governed by and construed in accordance with the laws of India. Any legal actions, disputes, or claims arising out of these terms shall be subject to the exclusive jurisdiction of the courts located in Gurugram, Haryana, India.
           </p>

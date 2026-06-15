@@ -31,6 +31,10 @@ interface ProductFormProps {
     version: string;
     featured: boolean;
     published: boolean;
+    isFree?: boolean;
+    discountPercent?: number;
+    promoStart?: Date | string | null;
+    promoEnd?: Date | string | null;
   };
 }
 
@@ -54,6 +58,23 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
   const [demoUrl, setDemoUrl] = useState(initialData?.demoUrl || "");
   const [featured, setFeatured] = useState(initialData?.featured || false);
   const [published, setPublished] = useState(initialData ? initialData.published : true);
+  
+  const [isFree, setIsFree] = useState(initialData?.isFree || false);
+  const [discountPercent, setDiscountPercent] = useState(initialData?.discountPercent?.toString() || "0");
+  
+  const formatDateForInput = (dateVal: any) => {
+    if (!dateVal) return "";
+    try {
+      const d = new Date(dateVal);
+      const tzOffset = d.getTimezoneOffset() * 60000;
+      return new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
+    } catch {
+      return "";
+    }
+  };
+
+  const [promoStart, setPromoStart] = useState(formatDateForInput(initialData?.promoStart));
+  const [promoEnd, setPromoEnd] = useState(formatDateForInput(initialData?.promoEnd));
   
   const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnail || "");
   const [previewGif, setPreviewGif] = useState(initialData?.previewGif || "");
@@ -88,6 +109,10 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
         if (data.version) setVersion(data.version);
         if (data.featured !== undefined) setFeatured(data.featured);
         if (data.published !== undefined) setPublished(data.published);
+        if (data.isFree !== undefined) setIsFree(data.isFree);
+        if (data.discountPercent !== undefined) setDiscountPercent(data.discountPercent);
+        if (data.promoStart) setPromoStart(data.promoStart);
+        if (data.promoEnd) setPromoEnd(data.promoEnd);
       }
     } catch (err) {
       console.error("Failed to load draft from localStorage:", err);
@@ -115,6 +140,10 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
       version,
       featured,
       published,
+      isFree,
+      discountPercent,
+      promoStart,
+      promoEnd,
     };
     localStorage.setItem("scriptlystore_new_product_draft", JSON.stringify(data));
   }, [
@@ -188,6 +217,10 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
     formData.set("videoUrl", videoUrl);
     formData.set("fileUrl", fileUrl);
     formData.set("subcategory", subcategory);
+    formData.set("isFree", isFree ? "true" : "false");
+    formData.set("discountPercent", isFree ? "0" : discountPercent);
+    formData.set("promoStart", promoStart);
+    formData.set("promoEnd", promoEnd);
 
     startTransition(async () => {
       try {
@@ -329,8 +362,45 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Price (USD $) *</label>
-                <input type="number" name="price" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors" />
+                <input type="number" name="price" step="0.01" min="0" disabled={isFree} value={isFree ? "0.00" : price} onChange={(e) => setPrice(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors disabled:opacity-50" />
               </div>
+            </div>
+
+            {/* Promotion / Free product options */}
+            <div className="border-t border-neutral-800/60 pt-5 space-y-4">
+              <h4 className="text-[10px] font-black uppercase tracking-wider text-purple-400">Promotions & Discounts</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-4 rounded-xl border border-neutral-800 bg-neutral-950/60">
+                  <div className="space-y-0.5">
+                    <h4 className="text-xs font-bold text-neutral-300 uppercase">Make Product Free</h4>
+                    <p className="text-[9px] text-neutral-500">Bypass checkout payment flows completely</p>
+                  </div>
+                  <input type="checkbox" checked={isFree} onChange={(e) => {
+                    setIsFree(e.target.checked);
+                    if (e.target.checked) setPrice("0.00");
+                  }} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Discount Percentage (%)</label>
+                  <input type="number" min="0" max="100" name="discountPercent" disabled={isFree} value={isFree ? "0" : discountPercent} onChange={(e) => setDiscountPercent(e.target.value)} placeholder="e.g. 20 (for 20% off)" className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/5 focus:border-neutral-500 transition-colors disabled:opacity-50" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Promotion Start Date (Optional)</label>
+                  <input type="datetime-local" name="promoStart" value={promoStart} onChange={(e) => setPromoStart(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:border-neutral-500 cursor-pointer" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Promotion End Date (Optional)</label>
+                  <input type="datetime-local" name="promoEnd" value={promoEnd} onChange={(e) => setPromoEnd(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:border-neutral-500 cursor-pointer" />
+                </div>
+              </div>
+              <p className="text-[9px] text-neutral-500 leading-normal">
+                Leave dates empty to apply the promotion permanently. If start/end dates are specified, the discount or free status will automatically activate and deactivate at those times.
+              </p>
             </div>
           </div>
 
