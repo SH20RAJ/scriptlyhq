@@ -1,18 +1,39 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { db } from "../../../db";
 import { products, orders, coupons } from "../../../db/schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Package, Sparkles, AlertTriangle, Plus, LayoutGrid, Coins, Activity, ArrowRight } from "lucide-react";
+import {
+  Package,
+  Sparkles,
+  AlertTriangle,
+  Plus,
+  LayoutGrid,
+  Coins,
+  Activity,
+  ArrowRight,
+  ShieldCheck,
+  Hourglass,
+  HelpCircle,
+  Building,
+  HelpCircle as QuestionIcon
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CreatorProductsTable from "../../../components/CreatorProductsTable";
 import StoreNameEditor from "../../../components/StoreNameEditor";
 import CreatorCouponsManager from "../../../components/CreatorCouponsManager";
 import PayoutSettingsEditor from "../../../components/PayoutSettingsEditor";
+
+export const metadata: Metadata = {
+  title: "Creator Console | ScriptlyStore",
+  description: "Manage your developer storefront, configure automated splits via Razorpay Route, and track script earnings.",
+};
 
 export default async function CreatorConsolePage() {
   const user = await getOrCreateDbUser();
@@ -66,9 +87,13 @@ export default async function CreatorConsolePage() {
     .where(eq(coupons.creatorId, user.id))
     .orderBy(desc(coupons.createdAt));
 
+  // Determine Razorpay Route Connection Status
+  const hasBankDetails = !!user.bankAccountNumber && !!user.bankIfsc;
+  const isRouteActive = !!user.razorpayAccountId && user.razorpayAccountId.startsWith("acc_");
+
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="container max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-12">
+      <div className="container max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-12 animate-in fade-in duration-500">
         
         {/* Welcome / Heading Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900 pb-10">
@@ -96,19 +121,62 @@ export default async function CreatorConsolePage() {
           </div>
         </div>
 
-        {/* Global Beta payout notice */}
-        <div className="p-5 rounded-2xl border border-amber-500/10 bg-amber-500/5 text-amber-400 text-xs flex gap-3.5 items-start">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-500" />
-          <div className="space-y-1.5">
-            <h4 className="font-bold text-amber-300 uppercase tracking-wide">Automated Payouts via Razorpay Route Split (95/5)</h4>
-            <p className="leading-relaxed text-neutral-400 font-medium">
-              Automated profit splitting is now active via **Razorpay Route**! When you select **Direct Bank** payout and provide your banking details below, your 95% share of each sale will be dynamically split and routed directly to your bank account at checkout (platform retains 5% service fee). We are operating in Beta to optimize routing flows (99% to 100% automated soon). Other methods (PayPal, UPI) are settled manually.
-              <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-amber-300 hover:text-amber-200 underline font-bold transition-all ml-1">
-                Read the Route Splits Guide <ArrowRight className="w-3 h-3" />
-              </Link>
-            </p>
+        {/* Razorpay Route Split Integration Status Banner */}
+        {isRouteActive ? (
+          <div className="p-6 rounded-3xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-400 flex gap-4 items-start shadow-lg shadow-emerald-500/5">
+            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-emerald-300 uppercase tracking-wide text-xs">Razorpay Route splits Active</h4>
+                <Badge className="bg-emerald-500/20 text-emerald-300 border-0 text-[9px] uppercase tracking-wider h-5">Verified Linked Account</Badge>
+              </div>
+              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
+                Your store split configuration is completely active. 95% of customer payments are split instantly at checkout and transferred directly to your bank account under sub-merchant account <span className="font-mono text-emerald-300 bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded">{user.razorpayAccountId}</span>. Retained platform commission is 5%.
+                <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 underline font-bold transition-all ml-1.5">
+                  Route Guide <ArrowRight className="w-3 h-3" />
+                </Link>
+              </p>
+            </div>
           </div>
-        </div>
+        ) : hasBankDetails ? (
+          <div className="p-6 rounded-3xl border border-amber-500/10 bg-amber-500/5 text-amber-400 flex gap-4 items-start">
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+              <Hourglass className="w-6 h-6 animate-pulse" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-amber-300 uppercase tracking-wide text-xs">Razorpay Route Onboarding in Progress</h4>
+                <Badge className="bg-amber-500/20 text-amber-300 border-0 text-[9px] uppercase tracking-wider h-5 font-bold">Staged for API Approval</Badge>
+              </div>
+              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
+                Your bank details are recorded. Our system administrators are setting up your merchant credentials on the Razorpay node. Splits will deploy automatically once verification is finalized. If you experience latency, our support team will complete manual setup fallback.
+                <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-amber-300 hover:text-amber-200 underline font-bold transition-all ml-1.5">
+                  Route Guide <ArrowRight className="w-3 h-3" />
+                </Link>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 rounded-3xl border border-rose-500/10 bg-rose-500/5 text-rose-400 flex gap-4 items-start shadow-lg shadow-rose-500/5">
+            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-400">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-rose-300 uppercase tracking-wide text-xs">Setup Required: Automated Payout Splits (95/5)</h4>
+                <Badge className="bg-rose-500/20 text-rose-300 border-0 text-[9px] uppercase tracking-wider h-5 font-bold">Inactive</Badge>
+              </div>
+              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
+                You have not linked your bank account. Change your preferred payout method to **Direct Bank (via Razorpay Route)** and fill out your banking details below. Once registered, you will automatically receive your 95% share directly and instantly into your bank account at checkout.
+                <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-rose-300 hover:text-rose-200 underline font-bold transition-all ml-1.5">
+                  View Setup Document <ArrowRight className="w-3 h-3" />
+                </Link>
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Analytics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

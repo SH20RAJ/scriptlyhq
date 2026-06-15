@@ -257,7 +257,7 @@ export default function RouteGuidePage() {
                   <p className="text-xs">
                     If the automated API request fails (due to regulatory warnings or complex business types):
                     1. Log into the official **Razorpay Dashboard**.
-                    2. Go to **Route > Linked Accounts** and click **Add Account**.
+                    2. Go to **Route &gt; Linked Accounts** and click **Add Account**.
                     3. Fill out the creator's bank details manually and save to generate an Account ID.
                     4. Copy the resulting `acc_...` ID.
                     5. Paste it in the creator's record on `/admin/stores` and click **Save** (disk icon).
