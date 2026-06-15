@@ -9,6 +9,11 @@ export const users = pgTable("users", {
   payoutMethod: text("payout_method"),
   paypalEmail: text("paypal_email"),
   payoutDetails: text("payout_details"),
+  razorpayAccountId: text("razorpay_account_id"),
+  bankName: text("bank_name"),
+  bankAccountName: text("bank_account_name"),
+  bankAccountNumber: text("bank_account_number"),
+  bankIfsc: text("bank_ifsc"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

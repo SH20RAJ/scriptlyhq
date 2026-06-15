@@ -3,7 +3,7 @@
 import Razorpay from "razorpay";
 import { getOrCreateDbUser } from "../auth-utils";
 import { db } from "../../db";
-import { products, orders, coupons } from "../../db/schema";
+import { products, orders, coupons, users, payouts } from "../../db/schema";
 import { eq, inArray } from "drizzle-orm";
 import crypto from "crypto";
 import { getProductEffectivePrice } from "../price-utils";
@@ -175,6 +175,51 @@ export async function createRazorpayOrderAction({
 
   const finalAmountInInrPaise = Math.round(razorpayAmount * usdToInrRate);
 
+  // 3. Compile transfers array for Razorpay Route
+  const transfers: any[] = [];
+  let distributedAmountSum = 0;
+  let distributedDiscountSum = 0;
+
+  // Query creators
+  const creatorIds = selectedProducts.map(p => p.creatorId).filter(Boolean) as string[];
+  const productCreators = creatorIds.length > 0
+    ? await db.query.users.findMany({ where: inArray(users.id, creatorIds) })
+    : [];
+
+  for (let i = 0; i < selectedProducts.length; i++) {
+    const product = selectedProducts[i];
+    const isLast = i === selectedProducts.length - 1;
+
+    let itemAmount = 0;
+    if (isLast) {
+      itemAmount = razorpayAmount - distributedAmountSum;
+    } else {
+      const ratio = product.price / subtotal;
+      const itemDiscount = Math.round(totalDiscount * ratio);
+      itemAmount = Math.round(razorpayAmount * ratio);
+
+      distributedDiscountSum += itemDiscount;
+      distributedAmountSum += itemAmount;
+    }
+
+    const itemAmountInInrPaise = Math.round(itemAmount * usdToInrRate);
+    const creatorSplitInInrPaise = Math.round(itemAmountInInrPaise * 0.95);
+
+    const creator = productCreators.find(c => c.id === product.creatorId);
+    if (creator?.razorpayAccountId && creatorSplitInInrPaise > 0) {
+      transfers.push({
+        account: creator.razorpayAccountId,
+        amount: creatorSplitInInrPaise,
+        currency: "INR",
+        notes: {
+          info: `Split transfer for product: ${product.title.slice(0, 30)}`,
+        },
+        linked_to: ["payment"],
+        on_hold: false,
+      });
+    }
+  }
+
   // Generate Razorpay Order
   let rzpOrderId = "rzp_order_mock_" + crypto.randomBytes(8).toString("hex");
   const isMockKeys = (process.env.RAZORPAY_KEY_ID || "").startsWith("rzp_test_mock");
@@ -182,11 +227,17 @@ export async function createRazorpayOrderAction({
   if (!isMockKeys) {
     try {
       const razorpay = getRazorpay();
-      const rzpOrder = await razorpay.orders.create({
+      const rzpPayload: any = {
         amount: finalAmountInInrPaise, // INR paise
         currency: "INR",
         receipt: crypto.randomUUID(),
-      });
+      };
+
+      if (transfers.length > 0) {
+        rzpPayload.transfers = transfers;
+      }
+
+      const rzpOrder = await razorpay.orders.create(rzpPayload);
       rzpOrderId = rzpOrder.id;
     } catch (error) {
       console.error("Razorpay order creation failed, falling back to mock:", error);
@@ -195,8 +246,8 @@ export async function createRazorpayOrderAction({
 
   // Proportionally distribute the discounts and paid amounts among orders (in USD cents)
   const insertedOrders = [];
-  let distributedAmountSum = 0;
-  let distributedDiscountSum = 0;
+  distributedAmountSum = 0;
+  distributedDiscountSum = 0;
 
   for (let i = 0; i < selectedProducts.length; i++) {
     const product = selectedProducts[i];
@@ -290,6 +341,27 @@ export async function verifyPaymentAction({
         razorpayPaymentId,
       })
       .where(eq(orders.razorpayOrderId, razorpayOrderId));
+
+    // Route split automation auto-logging
+    for (const order of orderRecords) {
+      const product = await db.query.products.findFirst({ where: eq(products.id, order.productId) });
+      if (product?.creatorId) {
+        const creator = await db.query.users.findFirst({ where: eq(users.id, product.creatorId) });
+        if (creator?.razorpayAccountId && order.amount > 0) {
+          const creatorSplitCents = Math.round(order.amount * 0.95);
+          await db.insert(payouts).values({
+            id: crypto.randomUUID(),
+            userId: creator.id,
+            amount: creatorSplitCents,
+            status: "processed",
+            payoutMethod: "bank",
+            paypalEmail: creator.paypalEmail || null,
+            payoutDetails: `Automated Razorpay Route Split payout for Order ID: ${order.id}`,
+            createdAt: new Date(),
+          });
+        }
+      }
+    }
 
     return { success: true, orderId: orderRecords[0].id };
   } else {

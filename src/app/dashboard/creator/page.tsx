@@ -6,7 +6,7 @@ import { eq, and, desc, inArray } from "drizzle-orm";
 import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Package, Sparkles, AlertTriangle, Plus, LayoutGrid, Coins, Activity } from "lucide-react";
+import { Package, Sparkles, AlertTriangle, Plus, LayoutGrid, Coins, Activity, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CreatorProductsTable from "../../../components/CreatorProductsTable";
@@ -99,11 +99,13 @@ export default async function CreatorConsolePage() {
         {/* Global Beta payout notice */}
         <div className="p-5 rounded-2xl border border-amber-500/10 bg-amber-500/5 text-amber-400 text-xs flex gap-3.5 items-start">
           <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-500" />
-          <div className="space-y-1">
-            <h4 className="font-bold text-amber-300 uppercase tracking-wide">Beta Payout Policy & Profit Split (95/5)</h4>
+          <div className="space-y-1.5">
+            <h4 className="font-bold text-amber-300 uppercase tracking-wide">Automated Payouts via Razorpay Route Split (95/5)</h4>
             <p className="leading-relaxed text-neutral-400 font-medium">
-              During the initial Beta phase, automated payouts are disabled. Transactions are processed centrally by Scriptly Store. We operate a creator-first model: <strong>you keep 95% of your sales</strong> (platform charges a flat 5% service fee).
-              Payout settlement is currently at 99% manual configuration; we are working to make it 100% automated soon. Specify your payout method and optional PayPal email below to receive manual settlements.
+              Automated profit splitting is now active via **Razorpay Route**! When you select **Direct Bank** payout and provide your banking details below, your 95% share of each sale will be dynamically split and routed directly to your bank account at checkout (platform retains 5% service fee). We are operating in Beta to optimize routing flows (99% to 100% automated soon). Other methods (PayPal, UPI) are settled manually.
+              <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-amber-300 hover:text-amber-200 underline font-bold transition-all ml-1">
+                Read the Route Splits Guide <ArrowRight className="w-3 h-3" />
+              </Link>
             </p>
           </div>
         </div>
@@ -178,6 +180,10 @@ export default async function CreatorConsolePage() {
                 initialPayoutMethod={user.payoutMethod}
                 initialPaypalEmail={user.paypalEmail}
                 initialPayoutDetails={user.payoutDetails}
+                initialBankName={user.bankName}
+                initialBankAccountName={user.bankAccountName}
+                initialBankAccountNumber={user.bankAccountNumber}
+                initialBankIfsc={user.bankIfsc}
               />
             </div>
             <div className="lg:col-span-4">

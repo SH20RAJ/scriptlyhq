@@ -37,8 +37,7 @@
 	},
 	"upload_source_maps": true,
 	"routes": [
-		{ "pattern": "scriptly.store", "custom_domain": true },
-		{ "pattern": "strivio.world", "custom_domain": true }
+		{ "pattern": "scriptly.store", "custom_domain": true }
 	]
 	/**
 	 * Smart Placement

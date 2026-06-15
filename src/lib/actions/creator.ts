@@ -104,7 +104,11 @@ export async function deleteCreatorCouponAction(couponId: string) {
 export async function updateCreatorPayoutSettingsAction(
   payoutMethod: string,
   paypalEmail: string,
-  payoutDetails: string
+  payoutDetails: string,
+  bankName?: string,
+  bankAccountName?: string,
+  bankAccountNumber?: string,
+  bankIfsc?: string
 ) {
   const user = await getOrCreateDbUser();
   if (!user) {
@@ -121,6 +125,10 @@ export async function updateCreatorPayoutSettingsAction(
       payoutMethod: method,
       paypalEmail: emailTrimmed || null,
       payoutDetails: detailsTrimmed || null,
+      bankName: bankName?.trim() || null,
+      bankAccountName: bankAccountName?.trim() || null,
+      bankAccountNumber: bankAccountNumber?.trim() || null,
+      bankIfsc: bankIfsc?.trim() || null,
       updatedAt: new Date(),
     })
     .where(eq(users.id, user.id));

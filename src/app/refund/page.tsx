@@ -38,7 +38,7 @@ export default function RefundPage() {
             To request a refund under valid exception cases, email mail@scriptly.store with your transaction receipt, registered email, and detailed reasoning within 7 days of purchase. 
           </p>
           <p>
-            Once verified and approved, refunds are processed via our payment processor, <strong>Razorpay</strong>, back to your original payment method. The refund amount will typically reflect in your account within <strong>5-7 business days</strong>.
+            Once verified and approved, refunds are processed via our payment processor, <strong>Razorpay</strong>, back to your original payment method. For payments that were dynamically split at checkout, Razorpay Route will automatically reverse the split transfers proportionally from the linked merchant bank account. The refund amount will typically reflect in your account within <strong>5-7 business days</strong>.
           </p>
         </section>
 
@@ -51,7 +51,7 @@ export default function RefundPage() {
 
         <section className="space-y-4 border-t border-border/40 pt-10">
           <p className="text-xs italic">
-            For support queries, please email mail@scriptly.store or call us at +91 81783 85203.
+            For support queries, please email mail@scriptly.store.
           </p>
           <p className="text-xs text-muted-foreground">
             <strong>Registered Office:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India.

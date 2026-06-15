@@ -29,6 +29,7 @@ export default function PrivacyPage() {
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Account Details:</strong> When you register or sign in, we collect your email address and name. Authentication is handled securely through our partner, Hexclave, and we do not store passwords.</li>
             <li><strong>Transaction Details:</strong> When you make a purchase, details such as name, email address, transaction currency, payment status, and order details are registered.</li>
+            <li><strong>Creator Payout Settings:</strong> For creators who opt-in to Direct Bank Transfer, we collect and store their banking details (Bank Name, Account Holder Name, Bank Account Number, and IFSC Code) solely for the purpose of configuring and executing Razorpay Route automated splits.</li>
             <li><strong>Usage & Device Data:</strong> We may automatically log information about your device, browser type, operating system, and interaction details to optimize page speed and functionality.</li>
           </ul>
         </section>
@@ -80,7 +81,7 @@ export default function PrivacyPage() {
             If you have questions about this Privacy Policy or how your data is handled, please contact our data team at mail@scriptly.store.
           </p>
           <p className="text-xs text-muted-foreground">
-            <strong>Address:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India | Support Phone: +91 81783 85203
+            <strong>Address:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India
           </p>
         </section>
       </div>

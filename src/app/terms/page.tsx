@@ -56,7 +56,7 @@ export default function TermsPage() {
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Store Naming:</strong> Creators may choose a store name to represent their catalog. Store names must not infringe upon trademarks, brands, or third-party intellectual property. Strivio Inc. reserves the right to rename or suspend stores violating this policy.</li>
-            <li><strong>Beta Listings & Payouts:</strong> In the current Beta release, all customer payments are processed directly by ScriptlyStore. Payout allocations (e.g. 50/50 split or other metrics) will be settled in accordance with separate agreements or manual console credits.</li>
+            <li><strong>Beta Listings & Payouts:</strong> In the current Beta release, automated payouts are supported via Razorpay Route. For creators who select Direct Bank Transfer and provide valid banking details, payment splits of 95% (creator share) and 5% (platform commission) are executed automatically at checkout. Other payout methods are settled manually on-demand. We are working to transition this framework from 99% to 100% automated soon.</li>
             <li><strong>Moderation:</strong> All creator uploads are unlisted by default. They are subject to code security reviews and copyright verification by our administration panel before approval.</li>
           </ul>
         </section>
@@ -76,10 +76,10 @@ export default function TermsPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-foreground tracking-tight">7. Pricing & Payments</h2>
           <p>
-            All prices listed on ScriptlyStore are in Indian Rupees (INR) or United States Dollars (USD), as indicated, and are subject to change without notice. 
+            All prices listed on ScriptlyStore are in Indian Rupees (INR) or United States Dollars (USD), as indicated, and are subject to change without notice.
           </p>
           <p>
-            Payments are securely processed via <strong>Razorpay</strong>. By placing an order, you authorize us and our payment processor to charge the designated payment method for the total order amount. Strivio Inc. does not store or process cardholder or bank credentials on its servers. Free checkouts bypass Razorpay processing entirely.
+            Payments are securely processed via <strong>Razorpay</strong>. Where split payments are enabled (e.g. through the creator's configured Direct Bank Transfer payout method), 95% of customer payments is split and transferred directly to the creator's bank account via Razorpay Route, while the platform retains a 5% commission. By placing an order, you authorize us and our payment processor to charge the designated payment method for the total order amount. Strivio Inc. does not store or process cardholder credentials on its servers. Free checkouts bypass Razorpay processing entirely.
           </p>
         </section>
 
@@ -115,7 +115,7 @@ export default function TermsPage() {
           <p className="text-xs italic">
             ScriptlyStore is a digital marketplace owned and operated by Strivio Inc. 
             For legal inquiries, contact mail@scriptly.store. 
-            For support queries, please reach out to mail@scriptly.store or call us at +91 81783 85203.
+            For support queries, please reach out to mail@scriptly.store.
           </p>
           <p className="text-xs text-muted-foreground">
             <strong>Registered Office:</strong> Strivio Inc., DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India.

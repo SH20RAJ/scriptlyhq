@@ -275,7 +275,7 @@ export default async function Home({ searchParams }: PageProps) {
               <div className="space-y-2">
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider">How do payouts and profit splits work?</h3>
                 <p className="text-xs leading-relaxed text-neutral-400">
-                  Scriptly Store is developer-first: you keep 95% of all gross sales (the platform only charges a flat 5% fee). Payouts are manually settled during our Beta phase (currently at 99% operational capacity, moving to 100% automated soon).
+                  Scriptly Store is developer-first: you keep 95% of all gross sales (the platform only charges a flat 5% fee). Split payouts are automatically and instantly transferred directly to your bank account via Razorpay Route once your Direct Bank settings are configured. Other methods are manually settled during our Beta phase.
                 </p>
               </div>
               <div className="space-y-2">

@@ -75,7 +75,7 @@ export default function DmcaPage() {
             Submit all DMCA notices or counter-notifications to:
           </p>
           <p className="text-xs text-muted-foreground font-mono">
-            Email: legal@scriptly.store<br />
+            Email: mail@scriptly.store<br />
             Address: Strivio Inc. Attn: Copyright Agent, DLF Phase 3, Sector 24, Gurugram, Haryana - 122002, India.
           </p>
         </section>
