@@ -44,6 +44,8 @@ export const products = pgTable("products", {
   published: boolean("published").default(true).notNull(),
   creatorId: text("creator_id").references(() => users.id, { onDelete: "set null" }),
   status: text("status").default("pending"), // 'pending', 'approved', 'rejected'
+  rating: text("rating").default("5.0").notNull(), // Average rating (e.g. '4.8')
+  ratingCount: integer("rating_count").default(1).notNull(), // Internal count
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

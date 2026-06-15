@@ -495,3 +495,36 @@ export async function rejectProductAction(id: string) {
   return { success: true };
 }
 
+export async function rateProductAction(productId: string, ratingValue: number) {
+  if (ratingValue < 1 || ratingValue > 5) {
+    throw new Error("Invalid rating value. Must be between 1 and 5.");
+  }
+
+  const existing = await db.query.products.findFirst({
+    where: eq(products.id, productId),
+  });
+
+  if (!existing) {
+    throw new Error("Product not found");
+  }
+
+  const currentCount = existing.ratingCount || 0;
+  const currentRating = parseFloat(existing.rating || "5.0");
+  const currentSum = currentRating * currentCount;
+
+  const newCount = currentCount + 1;
+  const newRating = ((currentSum + ratingValue) / newCount).toFixed(1);
+
+  await db
+    .update(products)
+    .set({
+      rating: newRating,
+      ratingCount: newCount,
+    })
+    .where(eq(products.id, productId));
+
+  revalidatePath(`/products/${existing.slug}`);
+  revalidatePath("/");
+  return { success: true, rating: newRating };
+}
+

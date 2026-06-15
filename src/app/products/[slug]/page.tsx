@@ -20,6 +20,8 @@ import { isAdmin } from "../../../lib/auth-utils";
 import AdminToolbar from "./AdminToolbar";
 import TweetEmbed from "../../../components/TweetEmbed";
 import ProductScreenshots from "../../../components/ProductScreenshots";
+import ProductMediaSwitcher from "../../../components/ProductMediaSwitcher";
+import ProductRating from "../../../components/ProductRating";
 
 
 interface PageProps {
@@ -133,47 +135,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {/* Main Content */}
           <div className="lg:col-span-7 space-y-12">
             <div className="space-y-6">
-              {product.videoUrl ? (
-                tweetId ? (
-                  <div className="rounded-3xl border border-border/60 bg-black/20 overflow-hidden shadow-2xl shadow-primary/5 flex justify-center p-4">
-                    <TweetEmbed id={tweetId} />
-                  </div>
-                ) : (
-                  <div className="rounded-3xl border border-border/60 bg-black overflow-hidden shadow-2xl shadow-primary/5">
-                    <AspectRatio ratio={16 / 9}>
-                      {product.videoUrl.split("?")[0].toLowerCase().endsWith(".mp4") || product.videoUrl.toLowerCase().includes(".mp4") ? (
-                        <video
-                          src={product.videoUrl}
-                          controls
-                          className="absolute inset-0 w-full h-full object-cover"
-                          poster={product.thumbnail || undefined}
-                          preload="metadata"
-                        />
-                      ) : (
-                        <iframe
-                          src={product.videoUrl.replace("watch?v=", "embed/").split("&")[0]}
-                          title={product.title}
-                          className="absolute inset-0 w-full h-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      )}
-                    </AspectRatio>
-                  </div>
-                )
-              ) : (
-                <div className="rounded-3xl border border-border/60 bg-muted overflow-hidden shadow-sm">
-                  <AspectRatio ratio={4 / 3}>
-                    {product.thumbnail ? (
-                      <img src={product.thumbnail} alt={product.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground font-bold uppercase tracking-widest text-xs">
-                        No Preview
-                      </div>
-                    )}
-                  </AspectRatio>
-                </div>
-              )}
+              <ProductMediaSwitcher
+                videoUrl={product.videoUrl}
+                previewGif={product.previewGif}
+                thumbnail={product.thumbnail}
+                title={product.title}
+              />
 
               {screenshotsList.length > 0 && (
                 <ProductScreenshots screenshots={screenshotsList} productTitle={product.title} />
@@ -207,13 +174,16 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <div className="lg:col-span-5">
             <div className="sticky top-28 space-y-10">
               <div className="space-y-6">
-                <div className="space-y-2">
-                  <Badge variant="outline" className="rounded-full px-3 text-[10px] uppercase font-black tracking-[0.2em] border-primary/20 text-primary">
-                    {product.category}
-                  </Badge>
-                  <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-foreground leading-[1.1]">
-                    {product.title}
-                  </h1>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Badge variant="outline" className="rounded-full px-3 text-[10px] uppercase font-black tracking-[0.2em] border-primary/20 text-primary">
+                      {product.category}
+                    </Badge>
+                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-foreground leading-[1.1]">
+                      {product.title}
+                    </h1>
+                  </div>
+                  <ProductRating productId={product.id} initialRating={product.rating || "5.0"} />
                 </div>
                 <p className="text-lg text-muted-foreground leading-relaxed font-medium">
                   {product.shortDescription}
