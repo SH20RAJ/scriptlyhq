@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Store, Calendar, Mail, Save, Cpu, Loader2, Sparkles, Building, Landmark } from "lucide-react";
+import { Store, Calendar, Mail, Save, Cpu, Loader2, Sparkles, Building, Landmark, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 
 interface CreatorType {
@@ -101,16 +101,16 @@ export default function StoresClient({ initialCreators }: { initialCreators: Cre
                     Store & Owner
                   </TableHead>
                   <TableHead className="font-bold text-xs uppercase tracking-wider text-foreground px-6 py-4">
-                    Bank Transfer Details
+                    Bank Details
                   </TableHead>
                   <TableHead className="font-bold text-xs uppercase tracking-wider text-foreground px-6 py-4">
-                    Razorpay Account ID
+                    Route Onboarding Status
                   </TableHead>
                   <TableHead className="font-bold text-xs uppercase tracking-wider text-foreground px-6 py-4">
                     Catalog Items
                   </TableHead>
                   <TableHead className="font-bold text-xs uppercase tracking-wider text-foreground px-6 py-4 text-right">
-                    Review
+                    Review Actions
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -119,6 +119,7 @@ export default function StoresClient({ initialCreators }: { initialCreators: Cre
                   const hasBankDetails = !!c.bankAccountNumber && !!c.bankIfsc;
                   const isSavedPending = pendingMap[c.id] || false;
                   const isAutoPending = autoPendingMap[c.id] || false;
+                  const isRouteConnected = !!c.razorpayAccountId && c.razorpayAccountId.startsWith("acc_");
 
                   return (
                     <TableRow
@@ -168,56 +169,95 @@ export default function StoresClient({ initialCreators }: { initialCreators: Cre
                             <div className="font-mono text-[10px] text-muted-foreground">IFSC: {c.bankIfsc}</div>
                           </div>
                         ) : (
-                          <span className="text-xs text-muted-foreground/60 font-medium">
+                          <span className="text-xs text-muted-foreground/60 font-medium italic">
                             No bank details saved
                           </span>
                         )}
                       </TableCell>
 
-                      {/* Razorpay Linked Account ID Column */}
+                      {/* Route Onboarding Status Column */}
                       <TableCell className="px-6 py-5 align-top">
-                        <div className="space-y-2.5">
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              value={accountInputs[c.id]}
-                              onChange={(e) =>
-                                setAccountInputs((prev) => ({ ...prev, [c.id]: e.target.value }))
-                              }
-                              placeholder="e.g. acc_Hsb82sJdh7"
-                              className="px-3 py-1.5 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs font-mono w-44 outline-none focus:border-neutral-600"
-                            />
-                            <Button
-                              onClick={() => handleManualSave(c.id)}
-                              disabled={isSavedPending}
-                              size="icon"
-                              variant="outline"
-                              className="h-8 w-8 rounded-lg border-neutral-800 hover:bg-neutral-800 text-white cursor-pointer"
-                            >
-                              {isSavedPending ? (
-                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <div className="space-y-3">
+                          {/* Stepper Steps visual checklist */}
+                          <div className="space-y-1.5 text-[10px] font-bold uppercase tracking-wider">
+                            <div className="flex items-center gap-1 text-neutral-400">
+                              {c.storeName ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                               ) : (
-                                <Save className="w-3.5 h-3.5" />
+                                <XCircle className="w-3.5 h-3.5 text-neutral-600 flex-shrink-0" />
                               )}
-                            </Button>
+                              <span className={c.storeName ? "text-emerald-400" : "text-neutral-500"}>
+                                Step 1: Store Setup
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1 text-neutral-400">
+                              {hasBankDetails ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5 text-neutral-600 flex-shrink-0" />
+                              )}
+                              <span className={hasBankDetails ? "text-emerald-400" : "text-neutral-500"}>
+                                Step 2: Bank Credentials
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1 text-neutral-400">
+                              {isRouteConnected ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5 text-neutral-600 flex-shrink-0" />
+                              )}
+                              <span className={isRouteConnected ? "text-emerald-400" : "text-neutral-500"}>
+                                Step 3: Linked Account ID
+                              </span>
+                            </div>
                           </div>
 
-                          {/* Auto onboarding button */}
-                          {!c.razorpayAccountId && hasBankDetails && (
-                            <Button
-                              onClick={() => handleAutoRegister(c.id)}
-                              disabled={isAutoPending}
-                              size="xs"
-                              className="h-7 px-2.5 font-bold uppercase tracking-widest text-[8.5px] rounded-lg cursor-pointer bg-purple-500 hover:bg-purple-400 text-white border-0 shadow-lg shadow-purple-500/10 flex items-center gap-1"
-                            >
-                              {isAutoPending ? (
-                                <Loader2 className="w-2.5 h-2.5 animate-spin" />
-                              ) : (
-                                <Sparkles className="w-2.5 h-2.5" />
-                              )}
-                              Auto Route Onboard
-                            </Button>
-                          )}
+                          {/* Account ID manual save form / Auto Route onboarding triggers */}
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={accountInputs[c.id]}
+                                onChange={(e) =>
+                                  setAccountInputs((prev) => ({ ...prev, [c.id]: e.target.value }))
+                                }
+                                placeholder="e.g. acc_Hsb82sJdh7"
+                                className="px-3 py-1.5 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs font-mono w-44 outline-none focus:border-neutral-600"
+                              />
+                              <Button
+                                onClick={() => handleManualSave(c.id)}
+                                disabled={isSavedPending}
+                                size="icon"
+                                variant="outline"
+                                className="h-8 w-8 rounded-lg border-neutral-800 hover:bg-neutral-800 text-white cursor-pointer"
+                              >
+                                {isSavedPending ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <Save className="w-3.5 h-3.5" />
+                                )}
+                              </Button>
+                            </div>
+
+                            {/* Auto onboarding button */}
+                            {!c.razorpayAccountId && hasBankDetails && (
+                              <Button
+                                onClick={() => handleAutoRegister(c.id)}
+                                disabled={isAutoPending}
+                                size="xs"
+                                className="h-7 px-2.5 font-bold uppercase tracking-widest text-[8.5px] rounded-lg cursor-pointer bg-purple-500 hover:bg-purple-400 text-white border-0 shadow-lg shadow-purple-500/10 flex items-center gap-1"
+                              >
+                                {isAutoPending ? (
+                                  <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                                ) : (
+                                  <Sparkles className="w-2.5 h-2.5" />
+                                )}
+                                Auto Route Onboard
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </TableCell>
 
@@ -254,18 +294,32 @@ export default function StoresClient({ initialCreators }: { initialCreators: Cre
                         </div>
                       </TableCell>
 
-                      {/* Action Column */}
+                      {/* Review Actions Column */}
                       <TableCell className="px-6 py-5 align-top text-right">
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="xs"
-                          className="h-8 px-2.5 font-bold uppercase tracking-widest text-[9px] border-border/60 rounded-lg cursor-pointer"
-                        >
-                          <Link href={`/admin/products?search=${encodeURIComponent(c.storeName || c.email)}`}>
-                            View Products
-                          </Link>
-                        </Button>
+                        <div className="flex flex-col gap-2 items-end justify-start">
+                          {c.storeName && (
+                            <Button
+                              asChild
+                              variant="default"
+                              size="xs"
+                              className="h-8 px-2.5 font-bold uppercase tracking-widest text-[9px] bg-white text-black hover:bg-neutral-200 rounded-lg cursor-pointer flex items-center justify-center w-full"
+                            >
+                              <Link href={`/stores/${c.id}`} target="_blank">
+                                View Store
+                              </Link>
+                            </Button>
+                          )}
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="xs"
+                            className="h-8 px-2.5 font-bold uppercase tracking-widest text-[9px] border-border/60 rounded-lg cursor-pointer w-full"
+                          >
+                            <Link href={`/admin/products?search=${encodeURIComponent(c.storeName || c.email)}`}>
+                              View Products
+                            </Link>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

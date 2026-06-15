@@ -193,9 +193,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
                         {product.category}
                       </Badge>
                       {storeName && (
-                        <Badge variant="secondary" className="rounded-full px-3 text-[10px] uppercase font-bold tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                          Store: {storeName}
-                        </Badge>
+                        <Link href={`/stores/${product.creatorId}`}>
+                          <Badge variant="secondary" className="rounded-full px-3 text-[10px] uppercase font-bold tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 cursor-pointer transition-all">
+                            Store: {storeName}
+                          </Badge>
+                        </Link>
                       )}
                     </div>
                     <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-foreground leading-[1.1]">

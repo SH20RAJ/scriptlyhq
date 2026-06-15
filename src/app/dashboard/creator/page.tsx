@@ -245,9 +245,6 @@ export default async function CreatorConsolePage() {
             </div>
             <div className="lg:col-span-4">
               <PayoutSettingsEditor
-                initialPayoutMethod={user.payoutMethod}
-                initialPaypalEmail={user.paypalEmail}
-                initialPayoutDetails={user.payoutDetails}
                 initialBankName={user.bankName}
                 initialBankAccountName={user.bankAccountName}
                 initialBankAccountNumber={user.bankAccountNumber}

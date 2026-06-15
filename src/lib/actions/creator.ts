@@ -115,20 +115,29 @@ export async function updateCreatorPayoutSettingsAction(
     throw new Error("Unauthorized: Sign in required.");
   }
 
-  const emailTrimmed = paypalEmail?.trim() || "";
-  const detailsTrimmed = payoutDetails?.trim() || "";
-  const method = payoutMethod || null;
+  if (payoutMethod !== "bank") {
+    throw new Error("Only Direct Bank Transfer (via Razorpay Route) split is supported.");
+  }
+
+  const bankNameTrimmed = bankName?.trim();
+  const bankAccountNameTrimmed = bankAccountName?.trim();
+  const bankAccountNumberTrimmed = bankAccountNumber?.trim();
+  const bankIfscTrimmed = bankIfsc?.trim();
+
+  if (!bankNameTrimmed || !bankAccountNameTrimmed || !bankAccountNumberTrimmed || !bankIfscTrimmed) {
+    throw new Error("All bank account details are required for automated split routing.");
+  }
 
   await db
     .update(users)
     .set({
-      payoutMethod: method,
-      paypalEmail: emailTrimmed || null,
-      payoutDetails: detailsTrimmed || null,
-      bankName: bankName?.trim() || null,
-      bankAccountName: bankAccountName?.trim() || null,
-      bankAccountNumber: bankAccountNumber?.trim() || null,
-      bankIfsc: bankIfsc?.trim() || null,
+      payoutMethod: "bank",
+      paypalEmail: null,
+      payoutDetails: null,
+      bankName: bankNameTrimmed,
+      bankAccountName: bankAccountNameTrimmed,
+      bankAccountNumber: bankAccountNumberTrimmed,
+      bankIfsc: bankIfscTrimmed,
       updatedAt: new Date(),
     })
     .where(eq(users.id, user.id));
