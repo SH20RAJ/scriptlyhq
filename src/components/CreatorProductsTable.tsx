@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { Edit2, Eye, Trash2, Search, Filter, Loader2, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
 import { deleteProductAction } from "../lib/actions/products";
@@ -27,6 +27,12 @@ export default function CreatorProductsTable({ products }: CreatorProductsTableP
   const [statusFilter, setStatusFilter] = useState("all");
   const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter]);
 
   const handleDelete = (id: string, title: string) => {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
@@ -55,6 +61,11 @@ export default function CreatorProductsTable({ products }: CreatorProductsTableP
     const statusMatch = statusFilter === "all" || statusVal === statusFilter;
     return titleMatch && statusMatch;
   });
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const displayPage = Math.min(currentPage, Math.max(1, totalPages));
+  const startIndex = (displayPage - 1) * itemsPerPage;
+  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatusBadge = (status: string | null) => {
     const val = status || "pending";
@@ -136,7 +147,7 @@ export default function CreatorProductsTable({ products }: CreatorProductsTableP
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-800/40 text-sm font-medium text-neutral-300">
-                {filteredProducts.map((p) => (
+                {paginatedProducts.map((p) => (
                   <tr key={p.id} className="hover:bg-neutral-800/10 transition-colors">
                     <td className="py-4 px-6">
                       <div className="space-y-1">
@@ -198,6 +209,69 @@ export default function CreatorProductsTable({ products }: CreatorProductsTableP
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-neutral-800/80 bg-neutral-950/40 text-xs font-semibold text-neutral-400">
+              <div>
+                Showing <span className="text-white font-bold">{startIndex + 1}</span> to{" "}
+                <span className="text-white font-bold">
+                  {Math.min(startIndex + itemsPerPage, filteredProducts.length)}
+                </span>{" "}
+                of <span className="text-white font-bold">{filteredProducts.length}</span> scripts
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={displayPage === 1}
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                  className="px-3.5 py-2 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-800 hover:text-white transition-colors cursor-pointer"
+                >
+                  Previous
+                </button>
+                <div className="flex items-center gap-1.5">
+                  {[...Array(totalPages)].map((_, i) => {
+                    const pageNum = i + 1;
+                    if (
+                      pageNum === 1 ||
+                      pageNum === totalPages ||
+                      (pageNum >= displayPage - 1 && pageNum <= displayPage + 1)
+                    ) {
+                      return (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-8 h-8 rounded-xl border text-xs font-bold transition-all flex items-center justify-center cursor-pointer ${
+                            displayPage === pageNum
+                              ? "border-purple-500/40 bg-purple-500/10 text-purple-400"
+                              : "border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:border-neutral-700 hover:text-white"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    } else if (pageNum === displayPage - 2 || pageNum === displayPage + 2) {
+                      return (
+                        <span key={pageNum} className="text-neutral-600 px-1 select-none">
+                          •••
+                        </span>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+                <button
+                  type="button"
+                  disabled={displayPage === totalPages}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  className="px-3.5 py-2 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-800 hover:text-white transition-colors cursor-pointer"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { db } from "../../db";
 import { orders, products } from "../../db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { getOrCreateDbUser } from "../../lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -11,14 +11,52 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ProductPagination } from "../../components/ProductPagination";
 
-export default async function DashboardPage() {
+interface PageProps {
+  searchParams: Promise<{
+    page?: string;
+  }>;
+}
+
+export default async function DashboardPage({ searchParams }: PageProps) {
   const user = await getOrCreateDbUser();
   if (!user) {
     redirect("/handler/sign-in?redirectTo=/dashboard");
   }
 
-  // Query completed orders with their associated product details
+  const resolvedParams = await searchParams;
+  const currentPage = parseInt(resolvedParams.page || "1", 10);
+  const limit = 5;
+  const offset = (currentPage - 1) * limit;
+
+  // Query total count of completed orders for pagination, and total invested amount
+  const [statsResult] = await db
+    .select({
+      count: sql<number>`count(*)`,
+      sum: sql<number>`coalesce(sum(${orders.amount}), 0)`
+    })
+    .from(orders)
+    .where(and(eq(orders.userId, user.id), eq(orders.status, "completed")));
+
+  const totalCount = Number(statsResult?.count || 0);
+  const totalInvested = Number(statsResult?.sum || 0);
+  const totalPages = Math.ceil(totalCount / limit);
+
+  // Query all completed orders for the lightweight billing history ledger
+  const billingHistory = await db
+    .select({
+      orderId: orders.id,
+      amount: orders.amount,
+      purchaseDate: orders.createdAt,
+      productTitle: products.title,
+    })
+    .from(orders)
+    .innerJoin(products, eq(orders.productId, products.id))
+    .where(and(eq(orders.userId, user.id), eq(orders.status, "completed")))
+    .orderBy(desc(orders.createdAt));
+
+  // Query paginated completed orders for this page
   const purchasedItems = await db
     .select({
       orderId: orders.id,
@@ -39,7 +77,9 @@ export default async function DashboardPage() {
     .from(orders)
     .innerJoin(products, eq(orders.productId, products.id))
     .where(and(eq(orders.userId, user.id), eq(orders.status, "completed")))
-    .orderBy(desc(orders.createdAt));
+    .orderBy(desc(orders.createdAt))
+    .limit(limit)
+    .offset(offset);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -65,7 +105,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {purchasedItems.length === 0 ? (
+        {totalCount === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 border border-dashed border-border rounded-[2.5rem] bg-card/30 space-y-6 text-center">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
                <ShoppingBag className="w-6 h-6 text-muted-foreground" />
@@ -152,6 +192,10 @@ export default async function DashboardPage() {
                   </Card>
                 ))}
               </div>
+              
+              {totalPages > 1 && (
+                <ProductPagination totalPages={totalPages} currentPage={currentPage} />
+              )}
             </div>
 
             {/* Sidebar: Activity/Receipts */}
@@ -171,12 +215,12 @@ export default async function DashboardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-8 pt-4 space-y-8">
-                  <div className="space-y-6">
-                    {purchasedItems.map((item, idx) => (
+                  <div className="space-y-6 max-h-[300px] overflow-y-auto pr-2">
+                    {billingHistory.map((item) => (
                       <div key={item.orderId} className="group flex justify-between items-start gap-4">
                         <div className="space-y-1.5 flex-1">
                           <p className="text-xs font-bold text-foreground line-clamp-1 uppercase tracking-tight group-hover:underline underline-offset-2">
-                            {item.product.title}
+                            {item.productTitle}
                           </p>
                           <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-bold">
                              <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.purchaseDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
@@ -195,7 +239,7 @@ export default async function DashboardPage() {
                   <div className="flex items-center justify-between font-black uppercase tracking-widest text-[10px]">
                      <span className="text-muted-foreground">Total Invested</span>
                      <span className="text-foreground text-sm">
-                        ${(purchasedItems.reduce((acc, curr) => acc + curr.amount, 0) / 100).toFixed(2)}
+                        ${(totalInvested / 100).toFixed(2)}
                      </span>
                   </div>
                 </CardContent>
