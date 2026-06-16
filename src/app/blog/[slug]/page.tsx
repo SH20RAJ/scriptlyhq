@@ -157,13 +157,8 @@ export default async function BlogPostPage({ params }: PageProps) {
 
           <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-border/40">
             <div className="flex items-center gap-3">
-              <img
-                src={post.author.avatar}
-                alt={post.author.name}
-                className="w-10 h-10 rounded-full border border-border"
-              />
               <div>
-                <p className="text-xs font-black text-foreground">{post.author.name}</p>
+                <p className="text-xs font-black text-foreground">By {post.author.name}</p>
                 <p className="text-[10px] text-muted-foreground font-bold">{post.author.role}</p>
               </div>
             </div>
@@ -191,16 +186,11 @@ export default async function BlogPostPage({ params }: PageProps) {
         {/* Footer Author Callout */}
         <footer className="max-w-3xl mx-auto border-t border-border/60 pt-8 mt-12">
           <div className="p-6 bg-card/45 border-2 border-border rounded-3xl flex flex-col md:flex-row items-center gap-6 shadow-[0_3px_0_var(--border)]">
-            <img
-              src={post.author.avatar}
-              alt={post.author.name}
-              className="w-16 h-16 rounded-full border-2 border-border"
-            />
             <div className="space-y-2 text-center md:text-left flex-1">
-              <p className="text-xs text-primary font-black uppercase tracking-wider">About the Author</p>
+              <p className="text-xs text-primary font-black uppercase tracking-wider">About the Team</p>
               <h4 className="text-sm font-black text-foreground">{post.author.name}</h4>
               <p className="text-xs text-muted-foreground font-medium leading-relaxed">
-                {post.author.name} is a software developer and technical writer specializing in modern javascript stacks, system design, and building micro-SaaS digital products.
+                The {post.author.name} is a group of passionate software developers, templates designers, and technical writers specializing in modern framework architectures, database scaling, prompt engineering, and SaaS growth frameworks.
               </p>
             </div>
           </div>

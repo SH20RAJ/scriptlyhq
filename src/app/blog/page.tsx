@@ -149,16 +149,9 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
 
                 <div className="space-y-6 pt-4 border-t border-border/40">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={featuredPost.author.avatar}
-                        alt={featuredPost.author.name}
-                        className="w-10 h-10 rounded-full border border-border"
-                      />
-                      <div>
-                        <p className="text-xs font-black text-foreground">{featuredPost.author.name}</p>
-                        <p className="text-[10px] text-muted-foreground font-bold">{featuredPost.author.role}</p>
-                      </div>
+                    <div>
+                      <p className="text-xs font-black text-foreground">{featuredPost.author.name}</p>
+                      <p className="text-[10px] text-muted-foreground font-bold">{featuredPost.author.role}</p>
                     </div>
                     <div className="flex items-center gap-4 text-[10px] font-extrabold text-muted-foreground">
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {featuredPost.readTime}</span>
@@ -196,7 +189,7 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
                 <Link
                   key={post.slug}
                   href={`/blog/${post.slug}`}
-                  className="group flex flex-col bg-card/35 border-2 border-border/60 hover:border-primary/60 rounded-[2rem] overflow-hidden transition-all shadow-[0_4px_0_var(--border)] hover:shadow-[0_4px_0_rgba(88,204,2,0.25)] hover:-translate-y-1 active:translate-y-0 active:shadow-none duration-250"
+                  className="group flex flex-col bg-card/35 border-2 border-border/60 hover:border-primary/60 rounded-[2rem] overflow-hidden transition-all shadow-[0_4px_0_var(--border)] hover:shadow-[0_4px_0_rgba(88,204,2,0.25)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none duration-250"
                 >
                   <div className="aspect-[16/10] w-full overflow-hidden relative border-b border-border/60 bg-muted">
                     <img
@@ -219,14 +212,7 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
                     </div>
 
                     <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <img
-                          src={post.author.avatar}
-                          alt={post.author.name}
-                          className="w-6 h-6 rounded-full border border-border"
-                        />
-                        <span className="text-[10px] font-bold text-muted-foreground">{post.author.name}</span>
-                      </div>
+                      <span className="text-[10px] font-bold text-muted-foreground">By {post.author.name}</span>
                       <span className="text-[9px] font-black uppercase text-muted-foreground flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" /> {post.readTime}
                       </span>
