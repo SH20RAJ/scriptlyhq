@@ -59,14 +59,33 @@ export async function GET(
       orderId: orderRecord ? orderRecord.id : "admin_download",
     });
 
-    // Read file from secure uploads folder
-    const fileBuffer = await fs.readFile(product.fileUrl);
-    const fileName = path.basename(product.fileUrl);
+    // Read file from secure uploads folder or fetch remote URL
+    let fileBuffer: Uint8Array | ArrayBuffer;
+    let fileName: string;
+
+    if (product.fileUrl.startsWith("http://") || product.fileUrl.startsWith("https://")) {
+      const response = await fetch(product.fileUrl);
+      if (!response.ok) {
+        return new Response(`Failed to fetch file from storage: ${response.statusText}`, { status: 502 });
+      }
+      fileBuffer = await response.arrayBuffer();
+      
+      let baseName = product.fileUrl.split("/").pop()?.split("?")[0] || "";
+      if (!baseName.endsWith(".zip") && !baseName.endsWith(".pdf") && !baseName.endsWith(".tar.gz")) {
+        baseName = `${product.slug}.zip`;
+      }
+      fileName = baseName;
+    } else {
+      // Read file from local secure uploads folder
+      const fileBuf = await fs.readFile(product.fileUrl);
+      fileBuffer = new Uint8Array(fileBuf);
+      fileName = path.basename(product.fileUrl);
+    }
 
     // Stream the file back
-    return new Response(fileBuffer, {
+    return new Response(fileBuffer as any, {
       headers: {
-        "Content-Type": "application/zip",
+        "Content-Type": fileName.endsWith(".zip") ? "application/zip" : "application/octet-stream",
         "Content-Disposition": `attachment; filename="${fileName}"`,
       },
     });
