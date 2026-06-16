@@ -9,7 +9,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-export default async function AdminDashboardPage() {
+import { ProductPagination } from "../../components/ProductPagination";
+
+interface PageProps {
+  searchParams: Promise<{
+    page?: string;
+  }>;
+}
+
+export default async function AdminDashboardPage({ searchParams }: PageProps) {
+  const resolvedParams = await searchParams;
+  const currentPage = parseInt(resolvedParams.page || "1", 10);
+  const limit = 8;
+  const offset = (currentPage - 1) * limit;
+
   const [prodCount] = await db.select({ count: sql<number>`count(*)` }).from(products);
   const totalProducts = prodCount?.count || 0;
 
@@ -21,6 +34,15 @@ export default async function AdminDashboardPage() {
 
   const [userCount] = await db.select({ count: sql<number>`count(*)` }).from(users);
   const totalUsers = userCount?.count || 0;
+
+  // Fetch total count of orders for pagination
+  const [totalOrdersCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(orders)
+    .innerJoin(products, eq(orders.productId, products.id))
+    .innerJoin(users, eq(orders.userId, users.id));
+  const totalItems = totalOrdersCount?.count || 0;
+  const totalPages = Math.ceil(totalItems / limit);
 
   const recentPurchases = await db
     .select({
@@ -37,7 +59,8 @@ export default async function AdminDashboardPage() {
     .innerJoin(products, eq(orders.productId, products.id))
     .innerJoin(users, eq(orders.userId, users.id))
     .orderBy(desc(orders.createdAt))
-    .limit(8);
+    .limit(limit)
+    .offset(offset);
 
   return (
     <div className="space-y-12">
@@ -147,6 +170,11 @@ export default async function AdminDashboardPage() {
                   <Clock className="w-8 h-8 text-muted-foreground/30 mx-auto" />
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">No Recent Logs</p>
                </div>
+            )}
+            {recentPurchases.length > 0 && (
+              <div className="py-5 border-t border-border/40 flex justify-center bg-card/10">
+                <ProductPagination totalPages={totalPages} currentPage={currentPage} />
+              </div>
             )}
          </Card>
       </div>
