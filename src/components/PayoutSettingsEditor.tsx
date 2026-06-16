@@ -58,36 +58,36 @@ export default function PayoutSettingsEditor({
   return (
     <form
       onSubmit={handleSave}
-      className="p-6 rounded-2xl border border-neutral-800 bg-neutral-950/40 backdrop-blur-sm space-y-4 h-full flex flex-col justify-between"
+      className="p-6 rounded-2xl border-2 border-border bg-card shadow-sm space-y-4 h-full flex flex-col justify-between"
     >
       <div className="space-y-4">
-        <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2 border-b border-neutral-800 pb-3">
-          <Coins className="w-4 h-4 text-purple-400" />
+        <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border pb-3">
+          <Coins className="w-4 h-4 text-[#CE82FF]" />
           Payout & Split Settings
         </h3>
 
         {/* Payout Method Status (Locked to Bank Routing) */}
-        <div className="space-y-1.5 p-3 rounded-xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-400">
+        <div className="space-y-1.5 p-3 rounded-xl border border-emerald-500/15 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400">
           <label className="text-[10px] font-black uppercase tracking-wider block">
             Payout Split Method
           </label>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-            <Landmark className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center gap-1.5 text-xs font-black text-foreground">
+            <Landmark className="w-4 h-4 text-emerald-500" />
             Direct Bank (via Razorpay Route)
           </div>
-          <p className="text-[9px] text-neutral-400 leading-relaxed font-medium mt-1">
+          <p className="text-[9px] text-muted-foreground leading-relaxed font-semibold mt-1">
             PayPal and UPI manual settlements have been phased out. Earnings split dynamically (95% creator / 5% platform) directly to your bank.
           </p>
         </div>
 
         {/* Bank Transfer Details Form */}
-        <div className="space-y-3 p-3 rounded-xl border border-neutral-900 bg-black/20">
-          <p className="text-[9px] text-purple-400 font-bold uppercase tracking-wider">
+        <div className="space-y-3 p-3 rounded-xl border-2 border-border bg-background/50">
+          <p className="text-[9px] text-primary font-black uppercase tracking-wider">
             Razorpay Route Linked Account Details
           </p>
           
           <div className="space-y-1.5">
-            <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block">
+            <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block">
               Bank Name
             </label>
             <input
@@ -95,12 +95,12 @@ export default function PayoutSettingsEditor({
               value={bankName}
               onChange={(e) => setBankName(e.target.value)}
               placeholder="e.g. HDFC Bank"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 font-medium"
+              className="w-full px-3 py-2 rounded-lg border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-bold"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block">
+            <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block">
               Beneficiary / Account Name
             </label>
             <input
@@ -108,12 +108,12 @@ export default function PayoutSettingsEditor({
               value={bankAccountName}
               onChange={(e) => setBankAccountName(e.target.value)}
               placeholder="Name exactly as in passbook"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 font-medium"
+              className="w-full px-3 py-2 rounded-lg border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-bold"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block">
+            <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block">
               Bank Account Number
             </label>
             <input
@@ -121,12 +121,12 @@ export default function PayoutSettingsEditor({
               value={bankAccountNumber}
               onChange={(e) => setBankAccountNumber(e.target.value)}
               placeholder="Enter Account Number"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 font-mono"
+              className="w-full px-3 py-2 rounded-lg border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-mono font-bold"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider block">
+            <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block">
               IFSC Code
             </label>
             <input
@@ -134,7 +134,7 @@ export default function PayoutSettingsEditor({
               value={bankIfsc}
               onChange={(e) => setBankIfsc(e.target.value.toUpperCase())}
               placeholder="e.g. HDFC0000240"
-              className="w-full px-3 py-2 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 font-mono"
+              className="w-full px-3 py-2 rounded-lg border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-mono font-bold"
             />
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function PayoutSettingsEditor({
         <button
           type="submit"
           disabled={isPending}
-          className="w-full inline-flex items-center justify-center px-4 py-2.5 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer gap-1.5"
+          className="w-full inline-flex items-center justify-center px-4 py-2.5 bg-primary text-primary-foreground hover:brightness-105 disabled:opacity-50 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer gap-1.5 shadow-[0_3px_0_var(--duo-feather-shadow)] active:translate-y-px active:shadow-none"
         >
           {isPending ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />

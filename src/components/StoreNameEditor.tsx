@@ -30,26 +30,26 @@ export default function StoreNameEditor({ initialStoreName }: StoreNameEditorPro
   };
 
   return (
-    <form onSubmit={handleSave} className="p-6 rounded-2xl border border-neutral-800 bg-neutral-950/40 backdrop-blur-sm space-y-4">
-      <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2 border-b border-neutral-800 pb-3">
-        <Store className="w-4 h-4 text-purple-400" />
+    <form onSubmit={handleSave} className="p-6 rounded-2xl border-2 border-border bg-card shadow-sm space-y-4">
+      <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border pb-3">
+        <Store className="w-4 h-4 text-[#CE82FF]" />
         Storefront Branding
       </h3>
 
       <div className="space-y-2">
-        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Store Name</label>
+        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Store Name</label>
         <div className="flex gap-2.5">
           <input
             type="text"
             value={storeName}
             onChange={(e) => setStoreName(e.target.value)}
             placeholder="e.g. Acme Scripts Store"
-            className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 font-medium"
+            className="flex-1 px-4 py-2.5 rounded-xl border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-bold"
           />
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center px-4 py-2.5 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer gap-1.5"
+            className="inline-flex items-center justify-center px-4 py-2.5 bg-primary text-primary-foreground hover:brightness-105 disabled:opacity-50 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer gap-1.5 shadow-[0_3px_0_var(--duo-feather-shadow)] active:translate-y-px active:shadow-none"
           >
             {isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -59,7 +59,7 @@ export default function StoreNameEditor({ initialStoreName }: StoreNameEditorPro
             Save
           </button>
         </div>
-        <p className="text-[9px] text-neutral-500">
+        <p className="text-[9px] text-muted-foreground font-semibold">
           This store name will be displayed on your product pages for customers to identify your catalog.
         </p>
       </div>

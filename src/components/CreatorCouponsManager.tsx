@@ -73,14 +73,14 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       {/* Create Coupon Form */}
-      <form onSubmit={handleCreate} className="lg:col-span-5 p-6 rounded-2xl border border-neutral-800 bg-neutral-950/40 backdrop-blur-sm space-y-4">
-        <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2 border-b border-neutral-800 pb-3">
-          <Gift className="w-4 h-4 text-emerald-400" />
+      <form onSubmit={handleCreate} className="lg:col-span-5 p-6 rounded-2xl border-2 border-border bg-card shadow-sm space-y-4">
+        <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border pb-3">
+          <Gift className="w-4 h-4 text-[#58CC02]" />
           Create Store Coupon
         </h3>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Coupon Code *</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Coupon Code *</label>
           <input
             type="text"
             name="code"
@@ -88,13 +88,13 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             placeholder="e.g. FLASH30"
             required
-            className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 font-mono font-bold"
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-mono font-bold"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Discount Type</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Discount Type</label>
             <select
               name="discountType"
               value={discountType}
@@ -102,7 +102,7 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
                 setDiscountType(e.target.value);
                 setDiscountValue("");
               }}
-              className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 cursor-pointer"
+              className="w-full px-4 py-2.5 rounded-xl border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-bold cursor-pointer"
             >
               <option value="percentage">Percentage (%)</option>
               <option value="fixed">Fixed USD ($)</option>
@@ -110,7 +110,7 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
               {discountType === "percentage" ? "Value (%) *" : "Value ($) *"}
             </label>
             <input
@@ -121,13 +121,13 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
               placeholder={discountType === "percentage" ? "e.g. 20" : "e.g. 10"}
               min="1"
               required
-              className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 font-medium"
+              className="w-full px-4 py-2.5 rounded-xl border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-bold"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Min Purchase Amount (USD)</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Min Purchase Amount (USD)</label>
           <input
             type="number"
             name="minPurchaseAmount"
@@ -135,14 +135,14 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
             value={minPurchaseAmount}
             onChange={(e) => setMinPurchaseAmount(e.target.value)}
             placeholder="e.g. 25.00 (Optional)"
-            className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:outline-none focus:border-neutral-500 font-medium"
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-bold"
           />
         </div>
 
         <button
           type="submit"
           disabled={isPending}
-          className="w-full py-2.5 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+          className="w-full py-2.5 bg-primary text-primary-foreground hover:brightness-105 disabled:opacity-50 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_3px_0_var(--duo-feather-shadow)] active:translate-y-px active:shadow-none"
         >
           {isPending ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />

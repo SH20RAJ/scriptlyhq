@@ -61,12 +61,12 @@ export default function SearchFilter({
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-5 py-2">
       <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none flex-1">
         <Button
-          variant={currentCategory === "all" ? "default" : "ghost"}
+          variant={currentCategory === "all" ? "default" : "outline"}
           size="sm"
-          className="rounded-full h-9 px-4 text-[11px] uppercase tracking-wider font-bold transition-all"
+          className="rounded-full h-9 px-4 text-[11px] uppercase tracking-wider font-extrabold transition-all cursor-pointer"
           onClick={() => handleCategorySelect("all")}
         >
           All
@@ -74,9 +74,9 @@ export default function SearchFilter({
         {categories.map((cat) => (
           <Button
             key={cat.id}
-            variant={currentCategory === cat.slug ? "default" : "ghost"}
+            variant={currentCategory === cat.slug ? "default" : "outline"}
             size="sm"
-            className="rounded-full h-9 px-4 text-[11px] uppercase tracking-wider font-bold whitespace-nowrap transition-all"
+            className="rounded-full h-9 px-4 text-[11px] uppercase tracking-wider font-extrabold whitespace-nowrap transition-all cursor-pointer"
             onClick={() => handleCategorySelect(cat.slug)}
           >
             {cat.name}
@@ -91,15 +91,15 @@ export default function SearchFilter({
         }}
         className="relative group w-full md:w-80"
       >
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-foreground transition-colors z-10" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors z-10" />
         <Input
           placeholder="Filter products..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          className="pl-10 h-10 bg-muted/30 border-transparent rounded-full focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-border transition-all"
+          className="pl-10 h-10 bg-card border-2 border-border rounded-xl shadow-[0_3px_0_var(--border)] focus-visible:border-primary focus-visible:shadow-[0_3px_0_var(--duo-feather-shadow)] focus-visible:ring-0 transition-all font-bold text-xs"
         />
         {isPending && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         )}
       </form>
     </div>
