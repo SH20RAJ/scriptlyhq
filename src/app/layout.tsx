@@ -1,21 +1,7 @@
 import type { Metadata } from "next";
-import { Nunito, Varela_Round } from "next/font/google";
 import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import Script from "next/script";
 import "./globals.css";
-
-const nunito = Nunito({
-	variable: "--font-nunito",
-	subsets: ["latin"],
-	display: "swap",
-});
-
-const varelaRound = Varela_Round({
-	weight: "400",
-	variable: "--font-varela-round",
-	subsets: ["latin"],
-	display: "swap",
-});
 
 export const metadata: Metadata = {
 	title: {
@@ -101,8 +87,11 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<head>
 				<link rel="icon" href="/favicon.svg" type="image/svg+xml"></link>
+				<link rel="preconnect" href="https://fonts.googleapis.com" />
+				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+				<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&family=Varela+Round&display=swap" rel="stylesheet" />
 			</head>
-			<body className={`${nunito.variable} ${varelaRound.variable} antialiased bg-background text-foreground min-h-screen flex flex-col transition-colors duration-200`}>
+			<body className="antialiased bg-background text-foreground min-h-screen flex flex-col transition-colors duration-200">
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<HexclaveProvider app={stack}>
 						<HexclaveTheme>

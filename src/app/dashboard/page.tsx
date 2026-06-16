@@ -6,7 +6,7 @@ import { eq, and, desc, sql } from "drizzle-orm";
 import { getOrCreateDbUser } from "../../lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Download, ShoppingBag, CreditCard, ExternalLink, Calendar, Package } from "lucide-react";
+import { Download, ShoppingBag, CreditCard, ExternalLink, Calendar, Package, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -168,12 +168,18 @@ export default async function DashboardPage({ searchParams }: PageProps) {
                             </div>
                           </div>
 
-                          <div className="flex items-center flex-wrap gap-3">
+                           <div className="flex items-center flex-wrap gap-3">
                             <Button asChild size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px] shadow-xl shadow-primary/10">
                               <a href={`/api/download/${item.product.id}`}>
                                 <Download className="w-3.5 h-3.5 mr-2" />
                                 Get Files
                               </a>
+                            </Button>
+                            <Button asChild variant="outline" size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px]">
+                              <Link href={`/dashboard/receipt/${item.orderId}`}>
+                                <FileText className="w-3.5 h-3.5 mr-2" />
+                                Receipt
+                              </Link>
                             </Button>
                             {item.product.demoUrl && (
                               <Button asChild variant="outline" size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px]">
@@ -219,9 +225,12 @@ export default async function DashboardPage({ searchParams }: PageProps) {
                     {billingHistory.map((item) => (
                       <div key={item.orderId} className="group flex justify-between items-start gap-4">
                         <div className="space-y-1.5 flex-1">
-                          <p className="text-xs font-bold text-foreground line-clamp-1 uppercase tracking-tight group-hover:underline underline-offset-2">
-                            {item.productTitle}
-                          </p>
+                          <Link href={`/dashboard/receipt/${item.orderId}`}>
+                            <p className="text-xs font-bold text-foreground line-clamp-1 uppercase tracking-tight group-hover:underline underline-offset-2 flex items-center gap-1">
+                              {item.productTitle}
+                              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </p>
+                          </Link>
                           <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-bold">
                              <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.purchaseDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
                              <span className="flex items-center gap-1 uppercase tracking-tighter opacity-60">TX: {item.orderId.slice(0, 8)}</span>

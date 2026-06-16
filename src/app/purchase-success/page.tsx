@@ -3,7 +3,7 @@ import { orders, products } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, Download, Home, ArrowRight } from "lucide-react";
+import { CheckCircle2, Download, Home, ArrowRight, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -104,8 +104,15 @@ export default async function PurchaseSuccessPage({ searchParams }: PageProps) {
             Download Files
           </a>
         </Button>
-        
+
         <Button asChild variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8">
+          <Link href={`/dashboard/receipt/${receipt.orderId}`}>
+            <FileText className="w-4 h-4 mr-2" />
+            View Receipt
+          </Link>
+        </Button>
+        
+        <Button asChild variant="ghost" size="lg" className="w-full sm:w-auto h-12 px-8">
           <Link href="/dashboard">
             View Purchases
             <ArrowRight className="w-4 h-4 ml-2" />
