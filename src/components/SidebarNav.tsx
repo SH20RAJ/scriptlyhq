@@ -61,7 +61,7 @@ export default function SidebarNav() {
             className={cn(
               "flex items-center gap-3 px-4 py-3 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-200 border-2 border-transparent w-full whitespace-nowrap",
               isActive
-                ? "bg-primary text-primary-foreground border-primary shadow-sm hover:brightness-105"
+                ? "bg-primary/15 text-primary border-primary/30 shadow-sm"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >

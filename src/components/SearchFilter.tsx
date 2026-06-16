@@ -196,6 +196,15 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed font-medium">
             {prod.shortDescription}
           </p>
+          {prod.tags && (
+            <div className="flex flex-wrap gap-1.5 pt-1.5">
+              {prod.tags.split(",").slice(0, 3).map((tag: string) => (
+                <Badge key={tag} variant="outline" className="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-muted/30 text-muted-foreground border border-border/60">
+                  {tag.trim()}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-border/40">
@@ -210,7 +219,7 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="xs" className="h-8 px-2.5 text-muted-foreground hover:text-white uppercase tracking-widest text-[9px] font-bold rounded-lg cursor-pointer">
+            <Button asChild variant="outline" size="xs" className="h-8 px-2.5 uppercase tracking-widest text-[9px] font-bold rounded-lg cursor-pointer">
               <Link href={`/products/${prod.slug}`}>Details</Link>
             </Button>
             <Button

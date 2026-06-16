@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Play, Image as ImageIcon, Film, Eye } from "lucide-react";
 import TweetEmbed from "./TweetEmbed";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Button } from "@/components/ui/button";
 
 interface ProductMediaSwitcherProps {
   videoUrl: string | null;
@@ -92,48 +93,36 @@ export default function ProductMediaSwitcher({ videoUrl, previewGif, thumbnail, 
       {/* Selector Thumbnails / Tabs */}
       <div className="flex flex-wrap items-center gap-3">
         {hasVideo && (
-          <button
-            type="button"
+          <Button
+            variant={activeTab === "video" ? "default" : "outline"}
             onClick={() => setActiveTab("video")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-              activeTab === "video"
-                ? "bg-white text-black border-white shadow-lg"
-                : "bg-neutral-900/40 text-neutral-400 border-neutral-800/80 hover:text-white hover:bg-neutral-950"
-            }`}
+            className="cursor-pointer font-bold h-10 rounded-xl px-5"
           >
-            <Play className="w-3.5 h-3.5" />
+            <Play className="w-3.5 h-3.5 mr-1" />
             Watch Video
-          </button>
+          </Button>
         )}
 
         {hasGif && (
-          <button
-            type="button"
+          <Button
+            variant={activeTab === "gif" ? "default" : "outline"}
             onClick={() => setActiveTab("gif")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-              activeTab === "gif"
-                ? "bg-white text-black border-white shadow-lg"
-                : "bg-neutral-900/40 text-neutral-400 border-neutral-800/80 hover:text-white hover:bg-neutral-950"
-            }`}
+            className="cursor-pointer font-bold h-10 rounded-xl px-5"
           >
-            <Film className="w-3.5 h-3.5" />
+            <Film className="w-3.5 h-3.5 mr-1" />
             View GIF
-          </button>
+          </Button>
         )}
 
         {hasPoster && (
-          <button
-            type="button"
+          <Button
+            variant={activeTab === "poster" ? "default" : "outline"}
             onClick={() => setActiveTab("poster")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-              activeTab === "poster"
-                ? "bg-white text-black border-white shadow-lg"
-                : "bg-neutral-900/40 text-neutral-400 border-neutral-800/80 hover:text-white hover:bg-neutral-950"
-            }`}
+            className="cursor-pointer font-bold h-10 rounded-xl px-5"
           >
-            <ImageIcon className="w-3.5 h-3.5" />
+            <ImageIcon className="w-3.5 h-3.5 mr-1" />
             Static Poster
-          </button>
+          </Button>
         )}
       </div>
     </div>

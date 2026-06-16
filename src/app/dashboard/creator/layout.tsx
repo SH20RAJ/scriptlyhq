@@ -28,11 +28,20 @@ export default async function CreatorDashboardLayout({
         
         {/* Left Navigation Sidebar */}
         <aside className="w-full md:w-64 shrink-0 flex flex-col gap-4">
-          <div className="p-5 border-2 border-border bg-card rounded-2xl shadow-sm space-y-2">
-            <h2 className="text-sm font-black uppercase tracking-wider text-foreground">Creator console</h2>
-            <p className="text-[10px] text-muted-foreground font-semibold leading-relaxed">
-              Storefront: <span className="text-primary font-bold">{user.storeName || "Unnamed Store"}</span>
-            </p>
+          <div className="p-5 border-2 border-border bg-card rounded-2xl shadow-sm space-y-3">
+            <div className="space-y-1">
+              <h2 className="text-sm font-black uppercase tracking-wider text-foreground">Creator console</h2>
+              <p className="text-[10px] text-muted-foreground font-semibold leading-relaxed">
+                Storefront: <span className="text-primary font-bold">{user.storeName || "Unnamed Store"}</span>
+              </p>
+            </div>
+            <Link
+              href={`/stores/${user.id}`}
+              target="_blank"
+              className="flex items-center justify-center gap-1.5 w-full py-2 bg-[#1CB0F6] hover:bg-[#1CB0F6]/90 text-white rounded-xl text-[10px] font-black uppercase tracking-wider shadow-[0_3px_0_#1899D6] active:translate-y-px active:shadow-none transition-all duration-150"
+            >
+              View Public Store
+            </Link>
           </div>
 
           {/* Interactive Navigation Client Component */}
