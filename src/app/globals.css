@@ -7,9 +7,9 @@
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
-	--font-sans: DM Sans, sans-serif;
+	--font-sans: var(--font-nunito), sans-serif;
 	--font-mono: Space Mono, monospace;
-	--font-heading: var(--font-sans);
+	--font-heading: var(--font-nunito), sans-serif;
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,14 +46,14 @@
 	--radius-2xl: calc(var(--radius) * 1.8);
 	--radius-3xl: calc(var(--radius) * 2.2);
 	--radius-4xl: calc(var(--radius) * 2.6);
-	--font-serif: DM Sans, sans-serif;
+	--font-serif: var(--font-nunito), sans-serif;
 	--radius: 1rem;
 	--color-destructive-foreground: var(--destructive-foreground);
 }
 
 /* Hexclave Auth Overrides */
 .hexclave-auth-container {
-  --hexclave-primary: #10b981; /* emerald-500 */
+  --hexclave-primary: #58CC02; /* Duolingo Feather Green */
   --hexclave-background: transparent;
 }
 
@@ -70,131 +70,152 @@
 }
 
 .hexclave-auth-container input {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 12px !important;
-  color: white !important;
+  background: var(--background) !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 16px !important;
+  color: var(--foreground) !important;
   padding: 12px 16px !important;
   transition: all 0.2s ease !important;
 }
 
 .hexclave-auth-container input:focus {
-  border-color: #10b981 !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+  border-color: #1CB0F6 !important;
+  box-shadow: 0 0 0 4px rgba(28, 176, 246, 0.15) !important;
 }
 
 .hexclave-auth-container button[type="submit"] {
-  background: #10b981 !important;
-  color: #050505 !important;
-  font-weight: 700 !important;
-  border-radius: 12px !important;
-  padding: 12px !important;
-  transition: all 0.2s ease !important;
+  background: #58CC02 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  border-radius: 16px !important;
+  padding: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  box-shadow: 0 4px 0 #46A302 !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
   margin-top: 8px !important;
-  text-transform: none !important;
+  cursor: pointer !important;
 }
 
 .hexclave-auth-container button[type="submit"]:hover {
-  background: #34d399 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+  filter: brightness(1.05) !important;
+}
+
+.hexclave-auth-container button[type="submit"]:active {
+  transform: translateY(4px) !important;
+  box-shadow: none !important;
 }
 
 .hexclave-auth-container [class*="AuthDivider"] {
-  color: #404040 !important;
+  color: var(--muted-foreground) !important;
   font-size: 11px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
 }
 
 .hexclave-auth-container [class*="SocialButton"] {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 12px !important;
-  transition: all 0.2s ease !important;
+  background: var(--background) !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 0 var(--border) !important;
+  transition: transform 0.1s, box-shadow 0.1s !important;
 }
 
 .hexclave-auth-container [class*="SocialButton"]:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: var(--muted) !important;
+}
+
+.hexclave-auth-container [class*="SocialButton"]:active {
+  transform: translateY(4px) !important;
+  box-shadow: none !important;
 }
 
 .hexclave-auth-container [class*="AuthLink"] {
-  color: #10b981 !important;
-  font-weight: 500 !important;
+  color: #1CB0F6 !important;
+  font-weight: 700 !important;
   font-size: 13px !important;
 }
 
 :root {
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.129 0 0);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.129 0 0);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.129 0 0);
-	--primary: oklch(0.208 0 0);
-	--primary-foreground: oklch(0.984 0 0);
-	--secondary: oklch(0.967 0 0);
-	--secondary-foreground: oklch(0.208 0 0);
-	--muted: oklch(0.967 0 0);
-	--muted-foreground: oklch(0.552 0 0);
-	--accent: oklch(0.967 0 0);
-	--accent-foreground: oklch(0.208 0 0);
-	--destructive: oklch(0.577 0.245 27.325);
-	--destructive-foreground: oklch(0.577 0.245 27.325);
-	--border: oklch(0.922 0 0);
-	--input: oklch(0.922 0 0);
-	--ring: oklch(0.708 0 0);
-	--chart-1: oklch(0.646 0.222 41.116);
-	--chart-2: oklch(0.6 0.118 184.704);
-	--chart-3: oklch(0.398 0.07 227.392);
-	--chart-4: oklch(0.828 0.189 84.429);
-	--chart-5: oklch(0.769 0.188 70.08);
-	--radius: 0.75rem;
-	--sidebar: oklch(0.984 0 0);
-	--sidebar-foreground: oklch(0.129 0 0);
-	--sidebar-primary: oklch(0.208 0 0);
-	--sidebar-primary-foreground: oklch(0.984 0 0);
-	--sidebar-accent: oklch(0.967 0 0);
-	--sidebar-accent-foreground: oklch(0.208 0 0);
-	--sidebar-border: oklch(0.922 0 0);
-	--sidebar-ring: oklch(0.708 0 0);
+  --background: #FFFFFF;
+  --foreground: #4B4B4B; /* Eel text */
+  --card: #FFFFFF;
+  --card-foreground: #4B4B4B;
+  --popover: #FFFFFF;
+  --popover-foreground: #4B4B4B;
+  --primary: #58CC02; /* Feather Green */
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFFFFF; /* Secondary white */
+  --secondary-foreground: #4B4B4B;
+  --muted: #F7F7F7; /* Polar bg */
+  --muted-foreground: #777777; /* Wolf grey */
+  --accent: #1CB0F6; /* Macaw blue */
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF4B4B; /* Cardinal Red */
+  --destructive-foreground: #FFFFFF;
+  --border: #E5E5E5; /* Swan border */
+  --input: #E5E5E5;
+  --ring: #1CB0F6; /* Macaw ring */
+  --font-nunito: 'Nunito', sans-serif;
+  --radius: 1rem;
+  
+  /* Duolingo Specific Colors */
+  --duo-feather: #58CC02;
+  --duo-feather-shadow: #46A302;
+  --duo-macaw: #1CB0F6;
+  --duo-macaw-shadow: #1899D6;
+  --duo-cardinal: #FF4B4B;
+  --duo-cardinal-shadow: #E53535;
+  --duo-bee: #FFC800;
+  --duo-bee-shadow: #E6B400;
+  --duo-fox: #FF9600;
+  --duo-fox-shadow: #E68600;
+  --duo-beetle: #CE82FF;
+  --duo-beetle-shadow: #B86CE6;
+  --duo-swan: #E5E5E5;
+  --duo-polar: #F7F7F7;
+  --duo-eel: #4B4B4B;
+  --duo-wolf: #777777;
 }
 
 .dark {
-	--background: oklch(0 0 0);
-	--foreground: oklch(0.984 0 0);
-	--card: oklch(0.129 0 0);
-	--card-foreground: oklch(0.984 0 0);
-	--popover: oklch(0.129 0 0);
-	--popover-foreground: oklch(0.984 0 0);
-	--primary: oklch(0.984 0 0);
-	--primary-foreground: oklch(0.129 0 0);
-	--secondary: oklch(0.208 0 0);
-	--secondary-foreground: oklch(0.984 0 0);
-	--muted: oklch(0.208 0 0);
-	--muted-foreground: oklch(0.708 0 0);
-	--accent: oklch(0.208 0 0);
-	--accent-foreground: oklch(0.984 0 0);
-	--destructive: oklch(0.396 0.141 25.723);
-	--destructive-foreground: oklch(0.637 0.237 25.331);
-	--border: oklch(0.208 0 0);
-	--input: oklch(0.208 0 0);
-	--ring: oklch(0.871 0 0);
-	--chart-1: oklch(0.488 0.243 264.376);
-	--chart-2: oklch(0.696 0.17 162.48);
-	--chart-3: oklch(0.769 0.188 70.08);
-	--chart-4: oklch(0.627 0.265 303.9);
-	--chart-5: oklch(0.645 0.246 16.439);
-	--sidebar: oklch(0 0 0);
-	--sidebar-foreground: oklch(0.708 0 0);
-	--sidebar-primary: oklch(0.488 0.243 264.376);
-	--sidebar-primary-foreground: oklch(0.984 0 0);
-	--sidebar-accent: oklch(0.208 0 0);
-	--sidebar-accent-foreground: oklch(0.984 0 0);
-	--sidebar-border: oklch(0.208 0 0);
-	--sidebar-ring: oklch(0.871 0 0);
+  --background: #0F171C; /* Dark Slate-Eel */
+  --foreground: #F7F7F7; /* Polar light text */
+  --card: #1A2830; /* Dark card */
+  --card-foreground: #F7F7F7;
+  --popover: #1A2830;
+  --popover-foreground: #F7F7F7;
+  --primary: #58CC02; /* Feather Green */
+  --primary-foreground: #FFFFFF;
+  --secondary: #152026; /* Darker secondary */
+  --secondary-foreground: #F7F7F7;
+  --muted: #152026;
+  --muted-foreground: #AFAFAF;
+  --accent: #1CB0F6; /* Macaw */
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF4B4B; /* Cardinal */
+  --destructive-foreground: #FFFFFF;
+  --border: #2A3842; /* Darker border */
+  --input: #2A3842;
+  --ring: #1CB0F6;
+  
+  /* Duolingo Specific Colors dark variants */
+  --duo-feather: #58CC02;
+  --duo-feather-shadow: #46A302;
+  --duo-macaw: #1CB0F6;
+  --duo-macaw-shadow: #1899D6;
+  --duo-cardinal: #FF4B4B;
+  --duo-cardinal-shadow: #E53535;
+  --duo-bee: #FFC800;
+  --duo-bee-shadow: #E6B400;
+  --duo-fox: #FF9600;
+  --duo-fox-shadow: #E68600;
+  --duo-beetle: #CE82FF;
+  --duo-beetle-shadow: #B86CE6;
+  --duo-swan: #2A3842;
+  --duo-polar: #152026;
+  --duo-eel: #F7F7F7;
+  --duo-wolf: #AFAFAF;
 }
 
 @layer base {
@@ -267,4 +288,146 @@
   border-radius: 0;
   color: inherit;
   font-size: 0.875rem;
+}
+
+/* === DUOLINGO GLOBAL SELECTOR OVERRIDES === */
+
+/* Tactile 3D Buttons override */
+button, .button, [data-slot="button"] {
+  border-radius: 16px !important;
+}
+
+[data-slot="button"][data-variant="default"] {
+  background-color: var(--duo-feather) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 0 var(--duo-feather-shadow) !important;
+  border: none !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  font-weight: 800 !important;
+}
+
+[data-slot="button"][data-variant="default"]:hover {
+  filter: brightness(1.05) !important;
+}
+
+[data-slot="button"][data-variant="default"]:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 0px 0 transparent !important;
+}
+
+[data-slot="button"][data-variant="outline"] {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+  border: 2px solid var(--border) !important;
+  box-shadow: 0 4px 0 var(--border) !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  font-weight: 800 !important;
+}
+
+[data-slot="button"][data-variant="outline"]:hover {
+  background-color: var(--muted) !important;
+}
+
+[data-slot="button"][data-variant="outline"]:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 0px 0 transparent !important;
+}
+
+[data-slot="button"][data-variant="secondary"] {
+  background-color: var(--duo-macaw) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 0 var(--duo-macaw-shadow) !important;
+  border: none !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  font-weight: 800 !important;
+}
+
+[data-slot="button"][data-variant="secondary"]:hover {
+  filter: brightness(1.05) !important;
+}
+
+[data-slot="button"][data-variant="secondary"]:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 0px 0 transparent !important;
+}
+
+[data-slot="button"][data-variant="destructive"] {
+  background-color: var(--duo-cardinal) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 0 var(--duo-cardinal-shadow) !important;
+  border: none !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  font-weight: 800 !important;
+}
+
+[data-slot="button"][data-variant="destructive"]:hover {
+  filter: brightness(1.05) !important;
+}
+
+[data-slot="button"][data-variant="destructive"]:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 0px 0 transparent !important;
+}
+
+/* Ghost buttons click down slightly too */
+[data-slot="button"][data-variant="ghost"] {
+  border-radius: 16px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  transition: var(--ease-btn) !important;
+}
+[data-slot="button"][data-variant="ghost"]:active {
+  transform: translateY(2px) !important;
+}
+
+/* Card 3D Style */
+[data-slot="card"], .duo-card, .card-3d {
+  border: 2px solid var(--border) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 4px 0 var(--border) !important;
+  background-color: var(--card) !important;
+  transition: all 0.2s ease;
+}
+
+/* Input Rounded 3D Style */
+input, select, textarea, [data-slot="input"] {
+  border: 2px solid var(--border) !important;
+  border-radius: 16px !important;
+  padding: 10px 16px !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  font-family: var(--font-sans) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--duo-macaw) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(28, 176, 246, 0.25) !important;
+}
+
+/* Playful custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+  border: 2px solid var(--background);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
 }

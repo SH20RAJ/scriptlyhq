@@ -1,10 +1,10 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
-import { db } from "../../../db";
-import { products, orders, coupons } from "../../../db/schema";
+import { db } from "@/db";
+import { products, orders } from "@/db/schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
-import { getOrCreateDbUser } from "../../../lib/auth-utils";
+import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -18,17 +18,10 @@ import {
   ArrowRight,
   ShieldCheck,
   Hourglass,
-  HelpCircle,
-  Building,
-  HelpCircle as QuestionIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CreatorProductsTable from "../../../components/CreatorProductsTable";
-import StoreNameEditor from "../../../components/StoreNameEditor";
-import CreatorCouponsManager from "../../../components/CreatorCouponsManager";
-import PayoutSettingsEditor from "../../../components/PayoutSettingsEditor";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Creator Console | ScriptlyStore",
@@ -73,246 +66,229 @@ export default async function CreatorConsolePage() {
 
   const creatorShare = Math.round(grossSales * 0.95);
 
-  // Fetch creator's specific store coupons
-  const storeCoupons = await db
-    .select({
-      id: coupons.id,
-      code: coupons.code,
-      discountType: coupons.discountType,
-      discountValue: coupons.discountValue,
-      minPurchaseAmount: coupons.minPurchaseAmount,
-      active: coupons.active,
-    })
-    .from(coupons)
-    .where(eq(coupons.creatorId, user.id))
-    .orderBy(desc(coupons.createdAt));
-
   // Determine Razorpay Route Connection Status
   const hasBankDetails = !!user.bankAccountNumber && !!user.bankIfsc;
   const isRouteActive = !!user.razorpayAccountId && user.razorpayAccountId.startsWith("acc_");
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="container max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-12 animate-in fade-in duration-500">
-        
-        {/* Welcome / Heading Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900 pb-10">
-          <div className="space-y-2">
-            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-white flex items-center gap-3">
-              Creator Console
-              <span className="text-xs px-2.5 py-0.5 rounded-full font-black uppercase bg-purple-500/10 border border-purple-500/20 text-purple-400 tracking-wider">
-                Beta
-              </span>
-            </h1>
-            <p className="text-neutral-400 font-medium">
-              Manage your uploaded scripts, configure discounts, monitor store-level coupons, and request publishing approvals.
+    <div className="space-y-8 animate-in fade-in duration-300">
+      
+      {/* Welcome / Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
+            Overview
+            <Badge className="bg-[#CE82FF]/10 text-[#CE82FF] border-[#CE82FF]/20 text-[9px] uppercase tracking-wider h-5 font-black">
+              Beta
+            </Badge>
+          </h1>
+          <p className="text-xs text-muted-foreground font-medium mt-1">
+            Monitor store-level analytics, split payments status, and quick shortcuts.
+          </p>
+        </div>
+        <Button asChild size="sm" className="rounded-xl h-10 px-5 font-black uppercase tracking-wider text-[10px] bg-[#58CC02] text-white hover:bg-[#58CC02]/90 cursor-pointer shadow-sm">
+          <Link href="/dashboard/creator/new">
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            List New Script
+          </Link>
+        </Button>
+      </div>
+
+      {/* Razorpay Route Split Integration Status Banner */}
+      {isRouteActive ? (
+        <div className="p-5 rounded-2xl border-2 border-emerald-500/10 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 flex gap-4 items-start shadow-sm">
+          <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="font-black text-emerald-700 dark:text-emerald-300 uppercase tracking-wider text-[10px]">Razorpay Route splits Active</h4>
+              <Badge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border-0 text-[8px] uppercase tracking-wider font-bold h-4">Verified</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed font-medium">
+              Your store split configuration is completely active. 95% of customer payments are split instantly at checkout and transferred directly to your bank account under sub-merchant account <span className="font-mono text-emerald-600 dark:text-emerald-300 bg-muted px-1.5 py-0.5 rounded">{user.razorpayAccountId}</span>.
+              <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 hover:underline font-bold transition-all ml-1.5">
+                Route Guide <ArrowRight className="w-3 h-3" />
+              </Link>
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Button asChild variant="outline" size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px] border-neutral-800 text-neutral-300 hover:text-white">
-              <Link href="/dashboard">Customer Inventory</Link>
-            </Button>
-            <Button asChild size="sm" className="rounded-full h-10 px-6 font-bold uppercase tracking-widest text-[10px] bg-white text-black hover:bg-neutral-200">
-              <Link href="/dashboard/creator/new">
-                <Plus className="w-3.5 h-3.5 mr-1.5" />
-                List New Script
+        </div>
+      ) : hasBankDetails ? (
+        <div className="p-5 rounded-2xl border-2 border-amber-500/10 bg-amber-500/5 text-amber-600 dark:text-amber-400 flex gap-4 items-start shadow-sm">
+          <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 shrink-0">
+            <Hourglass className="w-5 h-5 animate-pulse" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="font-black text-amber-700 dark:text-amber-300 uppercase tracking-wider text-[10px]">Onboarding in Progress</h4>
+              <Badge className="bg-amber-500/20 text-amber-600 dark:text-amber-300 border-0 text-[8px] uppercase tracking-wider font-bold h-4">API Approval Pending</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed font-medium">
+              Your bank details are recorded. Our system administrators are setting up your merchant credentials on the Razorpay node.
+              <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 hover:underline font-bold transition-all ml-1.5">
+                Route Guide <ArrowRight className="w-3 h-3" />
               </Link>
-            </Button>
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="p-5 rounded-2xl border-2 border-rose-500/10 bg-rose-500/5 text-rose-600 dark:text-rose-400 flex gap-4 items-start shadow-sm">
+          <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500 shrink-0">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="font-black text-rose-700 dark:text-rose-300 uppercase tracking-wider text-[10px]">Setup Required: Automated Payout Splits (95/5)</h4>
+              <Badge className="bg-rose-500/20 text-rose-600 dark:text-rose-300 border-0 text-[8px] uppercase tracking-wider font-bold h-4">Inactive</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed font-medium">
+              You have not linked your bank account. Change your preferred payout method to **Direct Bank (via Razorpay Route)** and fill out your banking details.
+              <Link href="/dashboard/creator/payouts" className="inline-flex items-center gap-1 text-rose-600 dark:text-rose-400 hover:underline font-bold transition-all ml-1.5">
+                Setup Bank details <ArrowRight className="w-3 h-3" />
+              </Link>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Analytics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="rounded-2xl border-2 border-border shadow-sm">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              Total Uploads
+            </span>
+            <LayoutGrid className="w-4 h-4 text-muted-foreground/60" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-black text-foreground">{creatorProducts.length}</div>
+            <p className="text-[9px] text-muted-foreground font-semibold mt-1">Scripts added to catalog</p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-2 border-border shadow-sm">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              Total Unlocks
+            </span>
+            <Package className="w-4 h-4 text-muted-foreground/60" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-black text-foreground">{totalSold}</div>
+            <p className="text-[9px] text-muted-foreground font-semibold mt-1">Times your scripts were bought</p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-2 border-border shadow-sm">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              Gross Revenue
+            </span>
+            <Coins className="w-4 h-4 text-muted-foreground/60" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-black text-foreground">${(grossSales / 100).toFixed(2)}</div>
+            <p className="text-[9px] text-muted-foreground font-semibold mt-1">Total revenue processed</p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-2 border-primary/20 bg-primary/5 shadow-sm">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary">
+              Your Share (95%)
+            </span>
+            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-black text-foreground">${(creatorShare / 100).toFixed(2)}</div>
+            <p className="text-[9px] text-primary/80 font-semibold mt-1">Net pending settlement</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Split Details Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* Left: Creations Summary */}
+        <div className="lg:col-span-7 space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Creations Summary</h2>
+            <Link href="/dashboard/creator/products" className="text-[10px] font-black text-[#1CB0F6] uppercase tracking-widest hover:underline flex items-center gap-1">
+              View All <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+          
+          <div className="border-2 border-border rounded-2xl overflow-hidden bg-card shadow-sm">
+            {creatorProducts.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground font-medium">
+                You haven't listed any scripts yet.
+              </div>
+            ) : (
+              <div className="divide-y-2 divide-border">
+                {creatorProducts.slice(0, 3).map((prod) => (
+                  <div key={prod.id} className="p-4 flex items-center justify-between gap-4 hover:bg-muted/30 transition-colors">
+                    <div className="space-y-1">
+                      <p className="text-xs font-black text-foreground">{prod.title}</p>
+                      <p className="text-[10px] text-muted-foreground font-semibold uppercase">{prod.category}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-black text-foreground">${(prod.price / 100).toFixed(2)}</p>
+                      <Badge className="bg-primary/10 text-primary border-primary/20 text-[8px] uppercase tracking-wider font-bold h-4 mt-0.5">
+                        {prod.status || "approved"}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Razorpay Route Split Integration Status Banner */}
-        {isRouteActive ? (
-          <div className="p-6 rounded-3xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-400 flex gap-4 items-start shadow-lg shadow-emerald-500/5">
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-emerald-300 uppercase tracking-wide text-xs">Razorpay Route splits Active</h4>
-                <Badge className="bg-emerald-500/20 text-emerald-300 border-0 text-[9px] uppercase tracking-wider h-5">Verified Linked Account</Badge>
-              </div>
-              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
-                Your store split configuration is completely active. 95% of customer payments are split instantly at checkout and transferred directly to your bank account under sub-merchant account <span className="font-mono text-emerald-300 bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded">{user.razorpayAccountId}</span>. Retained platform commission is 5%.
-                <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 underline font-bold transition-all ml-1.5">
-                  Route Guide <ArrowRight className="w-3 h-3" />
-                </Link>
-              </p>
-            </div>
-          </div>
-        ) : hasBankDetails ? (
-          <div className="p-6 rounded-3xl border border-amber-500/10 bg-amber-500/5 text-amber-400 flex gap-4 items-start">
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-              <Hourglass className="w-6 h-6 animate-pulse" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-amber-300 uppercase tracking-wide text-xs">Razorpay Route Onboarding in Progress</h4>
-                <Badge className="bg-amber-500/20 text-amber-300 border-0 text-[9px] uppercase tracking-wider h-5 font-bold">Staged for API Approval</Badge>
-              </div>
-              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
-                Your bank details are recorded. Our system administrators are setting up your merchant credentials on the Razorpay node. Splits will deploy automatically once verification is finalized. If you experience latency, our support team will complete manual setup fallback.
-                <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-amber-300 hover:text-amber-200 underline font-bold transition-all ml-1.5">
-                  Route Guide <ArrowRight className="w-3 h-3" />
-                </Link>
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="p-6 rounded-3xl border border-rose-500/10 bg-rose-500/5 text-rose-400 flex gap-4 items-start shadow-lg shadow-rose-500/5">
-            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-400">
-              <AlertTriangle className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-rose-300 uppercase tracking-wide text-xs">Setup Required: Automated Payout Splits (95/5)</h4>
-                <Badge className="bg-rose-500/20 text-rose-300 border-0 text-[9px] uppercase tracking-wider h-5 font-bold">Inactive</Badge>
-              </div>
-              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
-                You have not linked your bank account. Change your preferred payout method to **Direct Bank (via Razorpay Route)** and fill out your banking details below. Once registered, you will automatically receive your 95% share directly and instantly into your bank account at checkout.
-                <Link href="/docs/route-guide" className="inline-flex items-center gap-1 text-rose-300 hover:text-rose-200 underline font-bold transition-all ml-1.5">
-                  View Setup Document <ArrowRight className="w-3 h-3" />
-                </Link>
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Analytics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="border-neutral-900 bg-neutral-950/40 rounded-2xl">
-            <CardHeader className="pb-2">
-              <span className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
-                Total Uploads
-                <LayoutGrid className="w-4 h-4 text-neutral-600" />
-              </span>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-black text-white">{creatorProducts.length}</div>
-              <p className="text-[10px] text-neutral-500 mt-1">Scripts added to catalog</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-neutral-900 bg-neutral-950/40 rounded-2xl">
-            <CardHeader className="pb-2">
-              <span className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
-                Total Unlocks
-                <Package className="w-4 h-4 text-neutral-600" />
-              </span>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-black text-white">{totalSold}</div>
-              <p className="text-[10px] text-neutral-500 mt-1">Times your scripts were bought</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-neutral-900 bg-neutral-950/40 rounded-2xl">
-            <CardHeader className="pb-2">
-              <span className="text-xs font-black uppercase tracking-wider text-neutral-500 flex items-center justify-between">
-                Gross Revenue
-                <Coins className="w-4 h-4 text-neutral-600" />
-              </span>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-black text-white">${(grossSales / 100).toFixed(2)}</div>
-              <p className="text-[10px] text-neutral-500 mt-1">Total revenue processed</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-purple-900/40 bg-purple-500/5 rounded-2xl shadow-lg shadow-purple-500/5">
-            <CardHeader className="pb-2">
-              <span className="text-xs font-black uppercase tracking-wider text-purple-400 flex items-center justify-between">
-                Your Share (95%)
-                <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-              </span>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-black text-white">${(creatorShare / 100).toFixed(2)}</div>
-              <p className="text-[10px] text-neutral-400 mt-1">Net pending settlement</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Store Naming Settings */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-4">
-            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-neutral-500">Storefront & Promotions</h2>
-            <div className="h-px flex-1 bg-neutral-900" />
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-4">
-              <StoreNameEditor initialStoreName={user.storeName} />
-            </div>
-            <div className="lg:col-span-4">
-              <PayoutSettingsEditor
-                initialBankName={user.bankName}
-                initialBankAccountName={user.bankAccountName}
-                initialBankAccountNumber={user.bankAccountNumber}
-                initialBankIfsc={user.bankIfsc}
-              />
-            </div>
-            <div className="lg:col-span-4">
-              <CreatorCouponsManager initialCoupons={storeCoupons} />
-            </div>
-          </div>
-        </section>
-
-        {/* Main Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left: Script listings */}
-          <div className="lg:col-span-8 space-y-4">
-            <div className="flex items-center gap-4">
-              <h2 className="text-sm font-black uppercase tracking-[0.2em] text-neutral-500">My Creations</h2>
-              <div className="h-px flex-1 bg-neutral-900" />
-            </div>
-            <CreatorProductsTable products={creatorProducts} />
+        {/* Right: Sales Activity Ledger */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Recent Activity</h2>
+            <Link href="/dashboard/creator/ledger" className="text-[10px] font-black text-[#1CB0F6] uppercase tracking-widest hover:underline flex items-center gap-1">
+              Ledger <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
-          {/* Right: Sales/Activity Ledger */}
-          <div className="lg:col-span-4 space-y-4">
-            <div className="flex items-center gap-4">
-              <h2 className="text-sm font-black uppercase tracking-[0.2em] text-neutral-500">Recent Sales</h2>
-              <div className="h-px flex-1 bg-neutral-900" />
-            </div>
-
-            <Card className="border-neutral-900 bg-neutral-950/40 rounded-2xl">
-              <CardHeader className="pb-4">
-                <span className="text-sm font-bold flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-purple-400" />
-                  Earning Ledger
-                </span>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {salesHistory.length === 0 ? (
-                  <p className="text-xs text-neutral-500 font-medium text-center py-6">
-                    Sales activity details will appear here as customers unlock your scripts.
-                  </p>
-                ) : (
-                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
-                    {salesHistory.map((sale) => (
-                      <div key={sale.orderId} className="flex justify-between items-start gap-4 text-xs">
-                        <div className="space-y-1 flex-1">
-                          <p className="font-bold text-white line-clamp-1">{sale.productTitle}</p>
-                          <div className="flex items-center gap-2 text-[10px] text-neutral-500">
-                            <span>{new Date(sale.date).toLocaleDateString()}</span>
-                            <span>•</span>
-                            <span className="font-mono">TX: {sale.orderId.slice(0, 8)}</span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-white">${(sale.amount / 100).toFixed(2)}</p>
-                          <p className="text-[10px] text-purple-400 font-semibold">+${((sale.amount * 0.95) / 100).toFixed(2)}</p>
+          <div className="p-5 border-2 border-border bg-card rounded-2xl shadow-sm space-y-4">
+            <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border pb-3">
+              <Activity className="w-4 h-4 text-[#CE82FF]" />
+              Earning Ledger
+            </h3>
+            <div className="space-y-4">
+              {salesHistory.length === 0 ? (
+                <p className="text-xs text-muted-foreground font-medium text-center py-6">
+                  Sales activity will appear here once purchases occur.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {salesHistory.slice(0, 4).map((sale) => (
+                    <div key={sale.orderId} className="flex justify-between items-start gap-4 text-xs border-b border-border pb-2.5 last:border-0 last:pb-0">
+                      <div className="space-y-0.5 flex-1">
+                        <p className="font-bold text-foreground line-clamp-1">{sale.productTitle}</p>
+                        <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground font-semibold">
+                          <span>{new Date(sale.date).toLocaleDateString()}</span>
+                          <span>•</span>
+                          <span className="font-mono">TX: {sale.orderId.slice(0, 8)}</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      <div className="text-right">
+                        <p className="font-bold text-foreground">${(sale.amount / 100).toFixed(2)}</p>
+                        <p className="text-[9px] text-primary font-bold">+${((sale.amount * 0.95) / 100).toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
       </div>
+
     </div>
   );
 }
