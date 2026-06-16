@@ -6,6 +6,7 @@ import { ProductPagination } from "../components/ProductPagination";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Cpu, HelpCircle, HeartHandshake, Layers, Tags, ChevronRight } from "lucide-react";
+import { getProductEffectivePrice } from "../lib/price-utils";
 
 interface PageProps {
   searchParams: Promise<{
@@ -38,9 +39,10 @@ export default async function Home({ searchParams }: PageProps) {
     limit: 12,
   });
 
-  const { products: contentPosts } = await getProductsAction({
-    category: "ebooks",
+  const { products: featuredPremiumList } = await getProductsAction({
+    priceType: "paid",
     limit: 3,
+    sortBy: "rating",
   });
 
   const categoriesList = await getCategoriesAction();
@@ -66,57 +68,96 @@ export default async function Home({ searchParams }: PageProps) {
         
         {/* Content-Only Hero Section */}
         <header className="py-12 space-y-10 max-w-5xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto space-y-4">
+          <div className="text-center max-w-3xl mx-auto space-y-5">
             <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground font-sans">
               Ready-To-Deploy <span className="text-[#58CC02]">Next.js Templates</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
             </h1>
             <p className="text-sm md:text-base text-muted-foreground font-bold leading-relaxed">
               Ship 10x faster with verified full-stack boilerplates, browser extensions, automation bots, and system prompts. Grab open-source code for free or sell your creations and keep 95% of sales!
             </p>
+
+            {/* Centered Premium/Free Switcher */}
+            <div className="flex items-center justify-center gap-3 pt-4">
+              <Link 
+                href="/" 
+                className="px-6 py-3 bg-primary text-white border-2 border-primary rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-[0_4px_0_#46A302] hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none cursor-pointer"
+              >
+                💎 Premium Marketplace
+              </Link>
+              <Link 
+                href="/free" 
+                className="px-6 py-3 bg-card text-muted-foreground border-2 border-border rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-[0_4px_0_var(--border)] hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none cursor-pointer"
+              >
+                🎁 Free Scripts
+              </Link>
+            </div>
           </div>
 
           {/* Featured Content Posts */}
-          {contentPosts && contentPosts.length > 0 && (
+          {featuredPremiumList && featuredPremiumList.length > 0 && (
             <div className="space-y-6 pt-4">
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#CE82FF] flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-[#CE82FF] animate-pulse" />
-                  Featured Playbooks & Handbooks
+                  Featured Premium Releases
                 </h3>
                 <div className="h-px flex-1 bg-border/40" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {contentPosts.map((post) => (
-                  <Link
-                    key={post.id}
-                    href={`/products/${post.slug}`}
-                    className="group flex flex-col bg-card/25 border-2 border-border/40 hover:border-purple-500/50 rounded-2xl overflow-hidden transition-all shadow-[0_3px_0_var(--border)] hover:shadow-[0_3px_0_rgba(168,85,247,0.3)] hover:-translate-y-0.5 active:translate-y-0 duration-200"
-                  >
-                    <div className="aspect-[16/9] w-full overflow-hidden relative border-b border-border/40">
-                      <img
-                        src={post.thumbnail || "/placeholder.jpg"}
-                        alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <span className="absolute top-2.5 left-2.5 bg-purple-500 text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">
-                        📖 Free Guide
-                      </span>
-                    </div>
-                    <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                      <div className="space-y-1">
-                        <h4 className="text-xs font-black text-foreground group-hover:text-purple-400 transition-colors line-clamp-2">
-                          {post.title}
-                        </h4>
-                        <p className="text-[10px] text-muted-foreground font-bold line-clamp-2 leading-relaxed">
-                          {post.shortDescription}
-                        </p>
+                {featuredPremiumList.map((post) => {
+                  const promo = getProductEffectivePrice(post);
+                  return (
+                    <Link
+                      key={post.id}
+                      href={`/products/${post.slug}`}
+                      className="group flex flex-col bg-card/45 border-2 border-border/80 hover:border-primary/60 rounded-2xl overflow-hidden transition-all shadow-[0_4px_0_var(--border)] hover:shadow-[0_4px_0_rgba(88,204,2,0.3)] hover:-translate-y-1 active:translate-y-0 active:shadow-none duration-200"
+                    >
+                      <div className="aspect-[16/10] w-full overflow-hidden relative border-b border-border/60 bg-muted">
+                        <img
+                          src={post.thumbnail || "/placeholder.jpg"}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {/* Rating Badge */}
+                        <span className="absolute top-3 left-3 bg-background/90 backdrop-blur-md text-foreground text-[9px] font-black uppercase px-2.5 py-1 rounded-lg border border-border/40 shadow-sm flex items-center gap-1">
+                          ⭐ {post.rating}
+                        </span>
+                        {/* Discount Badge */}
+                        {promo.hasDiscount && (
+                          <span className="absolute top-3 right-3 bg-[#FF4B4B] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider shadow-sm">
+                            SAVE {post.discountPercent}%
+                          </span>
+                        )}
                       </div>
-                      <span className="text-[9px] text-purple-400 font-extrabold uppercase tracking-widest flex items-center gap-1">
-                        Read Now &rarr;
-                      </span>
-                    </div>
-                  </Link>
-                ))}
+                      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-black text-foreground group-hover:text-primary transition-colors line-clamp-1 leading-snug">
+                            {post.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground font-medium line-clamp-2 leading-relaxed">
+                            {post.shortDescription}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between pt-3 border-t border-border/40">
+                          {/* Price Tag */}
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-black text-foreground">
+                              ${(promo.effectivePrice / 100).toFixed(2)}
+                            </span>
+                            {promo.hasDiscount && (
+                              <span className="text-[10px] text-muted-foreground line-through font-bold">
+                                ${(post.price / 100).toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-primary font-black uppercase tracking-wider group-hover:underline flex items-center gap-1 transition-all">
+                            Get Access &rarr;
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -131,7 +172,7 @@ export default async function Home({ searchParams }: PageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           
           {/* Left Column: Sidebar Filters */}
-          <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-[9rem] max-h-[calc(100vh-11rem)] overflow-y-auto scrollbar-none bg-card/10 p-6 border border-border/40 rounded-3xl">
+          <aside className="hidden lg:block lg:col-span-3 space-y-8 lg:sticky lg:top-[9rem] max-h-[calc(100vh-11rem)] overflow-y-auto scrollbar-none bg-card/10 p-6 border border-border/40 rounded-3xl">
             
             {/* Free Scripts Promo Link */}
             <div className="pb-6 border-b border-border/40">

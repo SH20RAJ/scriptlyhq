@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { db } from "../db";
 import { products, categories } from "../db/schema";
+import { BLOG_POSTS } from "../lib/blog-data";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://scriptly.store";
@@ -34,5 +35,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...routes, ...productRoutes, ...categoryRoutes];
+  // Blog dynamic pages
+  const blogIndexRoute = {
+    url: `${baseUrl}/blog`,
+    lastModified: new Date(),
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+  };
+
+  const blogRoutes = BLOG_POSTS.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.createdAt),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  return [...routes, ...productRoutes, ...categoryRoutes, blogIndexRoute, ...blogRoutes];
 }

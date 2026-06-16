@@ -29,6 +29,12 @@ export default function Navbar() {
               Search
             </Link>
             <Link
+              href="/blog"
+              className="flex items-center text-sm font-bold text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Blog
+            </Link>
+            <Link
               href="/offers"
               className="flex items-center text-sm font-bold text-muted-foreground transition-colors hover:text-foreground"
             >

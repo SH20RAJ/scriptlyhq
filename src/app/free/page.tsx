@@ -57,13 +57,29 @@ export default async function FreeProductsPage({ searchParams }: PageProps) {
       <div className="container max-w-7xl mx-auto px-4 py-8 space-y-12">
         
         {/* Typographic Hero Section */}
-        <header className="py-12 text-center max-w-3xl mx-auto space-y-4">
+        <header className="py-12 text-center max-w-3xl mx-auto space-y-5">
           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground font-sans">
             🎁 Free <span className="text-purple-400 font-extrabold">Scripts & Boilerplates</span>
           </h1>
           <p className="text-sm md:text-base text-muted-foreground font-bold leading-relaxed">
             Accelerate your development cycle with 100% free open-source boilerplates, scraper scripts, waitlist extensions, and AI recipes. No checkout or credit card required.
           </p>
+
+          {/* Centered Premium/Free Switcher */}
+          <div className="flex items-center justify-center gap-3 pt-4">
+            <Link 
+              href="/" 
+              className="px-6 py-3 bg-card text-muted-foreground border-2 border-border rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-[0_4px_0_var(--border)] hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none cursor-pointer"
+            >
+              💎 Premium Marketplace
+            </Link>
+            <Link 
+              href="/free" 
+              className="px-6 py-3 bg-purple-500 text-white border-2 border-purple-600 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-[0_4px_0_#8E3CC6] hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none cursor-pointer"
+            >
+              🎁 Free Scripts
+            </Link>
+          </div>
         </header>
 
         {/* Filter & Search Dashboard */}
@@ -75,7 +91,7 @@ export default async function FreeProductsPage({ searchParams }: PageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           
           {/* Left Column: Sidebar Filters */}
-          <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-[9rem] max-h-[calc(100vh-11rem)] overflow-y-auto scrollbar-none bg-card/10 p-6 border border-border/40 rounded-3xl">
+          <aside className="hidden lg:block lg:col-span-3 space-y-8 lg:sticky lg:top-[9rem] max-h-[calc(100vh-11rem)] overflow-y-auto scrollbar-none bg-card/10 p-6 border border-border/40 rounded-3xl">
             
             {/* Link back to Premium Marketplace */}
             <div className="pb-6 border-b border-border/40">
