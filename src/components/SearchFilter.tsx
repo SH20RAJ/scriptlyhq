@@ -91,7 +91,7 @@ export default function SearchFilter({
         }}
         className="relative group w-full md:w-80"
       >
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors z-10" />
+        <Search className="absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors z-5 p-4" />
         <Input
           placeholder="Filter products..."
           value={searchValue}
