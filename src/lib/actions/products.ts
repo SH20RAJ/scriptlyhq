@@ -263,13 +263,12 @@ export async function ensureCategoriesSeeded() {
     if (!existingCategories) {
       console.log("Seeding default categories...");
       const DEFAULT_CATEGORIES = [
-        { id: "landing-pages", name: "Landing Pages", slug: "landing-pages" },
         { id: "saas-templates", name: "SaaS Templates", slug: "saas-templates" },
-        { id: "ebooks", name: "Ebooks", slug: "ebooks" },
+        { id: "landing-pages", name: "Landing Pages", slug: "landing-pages" },
+        { id: "scripts", name: "Scripts & Automations", slug: "scripts" },
+        { id: "design-assets", name: "Design Assets", slug: "design-assets" },
         { id: "ai-prompts", name: "AI Prompts", slug: "ai-prompts" },
-        { id: "scripts", name: "Scripts", slug: "scripts" },
-        { id: "ui-kits", name: "UI Kits", slug: "ui-kits" },
-        { id: "other", name: "Other", slug: "other" },
+        { id: "ebooks", name: "Ebooks & Playbooks", slug: "ebooks" },
       ];
       await db.insert(categoriesTable).values(DEFAULT_CATEGORIES);
     }
@@ -279,19 +278,45 @@ export async function ensureCategoriesSeeded() {
     if (!existingSubcategories) {
       console.log("Seeding default subcategories...");
       const DEFAULT_SUBCATEGORIES = [
-        { id: "saas-landing-pages", name: "SaaS Landing Pages", slug: "saas-landing-pages", categoryId: "landing-pages" },
-        { id: "portfolio-landing-pages", name: "Portfolio Landing Pages", slug: "portfolio-landing-pages", categoryId: "landing-pages" },
-        { id: "nextjs-boilerplates", name: "Next.js Boilerplates", slug: "nextjs-boilerplates", categoryId: "saas-templates" },
-        { id: "react-boilerplates", name: "React Boilerplates", slug: "react-boilerplates", categoryId: "saas-templates" },
-        { id: "marketing-guides", name: "Marketing Guides", slug: "marketing-guides", categoryId: "ebooks" },
-        { id: "coding-tutorials", name: "Coding Tutorials", slug: "coding-tutorials", categoryId: "ebooks" },
-        { id: "chatgpt-prompts", name: "ChatGPT Prompts", slug: "chatgpt-prompts", categoryId: "ai-prompts" },
-        { id: "claude-prompts", name: "Claude Prompts", slug: "claude-prompts", categoryId: "ai-prompts" },
+        // SaaS Templates
+        { id: "nextjs-react-boilerplates", name: "Next.js & React Boilerplates", slug: "nextjs-react-boilerplates", categoryId: "saas-templates" },
+        { id: "python-backends", name: "Python Backends", slug: "python-backends", categoryId: "saas-templates" },
+        { id: "rest-apis-microservices", name: "REST APIs & Microservices", slug: "rest-apis-microservices", categoryId: "saas-templates" },
+        { id: "mobile-app-starters", name: "Mobile App Starters", slug: "mobile-app-starters", categoryId: "saas-templates" },
+        { id: "web3-crypto-templates", name: "Web3 & Crypto Templates", slug: "web3-crypto-templates", categoryId: "saas-templates" },
+
+        // Landing Pages
+        { id: "gsap-3d-animated-pages", name: "GSAP & 3D Animated Pages", slug: "gsap-3d-animated-pages", categoryId: "landing-pages" },
+        { id: "waitlist-newsletter-pages", name: "Waitlist & Newsletter Pages", slug: "waitlist-newsletter-pages", categoryId: "landing-pages" },
+        { id: "saas-pricing-checkout", name: "SaaS Pricing & Checkout", slug: "saas-pricing-checkout", categoryId: "landing-pages" },
+        { id: "agency-portfolio-pages", name: "Agency & Portfolio Pages", slug: "agency-portfolio-pages", categoryId: "landing-pages" },
+        { id: "no-code-themes", name: "No-Code Themes", slug: "no-code-themes", categoryId: "landing-pages" },
+
+        // Scripts
+        { id: "web-scrapers-crawlers", name: "Web Scrapers & Crawlers", slug: "web-scrapers-crawlers", categoryId: "scripts" },
         { id: "browser-extensions", name: "Browser Extensions", slug: "browser-extensions", categoryId: "scripts" },
-        { id: "automation-scripts", name: "Automation Scripts", slug: "automation-scripts", categoryId: "scripts" },
-        { id: "tailwind-kits", name: "Tailwind Kits", slug: "tailwind-kits", categoryId: "ui-kits" },
-        { id: "figma-templates", name: "Figma Templates", slug: "figma-templates", categoryId: "ui-kits" },
-        { id: "icons", name: "Icons", slug: "icons", categoryId: "other" },
+        { id: "social-media-bots", name: "Social Media Bots", slug: "social-media-bots", categoryId: "scripts" },
+        { id: "devops-cicd-pipelines", name: "DevOps & CI/CD Pipelines", slug: "devops-cicd-pipelines", categoryId: "scripts" },
+        { id: "script-automation-macros", name: "Script Automation Macros", slug: "script-automation-macros", categoryId: "scripts" },
+
+        // Design Assets
+        { id: "tailwind-css-component-kits", name: "Tailwind & CSS Component Kits", slug: "tailwind-css-component-kits", categoryId: "design-assets" },
+        { id: "figma-ui-kits-design-systems", name: "Figma UI Kits & Design Systems", slug: "figma-ui-kits-design-systems", categoryId: "design-assets" },
+        { id: "custom-svg-icon-libraries", name: "Custom SVG Icon Libraries", slug: "custom-svg-icon-libraries", categoryId: "design-assets" },
+        { id: "saas-display-typography", name: "SaaS Display Typography", slug: "saas-display-typography", categoryId: "design-assets" },
+        { id: "3d-models-illustrations", name: "3D Models & Illustrations", slug: "3d-models-illustrations", categoryId: "design-assets" },
+
+        // AI Prompts
+        { id: "developer-prompt-engineering", name: "Developer Prompt Engineering", slug: "developer-prompt-engineering", categoryId: "ai-prompts" },
+        { id: "marketing-copywriter-prompts", name: "Marketing Copywriter Prompts", slug: "marketing-copywriter-prompts", categoryId: "ai-prompts" },
+        { id: "creative-ai-recipes", name: "Creative AI Recipes", slug: "creative-ai-recipes", categoryId: "ai-prompts" },
+        { id: "autonomous-ai-agents", name: "Autonomous AI Agents", slug: "autonomous-ai-agents", categoryId: "ai-prompts" },
+
+        // Ebooks
+        { id: "launch-marketing-playbooks", name: "Launch & Marketing Playbooks", slug: "launch-marketing-playbooks", categoryId: "ebooks" },
+        { id: "seo-checklists", name: "SEO Checklists", slug: "seo-checklists", categoryId: "ebooks" },
+        { id: "coding-handbooks", name: "Coding Handbooks", slug: "coding-handbooks", categoryId: "ebooks" },
+        { id: "creator-business-guides", name: "Creator Business Guides", slug: "creator-business-guides", categoryId: "ebooks" },
       ];
       await db.insert(subcategories).values(DEFAULT_SUBCATEGORIES);
     }
@@ -308,6 +333,7 @@ export async function ensureCategoriesSeeded() {
           shortDescription: "A Next.js SaaS starter kit with auth, database, and Stripe/Razorpay integrations pre-configured.",
           description: "This starter kit helps you launch your SaaS product in hours, not weeks.\n\n### Features:\n- Next.js 15 App Router\n- Tailwind CSS styling\n- Drizzle ORM and Postgres database client\n- Full user authentication flow\n- Pre-built landing pages and dashboard",
           category: "saas-templates",
+          subcategory: "nextjs-react-boilerplates",
           tags: "nextjs,saas,boilerplate,drizzle",
           thumbnail: "/thumbnails/saas_starter.png",
           demoUrl: "https://demo.scriptlystore.com/saas-starter",
@@ -324,6 +350,7 @@ export async function ensureCategoriesSeeded() {
           shortDescription: "The ultimate ebook guide containing 50+ growth tactics to scale your digital product or community.",
           description: "Learn how we scaled ScriptlyHQ from 0 to 10k users in 3 months.\n\n### What's inside:\n- SEO and Content Marketing frameworks\n- Viral referral loops setup\n- Cold email templates that convert\n- Interactive marketing tactics checklist",
           category: "ebooks",
+          subcategory: "launch-marketing-playbooks",
           tags: "marketing,growth,ebook,guide",
           thumbnail: "/thumbnails/growth_guide.png",
           demoUrl: null,
@@ -340,6 +367,7 @@ export async function ensureCategoriesSeeded() {
           shortDescription: "Advanced LLM system prompt to write high-converting landing pages, ads, and email sequences.",
           description: "Get copy that sells. Tested on GPT-4 and Claude 3.5 Sonnet to produce conversion rates 2x higher than standard drafts.\n\n### Includes:\n- Headline writing prompts\n- Full page copy outline generator\n- Call-to-action variants creator",
           category: "ai-prompts",
+          subcategory: "marketing-copywriter-prompts",
           tags: "ai,prompt,gpt,claude,marketing",
           thumbnail: "/thumbnails/copywriter_prompt.png",
           demoUrl: null,
@@ -356,6 +384,7 @@ export async function ensureCategoriesSeeded() {
           shortDescription: "A Manifest V3 extension boilerplate with React, Tailwind CSS, and message passing structure.",
           description: "Launch browser extensions instantly. Clean structure with options page, popup UI, and background scripts.\n\n### Features:\n- Manifest V3 compliant\n- React + TypeScript popup\n- Tailwind CSS for premium styles\n- Message passing utilities",
           category: "scripts",
+          subcategory: "browser-extensions",
           tags: "chrome,extension,javascript,react",
           thumbnail: "/thumbnails/chrome_boilerplate.png",
           demoUrl: "https://demo.scriptlystore.com/chrome-extension",
@@ -371,7 +400,8 @@ export async function ensureCategoriesSeeded() {
           slug: "tailwind-glassmorphism-ui-kit",
           shortDescription: "A collection of 30+ premium glassmorphic UI components styled with Tailwind CSS.",
           description: "Wow your users with modern, elegant design layouts. Includes charts, navigations, form inputs, and modal designs.\n\n### Inclusions:\n- Fully responsive grid layouts\n- Smooth CSS backdrop blur overrides\n- Light and dark theme variables support",
-          category: "ui-kits",
+          category: "design-assets",
+          subcategory: "tailwind-css-component-kits",
           tags: "tailwind,ui,glassmorphism,css",
           thumbnail: "/thumbnails/glass_ui.png",
           demoUrl: "https://demo.scriptlystore.com/glassmorphism",
