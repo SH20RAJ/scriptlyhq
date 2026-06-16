@@ -62,7 +62,7 @@ export default function SearchFilter({
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-5 py-2">
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none flex-1">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none flex-1 lg:hidden">
         <Button
           variant={currentCategory === "all" ? "default" : "outline"}
           size="sm"
@@ -89,14 +89,14 @@ export default function SearchFilter({
           e.preventDefault();
           handleSearchSubmit(searchValue);
         }}
-        className="relative group w-full md:w-80"
+        className="relative group w-full lg:w-96"
       >
-        <Search className="absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors z-5 p-4" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors z-5" />
         <Input
-          placeholder="Filter products..."
+          placeholder="Search millions of developer scripts..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          className="pl-10 h-10 bg-card border-2 border-border rounded-xl shadow-[0_3px_0_var(--border)] focus-visible:border-primary focus-visible:shadow-[0_3px_0_var(--duo-feather-shadow)] focus-visible:ring-0 transition-all font-bold text-xs"
+          className="pl-10 h-10 w-full bg-card border-2 border-border rounded-xl shadow-[0_3px_0_var(--border)] focus-visible:border-primary focus-visible:shadow-[0_3px_0_var(--duo-feather-shadow)] focus-visible:ring-0 transition-all font-bold text-xs"
         />
         {isPending && (
           <div className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />

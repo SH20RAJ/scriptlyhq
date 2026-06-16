@@ -419,8 +419,11 @@ export async function getSubcategoriesAction() {
 
 export async function getProductsAction(options?: { 
   category?: string; 
+  subcategory?: string;
   search?: string;
   tag?: string;
+  priceType?: "all" | "free" | "paid";
+  sortBy?: "newest" | "rating" | "price_asc" | "price_desc";
   page?: number;
   limit?: number;
 }) {
@@ -439,6 +442,18 @@ export async function getProductsAction(options?: {
       filtered = filtered.filter((p) => p.category === options.category);
     }
 
+    if (options?.subcategory) {
+      filtered = filtered.filter((p) => p.subcategory === options.subcategory);
+    }
+
+    if (options?.priceType && options.priceType !== "all") {
+      if (options.priceType === "free") {
+        filtered = filtered.filter((p) => p.isFree || p.price === 0);
+      } else if (options.priceType === "paid") {
+        filtered = filtered.filter((p) => !p.isFree && p.price > 0);
+      }
+    }
+
     if (options?.tag) {
       const tagTerm = options.tag.toLowerCase();
       filtered = filtered.filter((p) => 
@@ -455,6 +470,19 @@ export async function getProductsAction(options?: {
           p.description.toLowerCase().includes(term) ||
           (p.tags && p.tags.toLowerCase().includes(term))
       );
+    }
+
+    // Apply sorting
+    const sortBy = options?.sortBy || "newest";
+    if (sortBy === "rating") {
+      filtered.sort((a, b) => parseFloat(b.rating || "0") - parseFloat(a.rating || "0"));
+    } else if (sortBy === "price_asc") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price_desc") {
+      filtered.sort((a, b) => b.price - a.price);
+    } else {
+      // newest: default
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
 
     const total = filtered.length;
