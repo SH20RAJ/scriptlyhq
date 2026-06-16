@@ -209,6 +209,15 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
     const isDraft = submitter?.getAttribute("data-draft") === "true";
 
     const formData = new FormData(e.currentTarget);
+    formData.set("title", title);
+    formData.set("slug", slug);
+    formData.set("shortDescription", shortDescription);
+    formData.set("description", description);
+    formData.set("category", category);
+    formData.set("price", price);
+    formData.set("version", version);
+    formData.set("tags", tags);
+    formData.set("demoUrl", demoUrl);
     formData.set("featured", featured ? "true" : "false");
     formData.set("published", isDraft ? "false" : (published ? "true" : "false"));
     formData.set("thumbnail", thumbnailUrl);
