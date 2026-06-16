@@ -32,10 +32,15 @@ export default async function Home({ searchParams }: PageProps) {
     category: currentCategory,
     subcategory: currentSubcategory,
     search: currentSearch,
-    priceType: currentPriceType,
+    priceType: "paid", // Show premium products first
     sortBy: currentSortBy,
     page: currentPage,
     limit: 12,
+  });
+
+  const { products: contentPosts } = await getProductsAction({
+    category: "ebooks",
+    limit: 3,
   });
 
   const categoriesList = await getCategoriesAction();
@@ -60,13 +65,61 @@ export default async function Home({ searchParams }: PageProps) {
       <div className="container max-w-7xl mx-auto px-4 py-8 space-y-12">
         
         {/* Content-Only Hero Section */}
-        <header className="py-10 text-center max-w-3xl mx-auto space-y-4">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground font-sans">
-            Ready-To-Deploy <span className="text-[#58CC02]">Next.js Templates</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground font-bold leading-relaxed">
-            Ship 10x faster with verified full-stack boilerplates, browser extensions, automation bots, and system prompts. Grab open-source code for free or sell your creations and keep 95% of sales!
-          </p>
+        <header className="py-12 space-y-10 max-w-5xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground font-sans">
+              Ready-To-Deploy <span className="text-[#58CC02]">Next.js Templates</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground font-bold leading-relaxed">
+              Ship 10x faster with verified full-stack boilerplates, browser extensions, automation bots, and system prompts. Grab open-source code for free or sell your creations and keep 95% of sales!
+            </p>
+          </div>
+
+          {/* Featured Content Posts */}
+          {contentPosts && contentPosts.length > 0 && (
+            <div className="space-y-6 pt-4">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#CE82FF] flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#CE82FF] animate-pulse" />
+                  Featured Playbooks & Handbooks
+                </h3>
+                <div className="h-px flex-1 bg-border/40" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {contentPosts.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/products/${post.slug}`}
+                    className="group flex flex-col bg-card/25 border-2 border-border/40 hover:border-purple-500/50 rounded-2xl overflow-hidden transition-all shadow-[0_3px_0_var(--border)] hover:shadow-[0_3px_0_rgba(168,85,247,0.3)] hover:-translate-y-0.5 active:translate-y-0 duration-200"
+                  >
+                    <div className="aspect-[16/9] w-full overflow-hidden relative border-b border-border/40">
+                      <img
+                        src={post.thumbnail || "/placeholder.jpg"}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <span className="absolute top-2.5 left-2.5 bg-purple-500 text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">
+                        📖 Free Guide
+                      </span>
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-black text-foreground group-hover:text-purple-400 transition-colors line-clamp-2">
+                          {post.title}
+                        </h4>
+                        <p className="text-[10px] text-muted-foreground font-bold line-clamp-2 leading-relaxed">
+                          {post.shortDescription}
+                        </p>
+                      </div>
+                      <span className="text-[9px] text-purple-400 font-extrabold uppercase tracking-widest flex items-center gap-1">
+                        Read Now &rarr;
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </header>
 
         {/* Filter & Search Dashboard */}
@@ -80,6 +133,17 @@ export default async function Home({ searchParams }: PageProps) {
           {/* Left Column: Sidebar Filters */}
           <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-[9rem] max-h-[calc(100vh-11rem)] overflow-y-auto scrollbar-none bg-card/10 p-6 border border-border/40 rounded-3xl">
             
+            {/* Free Scripts Promo Link */}
+            <div className="pb-6 border-b border-border/40">
+              <Link
+                href="/free"
+                className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30 hover:border-purple-500/60 rounded-2xl text-xs uppercase tracking-wider font-extrabold text-purple-400 hover:text-purple-300 transition-all shadow-[0_3px_0_rgba(168,85,247,0.2)] active:translate-y-[3px] active:shadow-none"
+              >
+                <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
+                <span>🎁 Free Scripts (100% Free)</span>
+              </Link>
+            </div>
+
             {/* Category Directory Tree */}
             <div className="space-y-4">
               <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-2">

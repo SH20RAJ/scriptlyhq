@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTransition, useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import Link from "next/link";
@@ -25,6 +25,7 @@ export default function SearchFilter({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
   const currentCategory = searchParams.get("category") || "all";
@@ -41,8 +42,10 @@ export default function SearchFilter({
     } else {
       params.delete("search");
     }
+    params.delete("page"); // Reset page on search submit
     startTransition(() => {
-      const targetPath = window.location.pathname === "/" ? "/" : "/search";
+      // If we are on '/free', stay on '/free'. If on '/', stay on '/'. Otherwise, fallback to '/search'.
+      const targetPath = pathname === "/free" ? "/free" : (pathname === "/" ? "/" : "/search");
       router.push(`${targetPath}?${params.toString()}`, { scroll: false });
     });
   }
@@ -56,7 +59,8 @@ export default function SearchFilter({
     }
     params.delete("page"); // Reset page on category change
     startTransition(() => {
-      router.push(`/?${params.toString()}`, { scroll: false });
+      const targetPath = pathname === "/free" ? "/free" : "/";
+      router.push(`${targetPath}?${params.toString()}`, { scroll: false });
     });
   }
 
