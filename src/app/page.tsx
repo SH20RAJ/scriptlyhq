@@ -57,8 +57,18 @@ export default async function Home({ searchParams }: PageProps) {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none -z-20" />
 
       {/* Main Content Area */}
-      <div className="container max-w-7xl mx-auto px-4 py-8 space-y-16">
+      <div className="container max-w-7xl mx-auto px-4 py-8 space-y-12">
         
+        {/* Content-Only Hero Section */}
+        <header className="py-10 text-center max-w-3xl mx-auto space-y-4">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground font-sans">
+            Ready-To-Deploy <span className="text-[#58CC02]">Next.js Templates</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground font-bold leading-relaxed">
+            Ship 10x faster with verified full-stack boilerplates, browser extensions, automation bots, and system prompts. Grab open-source code for free or sell your creations and keep 95% of sales!
+          </p>
+        </header>
+
         {/* Filter & Search Dashboard */}
         <div className="sticky top-[3.5rem] z-30 bg-background/80 backdrop-blur-sm py-5 border-b border-border">
           <SearchFilter categories={categoriesList} />
@@ -68,7 +78,7 @@ export default async function Home({ searchParams }: PageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           
           {/* Left Column: Sidebar Filters */}
-          <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-[9rem] bg-card/10 p-6 border border-border/40 rounded-3xl">
+          <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-[9rem] max-h-[calc(100vh-11rem)] overflow-y-auto scrollbar-none bg-card/10 p-6 border border-border/40 rounded-3xl">
             
             {/* Category Directory Tree */}
             <div className="space-y-4">
