@@ -96,7 +96,7 @@ export default function SearchFilter({
           placeholder="Filter products..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          className="pl-40 h-10 bg-card border-2 border-border rounded-xl shadow-[0_3px_0_var(--border)] focus-visible:border-primary focus-visible:shadow-[0_3px_0_var(--duo-feather-shadow)] focus-visible:ring-0 transition-all font-bold text-xs"
+          className="pl-10 h-10 bg-card border-2 border-border rounded-xl shadow-[0_3px_0_var(--border)] focus-visible:border-primary focus-visible:shadow-[0_3px_0_var(--duo-feather-shadow)] focus-visible:ring-0 transition-all font-bold text-xs"
         />
         {isPending && (
           <div className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -127,11 +127,11 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
 
   return (
     <Card 
-      className="border-border/50 bg-card group overflow-hidden transition-all duration-300 hover:border-foreground/20 hover:shadow-2xl hover:shadow-foreground/5 rounded-2xl flex flex-col h-full"
+      className="border-border/50 bg-card group overflow-hidden rounded-2xl flex flex-col h-full [--card-spacing:0px] py-0 gap-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/products/${prod.slug}`} className="block relative overflow-hidden">
+      <Link href={`/products/${prod.slug}`} className="block relative overflow-hidden rounded-t-[22px]">
         <AspectRatio ratio={4 / 3} className="bg-muted">
           {prod.thumbnail && (
             <img
@@ -159,39 +159,41 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
         </AspectRatio>
         
         {/* Floating Category Label */}
-        <div className="absolute top-4 left-4 z-20">
-          <Badge variant="secondary" className="bg-background/80 backdrop-blur-md border-transparent text-[9px] uppercase font-black tracking-widest px-2 py-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-4.5 left-4.5 z-20">
+          <Badge className="bg-background/90 backdrop-blur-md text-foreground border border-border/40 text-[9px] uppercase font-black tracking-widest px-2.5 py-1 rounded-md shadow-sm">
             {categoryName}
           </Badge>
+        </div>
+
+        {/* Floating Price & Discount Badge */}
+        <div className="absolute top-4.5 right-4.5 z-20 flex flex-col items-end gap-1.5">
+          {promo.isFree ? (
+            <Badge className="bg-emerald-500 text-white border-none text-[9px] font-black tracking-wider px-2.5 py-1 rounded-md shadow-md uppercase">
+              Free
+            </Badge>
+          ) : (
+            <>
+              {promo.hasDiscount && (
+                <Badge className="bg-[#FF4B4B] text-white border-none text-[8.5px] font-black tracking-widest px-2 py-0.5 rounded-full uppercase shadow-sm">
+                  Save {prod.discountPercent}%
+                </Badge>
+              )}
+              <Badge className="bg-foreground text-background border-none text-[10px] font-black tracking-tight px-3 py-1 rounded-md shadow-md">
+                ${(promo.effectivePrice / 100).toFixed(2)}
+              </Badge>
+            </>
+          )}
         </div>
       </Link>
       
       <div className="flex flex-col flex-1 p-6 space-y-4">
         <div className="space-y-2 flex-1">
-          <div className="flex items-center justify-between gap-4">
-             <Link href={`/products/${prod.slug}`} className="flex-1">
-                <h3 className="font-bold text-lg text-foreground tracking-tight line-clamp-1 group-hover:underline underline-offset-4 decoration-border transition-all">
-                  {prod.title}
-                </h3>
-             </Link>
-             {promo.isFree ? (
-               <span className="text-sm font-black text-emerald-500 uppercase">
-                  Free
-               </span>
-             ) : promo.hasDiscount ? (
-               <div className="flex flex-col items-end">
-                 <span className="text-sm font-black text-foreground tabular-nums">
-                    ${(promo.effectivePrice / 100).toFixed(2)}
-                 </span>
-                 <span className="text-[10px] font-bold text-muted-foreground line-through tabular-nums leading-none">
-                    ${(promo.price / 100).toFixed(2)}
-                 </span>
-               </div>
-             ) : (
-               <span className="text-sm font-black text-foreground tabular-nums">
-                  ${(prod.price / 100).toFixed(2)}
-               </span>
-             )}
+          <div className="space-y-1">
+            <Link href={`/products/${prod.slug}`}>
+              <h3 className="font-extrabold text-lg text-foreground tracking-tight line-clamp-1 group-hover:underline underline-offset-4 decoration-border transition-all">
+                {prod.title}
+              </h3>
+            </Link>
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed font-medium">
             {prod.shortDescription}

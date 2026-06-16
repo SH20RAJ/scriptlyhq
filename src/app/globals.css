@@ -395,7 +395,12 @@ button, .button, [data-slot="button"] {
   border-radius: 24px !important;
   box-shadow: 0 4px 0 var(--border) !important;
   background-color: var(--card) !important;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+[data-slot="card"]:hover, .duo-card:hover, .card-3d:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 0 var(--border) !important;
 }
 
 /* Input Rounded 3D Style */
