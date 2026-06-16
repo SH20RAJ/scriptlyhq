@@ -2,17 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RootLoading() {
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8 space-y-12">
-      {/* Hero section skeleton */}
-      <div className="text-center py-20 space-y-6">
-        <Skeleton className="h-12 w-3/4 md:w-1/2 mx-auto rounded-xl" />
-        <Skeleton className="h-6 w-2/3 md:w-1/3 mx-auto rounded-lg" />
-        <div className="flex justify-center gap-4 pt-4">
-          <Skeleton className="h-12 w-32 rounded-full" />
-          <Skeleton className="h-12 w-32 rounded-full" />
-        </div>
-      </div>
-
+    <div className="container max-w-7xl mx-auto px-4 py-8 space-y-8">
       {/* Categories filter skeleton */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-4 border-b border-border/20">
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
@@ -28,26 +18,40 @@ export default function RootLoading() {
       {/* Grid skeleton of cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {Array.from({ length: 6 }).map((_, idx) => (
-          <div key={idx} className="border border-border/40 rounded-2xl p-6 space-y-6 bg-card/10">
-            {/* Thumbnail aspect ratio */}
-            <Skeleton className="aspect-[4/3] w-full rounded-xl" />
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-6 w-2/3 rounded-md" />
-                <Skeleton className="h-6 w-16 rounded-md" />
+          <div key={idx} className="border border-border/50 bg-card rounded-2xl flex flex-col h-full overflow-hidden shadow-sm">
+            {/* Image Aspect ratio skeleton */}
+            <div className="aspect-[4/3] w-full bg-muted relative">
+              <div className="absolute top-4 left-4">
+                <Skeleton className="h-5 w-20 rounded-md opacity-80" />
               </div>
-              <Skeleton className="h-4 w-full rounded-md" />
-              <Skeleton className="h-4 w-5/6 rounded-md" />
+              <div className="absolute top-4 right-4">
+                <Skeleton className="h-6 w-12 rounded-md opacity-80" />
+              </div>
             </div>
-            {/* Footer buttons row */}
-            <div className="flex items-center justify-between pt-4 border-t border-border/20">
-              <div className="flex gap-2">
-                <Skeleton className="h-5 w-12 rounded-full" />
-                <Skeleton className="h-5 w-12 rounded-full" />
+            
+            {/* Card Content skeleton */}
+            <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+              <div className="space-y-3">
+                <Skeleton className="h-6 w-3/4 rounded-md" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full rounded-md" />
+                  <Skeleton className="h-4 w-5/6 rounded-md" />
+                </div>
+                <div className="flex gap-1.5 pt-1.5">
+                  <Skeleton className="h-5 w-12 rounded-full" />
+                  <Skeleton className="h-5 w-14 rounded-full" />
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-16 rounded-lg" />
-                <Skeleton className="h-8 w-20 rounded-lg" />
+              
+              <div className="flex items-center justify-between pt-4 border-t border-border/40">
+                <div className="flex gap-2">
+                  <Skeleton className="h-5 w-10 rounded-full" />
+                  <Skeleton className="h-5 w-8 rounded-full" />
+                </div>
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 w-16 rounded-lg" />
+                  <Skeleton className="h-8 w-20 rounded-lg" />
+                </div>
               </div>
             </div>
           </div>
