@@ -36,6 +36,7 @@ interface ProductFormProps {
     discountPercent?: number;
     promoStart?: Date | string | null;
     promoEnd?: Date | string | null;
+    redirectDownload?: boolean;
   };
 }
 
@@ -82,6 +83,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
   const [screenshots, setScreenshots] = useState(initialData?.screenshots || "");
   const [videoUrl, setVideoUrl] = useState(initialData?.videoUrl || "");
   const [fileUrl, setFileUrl] = useState(initialData?.fileUrl || "");
+  const [redirectDownload, setRedirectDownload] = useState(initialData ? (initialData.redirectDownload ?? true) : true);
 
   const isTweet = videoUrl?.includes("twitter.com") || videoUrl?.includes("x.com");
   const tweetId = isTweet ? videoUrl.match(/status\/(\d+)/)?.[1] : null;
@@ -114,6 +116,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
         if (data.discountPercent !== undefined) setDiscountPercent(data.discountPercent);
         if (data.promoStart) setPromoStart(data.promoStart);
         if (data.promoEnd) setPromoEnd(data.promoEnd);
+        if (data.redirectDownload !== undefined) setRedirectDownload(data.redirectDownload);
       }
     } catch (err) {
       console.error("Failed to load draft from localStorage:", err);
@@ -145,6 +148,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
       discountPercent,
       promoStart,
       promoEnd,
+      redirectDownload,
     };
     localStorage.setItem("scriptlystore_new_product_draft", JSON.stringify(data));
   }, [
@@ -166,6 +170,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
     version,
     featured,
     published,
+    redirectDownload,
   ]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetSetter: (val: string) => void, fieldName: string) => {
@@ -223,6 +228,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
     formData.set("screenshots", screenshots);
     formData.set("videoUrl", videoUrl);
     formData.set("fileUrl", fileUrl);
+    formData.set("redirectDownload", redirectDownload ? "true" : "false");
     formData.set("subcategory", subcategory);
     formData.set("isFree", isFree ? "true" : "false");
     formData.set("discountPercent", isFree ? "0" : discountPercent);
@@ -548,6 +554,15 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
             <div className="space-y-2 pt-4 border-t border-neutral-800/80">
               <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Product File Package URL *</label>
               <input type="url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="Private download URL (zip/pdf)" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
+            </div>
+
+            {/* Redirect Download Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-xl border border-neutral-800 bg-neutral-950/60">
+              <div className="space-y-0.5 pr-2">
+                <h4 className="text-xs font-bold text-neutral-300 uppercase">Redirect secure download</h4>
+                <p className="text-[9px] text-neutral-500">Redirect directly to the package URL instead of proxying/streaming it</p>
+              </div>
+              <input type="checkbox" checked={redirectDownload} onChange={(e) => setRedirectDownload(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
             </div>
           </div>
 

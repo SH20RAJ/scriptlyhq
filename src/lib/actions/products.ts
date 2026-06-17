@@ -58,6 +58,7 @@ export async function createProductAction(formData: FormData) {
   const screenshots = formData.get("screenshots") as string; // JSON or comma-separated
   const videoUrl = formData.get("videoUrl") as string;
   const fileUrl = formData.get("fileUrl") as string;
+  const redirectDownload = formData.get("redirectDownload") !== "false";
 
   const id = crypto.randomUUID();
 
@@ -76,6 +77,7 @@ export async function createProductAction(formData: FormData) {
     videoUrl: videoUrl || null,
     demoUrl,
     fileUrl: fileUrl || null,
+    redirectDownload,
     price,
     version,
     featured,
@@ -160,6 +162,7 @@ export async function updateProductAction(id: string, formData: FormData) {
   const screenshots = formData.get("screenshots") as string;
   const videoUrl = formData.get("videoUrl") as string;
   const fileUrl = formData.get("fileUrl") as string;
+  const redirectDownload = formData.get("redirectDownload") !== "false";
 
   await db
     .update(products)
@@ -177,6 +180,7 @@ export async function updateProductAction(id: string, formData: FormData) {
       videoUrl: videoUrl || null,
       demoUrl,
       fileUrl: fileUrl || null,
+      redirectDownload,
       price,
       version,
       featured,

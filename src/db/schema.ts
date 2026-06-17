@@ -47,6 +47,7 @@ export const products = pgTable("products", {
   videoUrl: text("video_url"), // YouTube embed or direct video URL
   demoUrl: text("demo_url"),
   fileUrl: text("file_url"), // URL to product file
+  redirectDownload: boolean("redirect_download").default(true).notNull(),
   price: integer("price").notNull(), // Price in paise (INR)
   version: text("version").default("1.0.0").notNull(),
   featured: boolean("featured").default(false).notNull(),

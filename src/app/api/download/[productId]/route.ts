@@ -64,6 +64,9 @@ export async function GET(
 
     // Handle remote storage download stream with redirect fallback
     if (product.fileUrl.startsWith("http://") || product.fileUrl.startsWith("https://")) {
+      if (product.redirectDownload) {
+        return NextResponse.redirect(new URL(product.fileUrl));
+      }
       try {
         const response = await fetch(product.fileUrl);
         if (response.ok) {

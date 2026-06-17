@@ -159,9 +159,9 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                         )}
                       </div>
                       <div>
-                        <div className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
+                        <Link href={`/admin/products/${prod.id}/edit`} className="font-semibold text-foreground text-sm hover:underline group-hover:text-primary transition-colors block">
                           {prod.title}
-                        </div>
+                        </Link>
                         <div className="text-[10px] font-mono text-muted-foreground mt-1 uppercase tracking-tighter opacity-70">
                           ID: {prod.id.slice(0, 8)}... | v{prod.version}
                         </div>
