@@ -453,7 +453,7 @@ export async function getProductsAction(options?: {
   search?: string;
   tag?: string;
   priceType?: "all" | "free" | "paid";
-  sortBy?: "newest" | "rating" | "price_asc" | "price_desc";
+  sortBy?: "newest" | "rating" | "price_asc" | "price_desc" | "featured_premium";
   page?: number;
   limit?: number;
 }) {
@@ -510,6 +510,18 @@ export async function getProductsAction(options?: {
       filtered.sort((a, b) => a.price - b.price);
     } else if (sortBy === "price_desc") {
       filtered.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "featured_premium") {
+      filtered.sort((a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        
+        const aPremium = !a.isFree && a.price > 0;
+        const bPremium = !b.isFree && b.price > 0;
+        if (aPremium && !bPremium) return -1;
+        if (!aPremium && bPremium) return 1;
+        
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
     } else {
       // newest: default
       filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

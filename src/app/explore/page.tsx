@@ -16,12 +16,19 @@ export default async function ExplorePage() {
   const categories = await getCategoriesAction();
   
   // Fetch initial products for each category to show previews
-  const categoriesWithProducts = await Promise.all(
+  const allCategoriesWithProducts = await Promise.all(
     categories.map(async (cat) => {
-      const { products } = await getProductsAction({ category: cat.slug, limit: 3 });
+      const { products } = await getProductsAction({ 
+        category: cat.slug, 
+        limit: 3,
+        sortBy: "featured_premium"
+      });
       return { ...cat, products };
     })
   );
+
+  // Filter out categories with no products
+  const categoriesWithProducts = allCategoriesWithProducts.filter(cat => cat.products.length > 0);
 
   return (
     <div className="flex flex-col min-h-screen">
