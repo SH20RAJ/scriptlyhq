@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+"use client";
 
 import { getProductsAction, getCategoriesAction, getSubcategoriesAction } from "../lib/actions/products";
 import SearchFilter, { ProductCard } from "../components/SearchFilter";
@@ -7,6 +7,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Cpu, HelpCircle, HeartHandshake, Layers, Tags, ChevronRight, ArrowRight } from "lucide-react";
 import { getProductEffectivePrice } from "../lib/price-utils";
+import { CyberBackground } from "../components/ui/CyberBackground";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface PageProps {
   searchParams: Promise<{
@@ -19,90 +22,138 @@ interface PageProps {
   }>;
 }
 
-export default async function Home({ searchParams }: PageProps) {
-  const resolvedParams = await searchParams;
-  const currentCategory = resolvedParams.category || "all";
-  const currentSubcategory = resolvedParams.subcategory || "";
-  const currentSearch = resolvedParams.search || "";
-  const currentPriceType = resolvedParams.priceType || "all";
-  const currentSortBy = resolvedParams.sortBy || "newest";
-  const currentPage = parseInt(resolvedParams.page || "1");
+export default function Home({ searchParams }: PageProps) {
+  const [data, setData] = useState<any>(null);
+  const [resolvedParams, setResolvedParams] = useState<any>(null);
 
-  // Fetch products, categories, and subcategories using server actions
-  const { products: productsList, totalPages } = await getProductsAction({
-    category: currentCategory,
-    subcategory: currentSubcategory,
-    search: currentSearch,
-    priceType: "paid", // Show premium products first
-    sortBy: currentSortBy,
-    page: currentPage,
-    limit: 12,
-  });
+  useEffect(() => {
+    async function load() {
+      const params = await searchParams;
+      setResolvedParams(params);
+      const currentCategory = params.category || "all";
+      const currentSubcategory = params.subcategory || "";
+      const currentSearch = params.search || "";
+      const currentPriceType = params.priceType || "all";
+      const currentSortBy = params.sortBy || "newest";
+      const currentPage = parseInt(params.page || "1");
 
-  const { products: featuredPremiumList } = await getProductsAction({
-    priceType: "paid",
-    limit: 3,
-    sortBy: "rating",
-  });
+      const [productsData, featuredData, categories, subcategories] = await Promise.all([
+        getProductsAction({
+          category: currentCategory,
+          subcategory: currentSubcategory,
+          search: currentSearch,
+          priceType: "paid",
+          sortBy: currentSortBy,
+          page: currentPage,
+          limit: 12,
+        }),
+        getProductsAction({
+          priceType: "paid",
+          limit: 3,
+          sortBy: "rating",
+        }),
+        getCategoriesAction(),
+        getSubcategoriesAction()
+      ]);
 
-  const categoriesList = await getCategoriesAction();
-  const subcategoriesList = await getSubcategoriesAction();
+      setData({
+        productsList: productsData.products,
+        totalPages: productsData.totalPages,
+        featuredPremiumList: featuredData.products,
+        categoriesList: categories,
+        subcategoriesList: subcategories,
+        currentCategory,
+        currentSubcategory,
+        currentSearch,
+        currentPriceType,
+        currentSortBy,
+        currentPage,
+      });
+    }
+    load();
+  }, [searchParams]);
 
-  // Separate featured products
-  const featuredProducts = productsList.filter((p) => p.featured);
-  const regularProducts = productsList.filter((p) => !p.featured);
+  if (!data) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
+  const { 
+    productsList, totalPages, featuredPremiumList, categoriesList, 
+    subcategoriesList, currentCategory, currentSubcategory, 
+    currentSearch, currentPriceType, currentSortBy, currentPage 
+  } = data;
+
+  const featuredProducts = productsList.filter((p: any) => p.featured);
+  const regularProducts = productsList.filter((p: any) => !p.featured);
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden">
-      
-      {/* Mesh Background Lights */}
-      <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-purple-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute top-[800px] left-[-300px] w-[600px] h-[600px] bg-emerald-500/5 blur-[160px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute top-[1800px] right-[-300px] w-[600px] h-[600px] bg-blue-500/5 blur-[160px] rounded-full pointer-events-none -z-10" />
-
-      {/* Cyberpunk Grid Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none -z-20" />
+    <div className="flex flex-col min-h-screen text-foreground relative">
+      <CyberBackground />
 
       {/* Main Content Area */}
       <div className="container max-w-7xl mx-auto px-4 py-8 space-y-12">
         
         {/* Content-Only Hero Section */}
-        <header className="py-12 space-y-10 max-w-5xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto space-y-5">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground font-sans">
-              Ready-To-Deploy <span className="text-[#58CC02]">Next.js Templates</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
-            </h1>
-            <p className="text-sm md:text-base text-muted-foreground font-bold leading-relaxed">
-              Ship 10x faster with verified full-stack boilerplates, browser extensions, automation bots, and system prompts. Grab open-source code for free or sell your creations and keep 95% of sales!
-            </p>
+        <header className="py-12 space-y-10 max-w-5xl mx-auto overflow-hidden">
+          <div className="text-center max-w-3xl mx-auto space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground font-sans leading-[1.1]">
+                Ready-To-Deploy <span className="text-primary">Next.js Templates</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
+              </h1>
+            </motion.div>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-sm md:text-lg text-muted-foreground font-bold leading-relaxed max-w-2xl mx-auto"
+            >
+              Ship 10x faster with verified full-stack boilerplates, browser extensions, automation bots, and system prompts.
+            </motion.p>
 
             {/* Centered Premium/Free Switcher */}
-            <div className="flex items-center justify-center gap-3 pt-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex items-center justify-center gap-4 pt-6"
+            >
               <Link 
                 href="/" 
-                className="px-6 py-3 bg-primary text-white border-2 border-primary rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-[0_4px_0_#46A302] hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none cursor-pointer"
+                className="px-8 py-4 bg-primary text-white border-2 border-primary rounded-2xl text-[12px] font-black uppercase tracking-wider transition-all shadow-[0_5px_0_#46A302] hover:-translate-y-0.5 active:translate-y-[4px] active:shadow-none cursor-pointer"
               >
                 💎 Premium Marketplace
               </Link>
               <Link 
                 href="/free" 
-                className="px-6 py-3 bg-card text-muted-foreground border-2 border-border rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-[0_4px_0_var(--border)] hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none cursor-pointer"
+                className="px-8 py-4 bg-card/50 backdrop-blur-md text-muted-foreground border-2 border-border rounded-2xl text-[12px] font-black uppercase tracking-wider transition-all shadow-[0_5px_0_var(--border)] hover:-translate-y-0.5 active:translate-y-[4px] active:shadow-none cursor-pointer"
               >
                 🎁 Free Scripts
               </Link>
-            </div>
+            </motion.div>
           </div>
 
           {/* Featured Content Posts */}
           {featuredPremiumList && featuredPremiumList.length > 0 && (
-            <div className="space-y-6 pt-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="space-y-6 pt-10"
+            >
               <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-1">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#CE82FF] flex items-center gap-1.5 whitespace-nowrap">
                     <Sparkles className="w-3.5 h-3.5 text-[#CE82FF] animate-pulse" />
                     Featured Premium Releases
                   </h3>
-                  <div className="h-px flex-1 bg-border/40" />
+                  <div className="h-px flex-1 bg-gradient-to-r from-border/40 to-transparent" />
                   <Link 
                     href="/featured" 
                     className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5"
@@ -111,63 +162,69 @@ export default async function Home({ searchParams }: PageProps) {
                   </Link>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {featuredPremiumList.map((post) => {
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {featuredPremiumList.map((post: any, idx: number) => {
                   const promo = getProductEffectivePrice(post);
                   return (
-                    <Link
+                    <motion.div
                       key={post.id}
-                      href={`/products/${post.slug}`}
-                      className="group flex flex-col bg-card/45 border-2 border-border/80 hover:border-primary/60 rounded-2xl overflow-hidden transition-all shadow-[0_4px_0_var(--border)] hover:shadow-[0_4px_0_rgba(88,204,2,0.3)] hover:-translate-y-1 active:translate-y-0 active:shadow-none duration-200"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.1 }}
                     >
-                      <div className="aspect-[16/10] w-full overflow-hidden relative border-b border-border/60 bg-muted">
-                        <img
-                          src={post.thumbnail || "/placeholder.jpg"}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        {/* Rating Badge */}
-                        <span className="absolute top-3 left-3 bg-background/90 backdrop-blur-md text-foreground text-[9px] font-black uppercase px-2.5 py-1 rounded-lg border border-border/40 shadow-sm flex items-center gap-1">
-                          ⭐ {post.rating}
-                        </span>
-                        {/* Discount Badge */}
-                        {promo.hasDiscount && (
-                          <span className="absolute top-3 right-3 bg-[#FF4B4B] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider shadow-sm">
-                            SAVE {post.discountPercent}%
+                      <Link
+                        href={`/products/${post.slug}`}
+                        className="group flex flex-col bg-card/30 backdrop-blur-md border-2 border-white/5 hover:border-primary/40 rounded-3xl overflow-hidden transition-all duration-300 shadow-xl hover:shadow-primary/5 hover:-translate-y-1 active:translate-y-0"
+                      >
+                        <div className="aspect-[16/10] w-full overflow-hidden relative border-b border-white/5 bg-muted">
+                          <img
+                            src={post.thumbnail || "/placeholder.jpg"}
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                          />
+                          {/* Rating Badge */}
+                          <span className="absolute top-4 left-4 bg-background/90 backdrop-blur-md text-foreground text-[10px] font-black uppercase px-3 py-1.5 rounded-xl border border-white/10 shadow-lg flex items-center gap-1">
+                            ⭐ {post.rating}
                           </span>
-                        )}
-                      </div>
-                      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                        <div className="space-y-2">
-                          <h4 className="text-sm font-black text-foreground group-hover:text-primary transition-colors line-clamp-1 leading-snug">
-                            {post.title}
-                          </h4>
-                          <p className="text-xs text-muted-foreground font-medium line-clamp-2 leading-relaxed">
-                            {post.shortDescription}
-                          </p>
-                        </div>
-                        <div className="flex items-center justify-between pt-3 border-t border-border/40">
-                          {/* Price Tag */}
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sm font-black text-foreground">
-                              ${(promo.effectivePrice / 100).toFixed(2)}
+                          {/* Discount Badge */}
+                          {promo.hasDiscount && (
+                            <span className="absolute top-4 right-4 bg-[#FF4B4B] text-white text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider shadow-lg">
+                              SAVE {post.discountPercent}%
                             </span>
-                            {promo.hasDiscount && (
-                              <span className="text-[10px] text-muted-foreground line-through font-bold">
-                                ${(post.price / 100).toFixed(2)}
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-[10px] text-primary font-black uppercase tracking-wider group-hover:underline flex items-center gap-1 transition-all">
-                            Get Access &rarr;
-                          </span>
+                          )}
                         </div>
-                      </div>
-                    </Link>
+                        <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
+                          <div className="space-y-3">
+                            <h4 className="text-base font-black text-foreground group-hover:text-primary transition-colors line-clamp-1 leading-snug">
+                              {post.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground font-medium line-clamp-2 leading-relaxed opacity-80">
+                              {post.shortDescription}
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg font-black text-foreground">
+                                ${(promo.effectivePrice / 100).toFixed(2)}
+                              </span>
+                              {promo.hasDiscount && (
+                                <span className="text-[11px] text-muted-foreground line-through font-bold">
+                                  ${(post.price / 100).toFixed(2)}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-primary font-black uppercase tracking-widest group-hover:underline flex items-center gap-1 transition-all">
+                              Details &rarr;
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           )}
         </header>
 
@@ -214,9 +271,9 @@ export default async function Home({ searchParams }: PageProps) {
                   All Categories
                 </Link>
                 
-                {categoriesList.map((cat) => {
+                {categoriesList.map((cat: any) => {
                   const isCatActive = currentCategory === cat.slug;
-                  const catSubs = subcategoriesList.filter(sub => sub.categoryId === cat.id);
+                  const catSubs = subcategoriesList.filter((sub: any) => sub.categoryId === cat.id);
                   
                   return (
                     <div key={cat.id} className="space-y-1">
@@ -241,7 +298,7 @@ export default async function Home({ searchParams }: PageProps) {
                       {/* Subcategories list */}
                       {isCatActive && catSubs.length > 0 && (
                         <div className="pl-4 flex flex-col gap-1.5 border-l-2 border-border/80 ml-3 py-1">
-                          {catSubs.map((sub) => {
+                          {catSubs.map((sub: any) => {
                             const isSubActive = currentSubcategory === sub.slug;
                             return (
                               <Link
@@ -346,12 +403,12 @@ export default async function Home({ searchParams }: PageProps) {
                 <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mr-1">Active Filters:</span>
                 {currentCategory !== "all" && (
                   <Link href={{ pathname: "/", query: { ...(currentSearch && { search: currentSearch }), ...(currentPriceType !== "all" && { priceType: currentPriceType }), ...(currentSortBy !== "newest" && { sortBy: currentSortBy }) } }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20">
-                    Category: {categoriesList.find(c => c.slug === currentCategory)?.name || currentCategory} ✕
+                    Category: {categoriesList.find((c: any) => c.slug === currentCategory)?.name || currentCategory} ✕
                   </Link>
                 )}
                 {currentSubcategory && (
                   <Link href={{ pathname: "/", query: { category: currentCategory, ...(currentSearch && { search: currentSearch }), ...(currentPriceType !== "all" && { priceType: currentPriceType }), ...(currentSortBy !== "newest" && { sortBy: currentSortBy }) } }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20">
-                    Subcategory: {subcategoriesList.find(s => s.slug === currentSubcategory)?.name || currentSubcategory} ✕
+                    Subcategory: {subcategoriesList.find((s: any) => s.slug === currentSubcategory)?.name || currentSubcategory} ✕
                   </Link>
                 )}
                 {currentPriceType !== "all" && (
@@ -382,11 +439,11 @@ export default async function Home({ searchParams }: PageProps) {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {featuredProducts.slice(0, 2).map((prod) => (
+                  {featuredProducts.slice(0, 2).map((prod: any) => (
                     <ProductCard 
                       key={prod.id} 
                       prod={prod} 
-                      categoryName={categoriesList.find((c) => c.slug === prod.category)?.name || prod.category} 
+                      categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
                     />
                   ))}
                 </div>
@@ -420,11 +477,11 @@ export default async function Home({ searchParams }: PageProps) {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                  {(currentSearch || currentCategory !== "all" || currentSubcategory ? productsList : regularProducts).map((prod) => (
+                  {(currentSearch || currentCategory !== "all" || currentSubcategory ? productsList : regularProducts).map((prod: any) => (
                     <ProductCard 
                       key={prod.id} 
                       prod={prod} 
-                      categoryName={categoriesList.find((c) => c.slug === prod.category)?.name || prod.category} 
+                      categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
                     />
                   ))}
                 </div>

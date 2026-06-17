@@ -6,6 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Percent, Gift, ShoppingBag, ArrowRight } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Exclusive Deals, Offers & Coupons - ScriptlyStore",
+  description: "Redeem active coupon codes and flat discounts on premium Next.js SaaS boilerplates, browser extensions, and utility scripts.",
+};
 
 export const dynamic = "force-dynamic";
 

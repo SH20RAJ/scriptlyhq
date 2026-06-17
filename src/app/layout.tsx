@@ -106,6 +106,15 @@ export default function RootLayout({
 					</HexclaveProvider>
 				</ThemeProvider>
 				<Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+				<Script id="clarity-tracking" strategy="afterInteractive">
+					{`
+						(function(c,l,a,r,i,t,y){
+								c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+								t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
+								y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+						})(window, document, "clarity", "script", "x8jtg1lfg7");
+					`}
+				</Script>
 			</body>
 		</html>
 	);

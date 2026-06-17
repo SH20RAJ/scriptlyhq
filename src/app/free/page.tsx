@@ -6,6 +6,12 @@ import { ProductPagination } from "../../components/ProductPagination";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Cpu, HelpCircle, HeartHandshake, Layers, ChevronRight } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Free Open-Source Developer Scripts & Code - ScriptlyStore",
+  description: "Download ready-to-deploy open-source developer scripts, utility macros, scrapers, and automation tools for free. Secured downloads.",
+};
 
 interface PageProps {
   searchParams: Promise<{
