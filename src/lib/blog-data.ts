@@ -21,7 +21,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: "Announcements",
     readTime: "8 min read",
     createdAt: "2026-06-17",
-    thumbnail: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=600&auto=format&fit=crop",
+    thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop",
     author: {
       name: "Team",
       role: "ScriptlyStore Core Engine"
@@ -104,7 +104,7 @@ We can't wait to see what you build with ScriptlyStore data. If you create somet
     category: "SaaS",
     readTime: "18 min read",
     createdAt: "2026-06-15",
-    thumbnail: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop",
+    thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&auto=format&fit=crop",
     author: {
       name: "Team",
       role: "ScriptlyStore Core Engine"
@@ -317,7 +317,7 @@ Services like Resend or Amazon SES are best for this. Integrate their SDKs into 
     category: "Boilerplates",
     readTime: "15 min read",
     createdAt: "2026-06-14",
-    thumbnail: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop",
+    thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop",
     author: {
       name: "Team",
       role: "ScriptlyStore Core Engine"
