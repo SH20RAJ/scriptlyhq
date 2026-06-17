@@ -5,7 +5,7 @@ import SearchFilter, { ProductCard } from "../components/SearchFilter";
 import { ProductPagination } from "../components/ProductPagination";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Cpu, HelpCircle, HeartHandshake, Layers, Tags, ChevronRight } from "lucide-react";
+import { Sparkles, Cpu, HelpCircle, HeartHandshake, Layers, Tags, ChevronRight, ArrowRight } from "lucide-react";
 import { getProductEffectivePrice } from "../lib/price-utils";
 
 interface PageProps {
@@ -97,11 +97,19 @@ export default async function Home({ searchParams }: PageProps) {
           {featuredPremiumList && featuredPremiumList.length > 0 && (
             <div className="space-y-6 pt-4">
               <div className="flex items-center justify-between gap-4">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#CE82FF] flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#CE82FF] animate-pulse" />
-                  Featured Premium Releases
-                </h3>
-                <div className="h-px flex-1 bg-border/40" />
+                <div className="flex items-center gap-4">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#CE82FF] flex items-center gap-1.5 whitespace-nowrap">
+                    <Sparkles className="w-3.5 h-3.5 text-[#CE82FF] animate-pulse" />
+                    Featured Premium Releases
+                  </h3>
+                  <div className="h-px flex-1 bg-border/40" />
+                  <Link 
+                    href="/featured" 
+                    className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5"
+                  >
+                    View All <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {featuredPremiumList.map((post) => {

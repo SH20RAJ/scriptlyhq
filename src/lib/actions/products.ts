@@ -453,6 +453,7 @@ export async function getProductsAction(options?: {
   search?: string;
   tag?: string;
   priceType?: "all" | "free" | "paid";
+  featuredOnly?: boolean;
   sortBy?: "newest" | "rating" | "price_asc" | "price_desc" | "featured_premium";
   page?: number;
   limit?: number;
@@ -467,6 +468,10 @@ export async function getProductsAction(options?: {
     });
 
     let filtered = allProducts.filter((p) => p.published && p.status === "approved");
+
+    if (options?.featuredOnly) {
+      filtered = filtered.filter((p) => p.featured);
+    }
 
     if (options?.category && options.category !== "all") {
       filtered = filtered.filter((p) => p.category === options.category);
