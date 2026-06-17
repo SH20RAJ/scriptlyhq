@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { createProductAction, updateProductAction } from "../lib/actions/products";
+import { uploadImageAction } from "../lib/actions/upload";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Upload, Loader2, Info, Image as ImageIcon, Sparkles, Globe, FileUp, Eye } from "lucide-react";
 import Link from "next/link";
@@ -173,29 +174,22 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
 
     setUploading(fieldName);
     const formData = new FormData();
-    formData.append("source", file);
-    formData.append("key", "6d207e02198a847aa98d0a2a901485a5");
-    formData.append("action", "upload");
-    formData.append("format", "json");
+    formData.append("file", file);
 
     try {
-      const res = await fetch("https://freeimage.host/api/1/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = (await res.json()) as any;
-      if (data.status_code === 200 && data.image?.url) {
+      const data = await uploadImageAction(formData);
+      if (data.url) {
         if (fieldName === "screenshots") {
           const current = screenshots ? screenshots.split(",").map(s => s.trim()) : [];
-          targetSetter([...current, data.image.url].join(", "));
+          targetSetter([...current, data.url].join(", "));
         } else {
-          targetSetter(data.image.url);
+          targetSetter(data.url);
         }
       } else {
-        setError("Image upload failed: " + (data.error?.message || data.status_txt || "Unknown error"));
+        setError("Image upload failed: Unexpected response from server.");
       }
-    } catch (err) {
-      setError("Image upload failed. Please try again.");
+    } catch (err: any) {
+      setError("Image upload failed: " + (err.message || "Please try again."));
     } finally {
       setUploading(null);
     }
