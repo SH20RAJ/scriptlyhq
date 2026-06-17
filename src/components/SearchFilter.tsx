@@ -123,7 +123,8 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
       id: prod.id,
       title: prod.title,
       slug: prod.slug,
-      price: prod.price,
+      price: promo.effectivePrice,
+      originalPrice: prod.price,
       category: prod.category,
       thumbnail: prod.thumbnail,
     });

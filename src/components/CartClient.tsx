@@ -197,8 +197,13 @@ export default function CartClient() {
                     {item.title}
                   </Link>
                 </h3>
-                <div className="text-sm font-black text-foreground sm:hidden leading-none pt-1">
-                  ${(item.price / 100).toFixed(2)}
+                <div className="text-sm font-black text-foreground sm:hidden leading-none pt-1 flex items-baseline gap-2">
+                  <span>${(item.price / 100).toFixed(2)}</span>
+                  {item.originalPrice && item.originalPrice > item.price && (
+                    <span className="text-[10px] text-muted-foreground line-through decoration-destructive/60 tabular-nums font-bold">
+                      ${(item.originalPrice / 100).toFixed(2)}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -206,6 +211,11 @@ export default function CartClient() {
                 <div className="text-base font-black text-foreground tabular-nums">
                   ${(item.price / 100).toFixed(2)}
                 </div>
+                {item.originalPrice && item.originalPrice > item.price && (
+                  <div className="text-xs text-muted-foreground line-through decoration-destructive/60 tabular-nums">
+                    ${(item.originalPrice / 100).toFixed(2)}
+                  </div>
+                )}
               </div>
 
               <div className="flex-shrink-0">

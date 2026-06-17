@@ -7,6 +7,7 @@ export interface CartItem {
   title: string;
   slug: string;
   price: number; // in paise
+  originalPrice?: number; // in paise
   category: string;
   thumbnail: string | null;
 }

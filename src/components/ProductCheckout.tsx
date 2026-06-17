@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCart } from "./CartContext";
 
+import { getProductEffectivePrice } from "../lib/price-utils";
+
 declare global {
   interface Window {
     Razorpay: any;
@@ -21,6 +23,10 @@ interface ProductCheckoutProps {
     price: number; // in paise
     category: string;
     thumbnail: string | null;
+    isFree?: boolean;
+    discountPercent?: number;
+    promoStart?: Date | string | null;
+    promoEnd?: Date | string | null;
   };
   hasPurchased: boolean;
   userLoggedIn: boolean;
@@ -127,7 +133,16 @@ export default function ProductCheckout({
     if (inCart) {
       removeFromCart(product.id);
     } else {
-      addToCart(product);
+      const promo = getProductEffectivePrice(product);
+      addToCart({
+        id: product.id,
+        title: product.title,
+        slug: product.slug,
+        price: promo.effectivePrice,
+        originalPrice: product.price,
+        category: product.category,
+        thumbnail: product.thumbnail,
+      });
     }
   };
 
