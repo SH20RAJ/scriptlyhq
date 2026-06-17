@@ -178,13 +178,15 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
 
     try {
       const data = await uploadImageAction(formData);
-      if (data.url) {
+      if (data && 'url' in data && data.url) {
         if (fieldName === "screenshots") {
           const current = screenshots ? screenshots.split(",").map(s => s.trim()) : [];
           targetSetter([...current, data.url].join(", "));
         } else {
           targetSetter(data.url);
         }
+      } else if (data && 'error' in data) {
+        setError("Image upload failed: " + data.error);
       } else {
         setError("Image upload failed: Unexpected response from server.");
       }
