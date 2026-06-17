@@ -39,87 +39,222 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
-  // Parse custom markdown layout simply
+  // Parse custom markdown layout simply and correctly line-by-line
   const renderContent = (markdown: string) => {
-    const blocks = markdown.split("\n\n");
-    let inCodeBlock = false;
-    let codeContent: string[] = [];
-
-    return blocks.map((block, i) => {
-      const trimmed = block.trim();
-      if (!trimmed) return null;
-
-      // Handle Code Blocks
+    const lines = markdown.split("\n");
+    const elements: React.ReactNode[] = [];
+    
+    let i = 0;
+    
+    while (i < lines.length) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      
+      // 1. Handle Code Blocks
       if (trimmed.startsWith("```")) {
-        if (inCodeBlock) {
-          inCodeBlock = false;
-          const content = codeContent.join("\n\n");
-          codeContent = [];
-          return (
-            <pre key={i} className="my-6 p-5 bg-card border-2 border-border rounded-2xl overflow-x-auto font-mono text-xs text-foreground shadow-sm">
-              <code>{content.replace(/```[a-z]*/g, "")}</code>
-            </pre>
-          );
-        } else {
-          inCodeBlock = true;
-          codeContent.push(trimmed);
-          return null;
+        const lang = trimmed.slice(3).trim();
+        const codeLines: string[] = [];
+        i++;
+        while (i < lines.length && !lines[i].trim().startsWith("```")) {
+          codeLines.push(lines[i]);
+          i++;
         }
-      }
-
-      if (inCodeBlock) {
-        codeContent.push(trimmed);
-        return null;
-      }
-
-      // Headings
-      if (trimmed.startsWith("## ")) {
-        return (
-          <h2 key={i} className="text-xl md:text-2xl font-black text-foreground mt-8 mb-4 tracking-tight leading-tight uppercase">
-            {trimmed.replace("## ", "")}
-          </h2>
+        // skip the closing ```
+        i++;
+        elements.push(
+          <pre key={`code-${i}`} className="my-6 p-5 bg-card border-2 border-border rounded-2xl overflow-x-auto font-mono text-xs text-foreground shadow-sm">
+            <code className={lang ? `language-${lang}` : ""}>{codeLines.join("\n")}</code>
+          </pre>
         );
+        continue;
       }
-      if (trimmed.startsWith("### ")) {
-        return (
-          <h3 key={i} className="text-lg font-black text-foreground mt-6 mb-3 tracking-tight uppercase">
-            {trimmed.replace("### ", "")}
-          </h3>
+      
+      // 2. Handle Tables
+      if (trimmed.startsWith("|")) {
+        const tableLines: string[] = [];
+        while (i < lines.length && lines[i].trim().startsWith("|")) {
+          tableLines.push(lines[i].trim());
+          i++;
+        }
+        
+        const rows = tableLines.map(row => {
+          const cells = row.split("|").map(c => c.trim());
+          if (cells[0] === "") cells.shift();
+          if (cells[cells.length - 1] === "") cells.pop();
+          return cells;
+        });
+        
+        const filteredRows = rows.filter(row => {
+          return !row.every(cell => /^:?-+:?$/.test(cell));
+        });
+        
+        if (filteredRows.length > 0) {
+          const headers = filteredRows[0];
+          const bodyRows = filteredRows.slice(1);
+          
+          elements.push(
+            <div key={`table-${i}`} className="my-6 overflow-x-auto rounded-xl border-2 border-border shadow-sm">
+              <table className="min-w-full divide-y-2 divide-border text-sm">
+                <thead className="bg-card">
+                  <tr>
+                    {headers.map((h, idx) => (
+                      <th key={idx} className="px-4 py-3 text-left font-black text-xs text-foreground uppercase tracking-wider border-r border-border last:border-r-0" dangerouslySetInnerHTML={{ __html: parseInlineStyles(h) }} />
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border bg-background/50">
+                  {bodyRows.map((row, rIdx) => (
+                    <tr key={rIdx} className="hover:bg-card/20 transition-colors">
+                      {row.map((cell, cIdx) => (
+                        <td key={cIdx} className="px-4 py-3 text-muted-foreground font-medium border-r border-border last:border-r-0" dangerouslySetInnerHTML={{ __html: parseInlineStyles(cell) }} />
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+        continue;
+      }
+      
+      // 3. Handle Blockquotes
+      if (trimmed.startsWith(">")) {
+        const bqLines: string[] = [];
+        while (i < lines.length && lines[i].trim().startsWith(">")) {
+          let bqLine = lines[i].trim().slice(1);
+          if (bqLine.startsWith(" ")) bqLine = bqLine.slice(1);
+          bqLines.push(bqLine);
+          i++;
+        }
+        
+        elements.push(
+          <div key={`bq-${i}`} className="my-6 pl-4 border-l-4 border-primary bg-primary/5 py-3 pr-4 rounded-r-xl text-muted-foreground italic font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: parseInlineStyles(bqLines.join(" ")) }} />
         );
+        continue;
       }
-
-      // Bullet points
-      if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-        const items = trimmed.split("\n").map(li => li.replace(/^[-*]\s+/, ""));
-        return (
-          <ul key={i} className="list-disc pl-6 my-4 space-y-2 text-sm text-muted-foreground font-medium leading-relaxed">
-            {items.map((item, idx) => (
+      
+      // 4. Handle Lists (unordered & ordered)
+      const ulMatch = trimmed.match(/^[-*]\s+(.*)/);
+      const olMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+      
+      if (ulMatch) {
+        const listItems: string[] = [];
+        while (i < lines.length) {
+          const currentTrimmed = lines[i].trim();
+          const match = currentTrimmed.match(/^[-*]\s+(.*)/);
+          if (match) {
+            listItems.push(match[1]);
+            i++;
+          } else {
+            break;
+          }
+        }
+        elements.push(
+          <ul key={`ul-${i}`} className="list-disc pl-6 my-4 space-y-2 text-sm md:text-base text-muted-foreground font-medium leading-relaxed">
+            {listItems.map((item, idx) => (
               <li key={idx} dangerouslySetInnerHTML={{ __html: parseInlineStyles(item) }} />
             ))}
           </ul>
         );
+        continue;
       }
-
-      // Normal paragraph
-      return (
+      
+      if (olMatch) {
+        const listItems: string[] = [];
+        while (i < lines.length) {
+          const currentTrimmed = lines[i].trim();
+          const match = currentTrimmed.match(/^(\d+)\.\s+(.*)/);
+          if (match) {
+            listItems.push(match[2]);
+            i++;
+          } else {
+            break;
+          }
+        }
+        elements.push(
+          <ol key={`ol-${i}`} className="list-decimal pl-6 my-4 space-y-2 text-sm md:text-base text-muted-foreground font-medium leading-relaxed">
+            {listItems.map((item, idx) => (
+              <li key={idx} dangerouslySetInnerHTML={{ __html: parseInlineStyles(item) }} />
+            ))}
+          </ol>
+        );
+        continue;
+      }
+      
+      // 5. Handle Horizontal Rules
+      if (trimmed === "---") {
+        elements.push(<hr key={`hr-${i}`} className="my-8 border-t-2 border-border/60" />);
+        i++;
+        continue;
+      }
+      
+      // 6. Handle Headings
+      if (trimmed.startsWith("#### ")) {
+        elements.push(
+          <h4 key={`h4-${i}`} className="text-base font-black text-foreground mt-4 mb-2 tracking-tight">
+            {trimmed.replace("#### ", "")}
+          </h4>
+        );
+        i++;
+        continue;
+      }
+      if (trimmed.startsWith("### ")) {
+        elements.push(
+          <h3 key={`h3-${i}`} className="text-lg font-black text-foreground mt-6 mb-3 tracking-tight">
+            {trimmed.replace("### ", "")}
+          </h3>
+        );
+        i++;
+        continue;
+      }
+      if (trimmed.startsWith("## ")) {
+        elements.push(
+          <h2 key={`h2-${i}`} className="text-xl md:text-2xl font-black text-foreground mt-8 mb-4 tracking-tight leading-tight">
+            {trimmed.replace("## ", "")}
+          </h2>
+        );
+        i++;
+        continue;
+      }
+      
+      // 7. Empty lines
+      if (!trimmed) {
+        i++;
+        continue;
+      }
+      
+      // 8. Normal Paragraph
+      elements.push(
         <p 
-          key={i} 
+          key={`p-${i}`} 
           className="my-4 text-sm md:text-base text-muted-foreground font-medium leading-relaxed"
           dangerouslySetInnerHTML={{ __html: parseInlineStyles(trimmed) }}
         />
       );
-    });
+      i++;
+    }
+    
+    return elements;
   };
 
   // Helper to parse links and bold inline styles
   const parseInlineStyles = (text: string) => {
     let html = text;
+    // Unescape common characters
+    html = html.replace(/\\`/g, "`");
+    html = html.replace(/\\\*/g, "*");
+    html = html.replace(/\\_/g, "_");
+    
     // Bold: **text** -> <strong>text</strong>
-    html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-    // Code blocks: `code` -> <code class="bg-muted px-1.5 py-0.5 rounded font-mono text-xs">code</code>
-    html = html.replace(/`(.*?)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded font-mono text-xs text-foreground">$1</code>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-foreground">$1</strong>');
+    
+    // Code blocks: `code` -> <code class="bg-muted px-1.5 py-0.5 rounded font-mono text-xs text-foreground">code</code>
+    html = html.replace(/`(.*?)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded font-mono text-[11px] text-foreground border border-border/60">$1</code>');
+    
     // Markdown links: [text](url) -> <a href="url" class="text-primary hover:underline font-black">text</a>
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-primary hover:underline font-black">$1</a>');
+    
     return html;
   };
 

@@ -21,7 +21,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: "Announcements",
     readTime: "8 min read",
     createdAt: "2026-06-17",
-    thumbnail: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=600&auto=format&fit=crop",
+    thumbnail: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=600&auto=format&fit=crop",
     author: {
       name: "Team",
       role: "ScriptlyStore Core Engine"
@@ -669,7 +669,7 @@ Standard Next.js Middleware works perfectly. It's executed before every request,
     category: "Side Hustle",
     readTime: "15 min read",
     createdAt: "2026-06-11",
-    thumbnail: "https://images.unsplash.com/photo-1618401471353-b98aedd07871?q=80&w=600&auto=format&fit=crop",
+    thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop",
     author: {
       name: "Team",
       role: "ScriptlyStore Core Engine"
@@ -801,7 +801,7 @@ Absolutely. You can call AI APIs from your background service worker. Just ensur
     category: "AI",
     readTime: "15 min read",
     createdAt: "2026-06-10",
-    thumbnail: "https://images.unsplash.com/photo-1677442136019-21780efad99a?q=80&w=600&auto=format&fit=crop",
+    thumbnail: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
     author: {
       name: "Team",
       role: "ScriptlyStore Core Engine"
