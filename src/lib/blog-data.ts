@@ -15,6 +15,61 @@ export interface BlogPost {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: "announcing-scriptlystore-public-api",
+    title: "Announcing ScriptlyStore Public API: Build Your Own Marketplace Frontends",
+    excerpt: "We are opening our marketplace data to developers. Learn how to use our new JSON endpoints to build custom storefronts, affiliate sites, and more.",
+    category: "Announcements",
+    readTime: "5 min read",
+    createdAt: "2026-06-17",
+    thumbnail: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=600&auto=format&fit=crop",
+    author: {
+      name: "Team",
+      role: "ScriptlyStore Core Engine"
+    },
+    content: `Today, we are excited to announce the launch of the ScriptlyStore Public API. We believe that by opening our data, we can empower developers to build innovative experiences around our marketplace products and blog content.
+
+Whether you want to build a custom dashboard to track new products, an affiliate site showcasing your favorite scripts, or integrate our blog feed into your own technical publication, our new JSON endpoints make it easier than ever.
+
+---
+
+### Why Open an API?
+At ScriptlyStore, our mission is to accelerate the software development lifecycle. By providing a public API, we allow our community to:
+1. **Build Custom Integrations**: Create tools that track product releases or price changes.
+2. **Expand Distribution**: Build niche storefronts or curation sites using our verified data.
+3. **Syndicate Content**: Display our latest guides and tutorials on external platforms.
+
+---
+
+### The New Endpoints
+We are launching with two primary endpoints, both supporting various filtering parameters:
+
+| Endpoint | Purpose | Parameters |
+|---|---|---|
+| \`/api/products.json\` | Marketplace Products | \`limit\`, \`category\`, \`slug\`, \`featured\` |
+| \`/api/blog.json\` | Blog Posts & Guides | \`limit\`, \`category\`, \`slug\` |
+
+---
+
+### How to Get Started
+Getting started is simple. Our API is public and does not currently require authentication or API keys. You can fetch data directly from your client-side or server-side applications.
+
+For full technical details, usage examples, and response formats, visit our new [API Documentation](/docs/api).
+
+---
+
+### Future Roadmap
+This is just the beginning. We plan to expand the API to include:
+- **Search Endpoints**: Full-text search for products and blogs.
+- **Creator Metadata**: More detailed information about the developers behind the scripts.
+- **Webhooks**: Real-time notifications for new product approvals.
+
+We can't wait to see what you build with ScriptlyStore data. If you create something cool, be sure to tag us on social media!
+
+> **🚀 Build Your Own Storefront Today**
+> Use our public data to power your next project. Explore our [SaaS Templates](https://scriptly.store/?category=saas-templates) or [Landing Pages](https://scriptly.store/?category=landing-pages) for inspiration on what you can showcase.
+`
+  },
+  {
     slug: "how-to-launch-nextjs-saas-fast",
     title: "How to Build and Launch a Next.js SaaS App in 24 Hours",
     excerpt: "Learn the exact boilerplate setup, database integration, and checkout flows to ship your software product over a single weekend.",
