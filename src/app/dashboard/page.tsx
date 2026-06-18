@@ -12,11 +12,18 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ProductPagination } from "../../components/ProductPagination";
+import type { Metadata } from "next";
 
 interface PageProps {
   searchParams: Promise<{
     page?: string;
   }>;
+}
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Dashboard | ScriptlyStore",
+    description: "Dashboard | ScriptlyStore",
+  };
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {

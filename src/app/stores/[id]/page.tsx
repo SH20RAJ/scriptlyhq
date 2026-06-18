@@ -21,15 +21,17 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
     where: eq(users.id, id),
   });
 
-  if (!creator || !creator.storeName) {
+  if (!creator) {
     return {
       title: "Store Not Found | ScriptlyStore",
     };
   }
 
+  const displayName = creator.storeName || creator.name || "Creator's Store";
+
   return {
-    title: `${creator.storeName} Storefront | ScriptlyStore`,
-    description: `Explore SaaS templates, extensions, prompts, and developer scripts listed by ${creator.storeName} on ScriptlyStore.`,
+    title: `${displayName} Storefront | ScriptlyStore`,
+    description: `Explore SaaS templates, extensions, prompts, and developer scripts listed by ${displayName} on ScriptlyStore.`,
   };
 }
 
@@ -41,10 +43,12 @@ export default async function CreatorStorefrontPage({ params }: StorePageProps) 
     where: eq(users.id, id),
   });
 
-  // Redirect to notFound if the user is not found or has not named their store storefront yet
-  if (!creator || !creator.storeName) {
+  // Redirect to notFound only if the user doesn't exist at all
+  if (!creator) {
     notFound();
   }
+
+  const displayName = creator.storeName || creator.name || "Creator's Store";
 
   // 2. Fetch Creator's approved & published products
   const storeProducts = await db.query.products.findMany({
@@ -90,7 +94,7 @@ export default async function CreatorStorefrontPage({ params }: StorePageProps) 
                 </div>
                 <div className="space-y-1">
                   <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-white">
-                    {creator.storeName}
+                    {displayName}
                   </h1>
                   <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                     <span className="flex items-center gap-1">
