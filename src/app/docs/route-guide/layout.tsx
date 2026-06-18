@@ -1,14 +1,10 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Razorpay Route Splits | ScriptlyStore",
-  description: "Comprehensive developer and user documentation on automated payment splits, bank onboarding, and checkouts via Razorpay Route.",
+  title: "Razorpay Route Splits Guide",
+  description: "Learn how ScriptlyStore uses Razorpay Route to dynamically split customer checkout payments for instant creator payouts.",
 };
 
-export default function RouteGuideLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RouteGuideLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

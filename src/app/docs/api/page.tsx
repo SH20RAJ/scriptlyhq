@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Book, Code, Globe, Zap, Info } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "API Documentation",
+  description: "Integrate ScriptlyStore products and blog feed into your applications using our public JSON API endpoints.",
+};
+
 
 export default function ApiDocsPage() {
   return (

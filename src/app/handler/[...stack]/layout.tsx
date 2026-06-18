@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Sign In",
+  description: "Sign in to access your ScriptlyStore digital assets and downloads.",
+};
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

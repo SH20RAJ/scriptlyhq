@@ -1,5 +1,11 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin Overview",
+};
+
 import { db } from "../../db";
 import { products, orders, users } from "../../db/schema";
 import { eq, sql, desc } from "drizzle-orm";

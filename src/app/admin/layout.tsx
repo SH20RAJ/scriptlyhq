@@ -7,6 +7,13 @@ import { Separator } from "@/components/ui/separator";
 import { db } from "../../db";
 import { products } from "../../db/schema";
 import { eq, sql } from "drizzle-orm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin Console",
+  description: "ScriptlyStore admin dashboard for managing products, orders, creators, and payouts.",
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminLayout({
   children,

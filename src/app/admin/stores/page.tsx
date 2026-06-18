@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { db } from "../../../db";
+
+export const metadata: Metadata = {
+  title: "Stores & Creators",
+};
+
 import { users, products } from "../../../db/schema";
 import { desc } from "drizzle-orm";
 import { isAdmin } from "../../../lib/auth-utils";

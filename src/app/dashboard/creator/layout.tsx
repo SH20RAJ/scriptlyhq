@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Creator Console",
+  description: "Manage your ScriptlyStore creator storefront, products, coupons, and payouts.",
+};
+
 import Link from "next/link";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
 import {

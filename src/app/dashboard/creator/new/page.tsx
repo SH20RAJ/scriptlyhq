@@ -1,5 +1,11 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Submit New Product",
+};
+
 import { getCategoriesAction, getSubcategoriesAction } from "../../../../lib/actions/products";
 import { getOrCreateDbUser } from "../../../../lib/auth-utils";
 import ProductForm from "../../../../components/ProductForm";
