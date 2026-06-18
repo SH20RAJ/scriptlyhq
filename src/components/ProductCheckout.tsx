@@ -48,7 +48,7 @@ export default function ProductCheckout({
 
   if (hasPurchased) {
     return (
-      <Button asChild className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-[11px]">
+      <Button asChild className="w-full min-h-[48px] py-3 rounded-xl font-bold uppercase tracking-widest text-[11px]">
         <a href={`/api/download/${product.id}`}>
           <Download className="w-4 h-4 mr-2" />
           <span>Download Files</span>
@@ -152,7 +152,7 @@ export default function ProductCheckout({
         <Button
           onClick={handleCheckout}
           disabled={isPending}
-          className="flex-1 h-12 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer"
+          className="flex-1 min-h-[48px] px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer"
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -166,7 +166,7 @@ export default function ProductCheckout({
           type="button"
           onClick={handleCartToggle}
           variant={inCart ? "destructive" : "secondary"}
-          className="h-12 px-6 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer"
+          className="min-h-[48px] px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer"
         >
           {inCart ? (
             <>
