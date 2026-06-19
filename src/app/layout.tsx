@@ -5,12 +5,12 @@ import "./globals.css";
 
 export const metadata: Metadata = {
 	title: {
-		default: "ScriptlyStore - Ready-To-Deploy Next.js SaaS Boilerplates & Developer Scripts",
+		default: "ScriptlyStore - Premium Digital Products, Templates & Developer Scripts",
 		template: "%s | ScriptlyStore",
 	},
-	description: "Ship 10x faster with ready-to-use Next.js SaaS templates, automation scripts, scraper boilerplates, extensions, and AI prompts. Sell your code & keep 95% of sales!",
+	description: "Ship 10x faster with ready-to-use SaaS templates, automation scripts, browser extensions, AI prompts, and digital tools. Sell your code & keep 95% of sales!",
 	keywords: [
-		"Next.js boilerplates",
+		"digital products marketplace",
 		"SaaS templates",
 		"source code marketplace",
 		"developer scripts",
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
 		},
 	},
 	openGraph: {
-		title: "ScriptlyStore - Ready-To-Deploy Next.js SaaS Boilerplates & Developer Scripts",
-		description: "Get instant access to ready-to-use Next.js SaaS templates, automation scripts, extensions, and AI prompts. Sell your code and keep 95% of sales!",
+		title: "ScriptlyStore - Premium Digital Products, Templates & Developer Scripts",
+		description: "Get instant access to ready-to-use SaaS templates, automation scripts, browser extensions, and AI prompts. Sell your code and keep 95% of sales!",
 		type: "website",
 		locale: "en_US",
 		siteName: "ScriptlyStore",
@@ -39,14 +39,14 @@ export const metadata: Metadata = {
 				url: "/og-image.png",
 				width: 1200,
 				height: 630,
-				alt: "ScriptlyStore Ready-To-Deploy Next.js SaaS Boilerplates & Developer Scripts",
+				alt: "ScriptlyStore - Premium Digital Products, Templates & Developer Scripts",
 			},
 		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "ScriptlyStore - Next.js SaaS Boilerplates & Developer Scripts",
-		description: "Get instant access to ready-to-use Next.js SaaS templates, automation scripts, and AI prompts. Sell your code and keep 95% of sales!",
+		title: "ScriptlyStore - Premium Digital Products, Templates & Developer Scripts",
+		description: "Get instant access to ready-to-use SaaS templates, automation scripts, browser extensions, and AI prompts. Sell your code and keep 95% of sales!",
 		images: ["/og-image.png"],
 	},
 	appleWebApp: {

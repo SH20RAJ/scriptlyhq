@@ -104,7 +104,7 @@ export default function Home({ searchParams }: PageProps) {
               transition={{ duration: 0.5 }}
             >
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground font-sans leading-[1.1]">
-                Ready-To-Deploy <span className="text-primary">Next.js Templates</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
+                Ready-To-Use <span className="text-primary">Digital Products</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
               </h1>
             </motion.div>
             

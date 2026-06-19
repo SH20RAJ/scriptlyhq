@@ -124,7 +124,7 @@ export default function ApiDocsPage() {
   "products": [
     {
       "id": "nextjs-saas-kit",
-      "title": "Premium Next.js SaaS Starter",
+      "title": "Premium SaaS Starter Kit",
       "slug": "nextjs-saas-kit",
       "priceFormatted": "49.00",
       "effectivePriceFormatted": "39.20",
