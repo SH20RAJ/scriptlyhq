@@ -82,8 +82,19 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const searchParams = new URL(request.url).searchParams;
-  const sessionId = searchParams.get("session");
+  console.log("MCP POST request.url:", request.url);
+  console.log("MCP POST nextUrl:", request.nextUrl.toString());
+  
+  const searchParams = request.nextUrl.searchParams;
+  const sessionId = searchParams.get("session") || 
+                    searchParams.get("sessionId") || 
+                    request.headers.get("mcp-session-id") || 
+                    request.headers.get("Mcp-Session-Id");
+                    
+  const authHeader = request.headers.get("authorization");
+  const token = authHeader?.replace("Bearer ", "") || searchParams.get("token") || searchParams.get("apiKey");
+
+  console.log(`MCP POST Auth: token=${token ? "present" : "missing"}, sessionId=${sessionId}`);
 
   if (!authorize(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
