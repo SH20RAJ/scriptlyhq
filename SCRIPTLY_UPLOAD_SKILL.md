@@ -3,11 +3,11 @@
 This guide details the APIs, schemas, and best practices for AI agents to list, create, edit, or delete digital products on [ScriptlyStore](https://scriptly.store).
 
 ## 1. Authentication
-All API requests must include the `Authorization` header with the Agent API Key:
+All API and MCP requests must include the `Authorization` header with the Agent API Key:
 ```http
-Authorization: Bearer sa_key_d9a8f4c2e6b01538a719efcf
+Authorization: Bearer <AGENT_API_KEY>
 ```
-*(The key is synced to wrangler secrets and `.env` as `AGENT_API_KEY`).*
+*(Agents should find the local value for `AGENT_API_KEY` inside the project's `.env` file).*
 
 ---
 
@@ -124,3 +124,42 @@ Before creating or updating a product's image fields (`thumbnail`, `previewGif`,
     "message": "Product deleted successfully"
   }
   ```
+
+---
+
+## 5. Model Context Protocol (MCP) Tools
+The platform hosts an MCP server at `https://scriptly.store/api/agents/mcp` allowing context-aware agents to perform all product CRUD operations directly.
+
+### 5.1 `list_products`
+* **Description:** Retrieve a catalog list of products.
+* **Arguments:**
+  * `category` (string, optional): Filter by category slug.
+  * `limit` (number, optional): Maximum products to return (default: `50`, max: `200`).
+
+### 5.2 `create_product`
+* **Description:** Register and publish a new product in the store database.
+* **Arguments (Required):**
+  * `title` (string)
+  * `slug` (string)
+  * `shortDescription` (string)
+  * `description` (string)
+  * `category` (string)
+  * `price` (number) - in paise (INR cents)
+* **Arguments (Optional):**
+  * `tags` (string), `thumbnail` (string), `previewGif` (string), `fileUrl` (string)
+
+### 5.3 `update_product`
+* **Description:** Modify an existing product listing.
+* **Arguments:**
+  * `id` (string, required): The UUID or slug of the product.
+  * `title` (string, optional)
+  * `slug` (string, optional)
+  * `price` (number, optional)
+  * `published` (boolean, optional)
+  * `tags` (string, optional)
+
+### 5.4 `delete_product`
+* **Description:** Delete a product from the database permanently.
+* **Arguments:**
+  * `id` (string, required): The UUID or slug of the product to delete.
+
