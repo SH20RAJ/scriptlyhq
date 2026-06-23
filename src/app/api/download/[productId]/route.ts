@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "../../../../db";
 import { products, orders, downloads, users } from "../../../../db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { hexclave } from "../../../../lib/hexclave";
 
 export async function GET(
@@ -58,6 +58,14 @@ export async function GET(
         productId: productId,
         orderId: orderRecord ? orderRecord.id : "admin_download",
       });
+
+      // Increment product downloads count
+      await db
+        .update(products)
+        .set({
+          downloadsCount: sql`${products.downloadsCount} + 1`,
+        })
+        .where(eq(products.id, productId));
     } catch (dbErr) {
       console.error("Failed to log download event:", dbErr);
     }

@@ -85,11 +85,81 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
   }, [searchParams]);
 
   if (!data) return (
-    <div className="flex items-center justify-center min-h-[80vh] bg-background">
-      <div className="relative">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        <div className="absolute inset-0 w-12 h-12 border-4 border-accent/20 rounded-full pointer-events-none" />
-      </div>
+    <div className="flex flex-col min-h-screen text-foreground bg-background">
+      <CyberBackground />
+      
+      {/* Hero Section Placeholder */}
+      <section className="relative overflow-hidden pt-16 pb-20 md:pt-24 md:pb-28">
+        <div className="container max-w-7xl mx-auto px-4 text-center space-y-8">
+          <div className="inline-flex h-8 w-64 bg-muted/65 rounded-2xl animate-pulse mx-auto" />
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div className="h-16 w-3/4 bg-muted/75 rounded-2xl animate-pulse mx-auto" />
+            <div className="h-6 w-1/2 bg-muted/65 rounded-xl animate-pulse mx-auto" />
+          </div>
+          <div className="max-w-2xl mx-auto h-14 bg-muted/65 rounded-2xl animate-pulse" />
+        </div>
+      </section>
+
+      {/* Stats Section Placeholder */}
+      <section className="border-y border-border bg-card/20 backdrop-blur-sm py-10">
+        <div className="container max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className="h-12 bg-muted/65 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Placeholder */}
+      <section className="py-20 bg-muted/10">
+        <div className="container max-w-7xl mx-auto px-4 space-y-12">
+          <div className="h-8 w-48 bg-muted/75 rounded-xl animate-pulse mx-auto" />
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            {[1, 2, 3, 4, 5].map((c) => (
+              <div key={c} className="h-32 bg-card border-2 border-border/40 rounded-3xl p-6 flex flex-col items-center justify-between space-y-4">
+                <div className="w-12 h-12 bg-muted/75 rounded-2xl animate-pulse" />
+                <div className="h-4 w-16 bg-muted/65 rounded-lg animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Products Grid Placeholder */}
+      <section className="py-20">
+        <div className="container max-w-7xl mx-auto px-4 space-y-12">
+          <div className="flex justify-between items-center border-b border-border pb-6">
+            <div className="space-y-2">
+              <div className="h-8 w-48 bg-muted/75 rounded-xl animate-pulse" />
+              <div className="h-4 w-64 bg-muted/65 rounded-lg animate-pulse" />
+            </div>
+            <div className="h-10 w-80 bg-muted/65 rounded-xl animate-pulse hidden md:block" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="rounded-[2rem] border-2 border-border bg-card overflow-hidden shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] flex flex-col h-full">
+                <div className="aspect-[16/9] w-full bg-muted/75 animate-pulse" />
+                <div className="p-6 flex flex-col flex-1 justify-between space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <div className="h-4 w-12 bg-muted/65 rounded-full animate-pulse" />
+                      <div className="h-4 w-16 bg-muted/65 rounded-full animate-pulse" />
+                    </div>
+                    <div className="h-6 w-3/4 bg-muted/75 rounded-lg animate-pulse" />
+                    <div className="h-4 w-full bg-muted/65 rounded-md animate-pulse" />
+                  </div>
+                  <div className="pt-4 border-t border-border/40 flex items-center justify-between">
+                    <div className="h-4 w-16 bg-muted/75 rounded-md animate-pulse" />
+                    <div className="h-6 w-14 bg-muted/75 rounded-lg animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 

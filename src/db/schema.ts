@@ -60,6 +60,10 @@ export const products = pgTable("products", {
   discountPercent: integer("discount_percent").default(0).notNull(),
   promoStart: timestamp("promo_start"),
   promoEnd: timestamp("promo_end"),
+  views: integer("views").default(0).notNull(),
+  downloadsCount: integer("downloads_count").default(0).notNull(),
+  saves: integer("saves").default(0).notNull(),
+  personal: boolean("personal").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -105,5 +109,22 @@ export const payouts = pgTable("payouts", {
   payoutMethod: text("payout_method"),
   paypalEmail: text("paypal_email"),
   payoutDetails: text("payout_details"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const reviews = pgTable("reviews", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  productId: text("product_id").references(() => products.id, { onDelete: "cascade" }).notNull(),
+  rating: integer("rating").notNull(),
+  comment: text("comment").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const userInteractions = pgTable("user_interactions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  productId: text("product_id").references(() => products.id, { onDelete: "cascade" }).notNull(),
+  type: text("type").notNull(), // 'save' or 'like'
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

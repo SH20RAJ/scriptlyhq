@@ -24,6 +24,7 @@ import ProductScreenshots from "../../../components/ProductScreenshots";
 import ProductMediaSwitcher from "../../../components/ProductMediaSwitcher";
 import ProductRating from "../../../components/ProductRating";
 import { CyberBackground } from "../../../components/ui/CyberBackground";
+import ProductInteractionAndReviews from "../../../components/ProductInteractionAndReviews";
 
 
 interface PageProps {
@@ -214,6 +215,18 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   </div>
                 </div>
               )}
+
+              <div className="pt-12 border-t border-border/40">
+                <ProductInteractionAndReviews 
+                  productId={product.id}
+                  initialViews={product.views || 0}
+                  initialDownloads={product.downloadsCount || 0}
+                  initialSaves={product.saves || 0}
+                  initialRating={product.rating || "5.0"}
+                  initialRatingCount={product.ratingCount || 0}
+                  userLoggedIn={!!user}
+                />
+              </div>
             </div>
           </div>
 

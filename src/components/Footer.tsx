@@ -17,6 +17,7 @@ export default function Footer() {
               <li><Link href="/" className="hover:text-foreground transition-colors">Explore</Link></li>
               <li><Link href="/search" className="hover:text-foreground transition-colors">Search</Link></li>
               <li><Link href="/offers" className="hover:text-foreground transition-colors">Offers</Link></li>
+              <li><Link href="/directories" className="hover:text-foreground transition-colors">Directories</Link></li>
               <li><Link href="/docs/route-guide" className="hover:text-foreground transition-colors">Route Guide</Link></li>
               <li><Link href="/rss" className="hover:text-foreground transition-colors">RSS Feed</Link></li>
             </ul>

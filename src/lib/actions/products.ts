@@ -59,6 +59,7 @@ export async function createProductAction(formData: FormData) {
   const videoUrl = formData.get("videoUrl") as string;
   const fileUrl = formData.get("fileUrl") as string;
   const redirectDownload = formData.get("redirectDownload") !== "false";
+  const personal = formData.get("personal") === "true";
 
   const id = crypto.randomUUID();
 
@@ -88,6 +89,7 @@ export async function createProductAction(formData: FormData) {
     discountPercent,
     promoStart,
     promoEnd,
+    personal,
   });
 
   revalidatePath("/");
@@ -163,6 +165,7 @@ export async function updateProductAction(id: string, formData: FormData) {
   const videoUrl = formData.get("videoUrl") as string;
   const fileUrl = formData.get("fileUrl") as string;
   const redirectDownload = formData.get("redirectDownload") !== "false";
+  const personal = formData.get("personal") === "true";
 
   await db
     .update(products)
@@ -190,6 +193,7 @@ export async function updateProductAction(id: string, formData: FormData) {
       discountPercent,
       promoStart,
       promoEnd,
+      personal,
       updatedAt: new Date(),
     })
     .where(eq(products.id, id));

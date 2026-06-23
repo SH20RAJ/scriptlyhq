@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Mail, MapPin, ShieldCheck, HelpCircle, Phone } from "lucide-react";
+import { Mail, ShieldCheck, HelpCircle, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -46,19 +46,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="flex gap-4 items-start">
-              <div className="w-10 h-10 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Headquarters</p>
-                <p className="text-sm font-bold text-foreground">
-                  Strivio Inc.<br />
-                  DLF Phase 3, Sector 24<br />
-                  Gurugram, Haryana - 122002
-                </p>
-              </div>
-            </div>
+
 
             <div className="flex gap-4 items-start">
               <div className="w-10 h-10 bg-amber-500/10 text-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
