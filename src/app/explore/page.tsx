@@ -9,8 +9,11 @@ import { CyberBackground } from "../../components/ui/CyberBackground";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Explore Library - Premium Digital Products & Scripts | ScriptlyStore",
+  title: "Explore Library - Premium Digital Products & Scripts",
   description: "Browse our extensive, developer-verified library of SaaS boilerplates, browser extensions, automation scrapers, design kits, and ebooks.",
+  alternates: {
+    canonical: "https://scriptly.store/explore",
+  },
 };
 
 export default async function ExplorePage() {

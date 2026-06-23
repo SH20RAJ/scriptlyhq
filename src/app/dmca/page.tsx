@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "DMCA Copyright Policy | ScriptlyStore",
-  description: "Copyright infringement notification procedures under the DMCA for ScriptlyStore.",
+  title: "DMCA Copyright Policy",
+  description: "Our copyright infringement notification and counter-notification procedures under the DMCA.",
+  alternates: {
+    canonical: "https://scriptly.store/dmca",
+  },
 };
 
 export default function DmcaPage() {

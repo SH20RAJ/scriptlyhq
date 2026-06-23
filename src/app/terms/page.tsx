@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | ScriptlyStore",
+  title: "Terms of Service",
   description: "Terms and conditions for using the ScriptlyStore marketplace.",
+  alternates: {
+    canonical: "https://scriptly.store/terms",
+  },
 };
 
 export default function TermsPage() {

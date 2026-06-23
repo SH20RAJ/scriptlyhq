@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Product Licenses | ScriptlyStore",
-  description: "Terms and details of our commercial and personal licenses.",
+  title: "Product Licensing Terms",
+  description: "Review personal, commercial, and redistribution rights for digital code templates and scripts purchased on ScriptlyStore.",
+  alternates: {
+    canonical: "https://scriptly.store/licenses",
+  },
 };
 
 export default function LicensesPage() {

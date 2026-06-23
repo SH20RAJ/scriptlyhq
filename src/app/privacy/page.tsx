@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | ScriptlyStore",
-  description: "How we handle your data at ScriptlyStore.",
+  title: "Privacy Policy",
+  description: "Understand how we collect, store, and protect your personal data, bank details, and transaction history on ScriptlyStore.",
+  alternates: {
+    canonical: "https://scriptly.store/privacy",
+  },
 };
 
 export default function PrivacyPage() {

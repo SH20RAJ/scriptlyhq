@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Refund Policy | ScriptlyStore",
-  description: "Our cancellation and refund policies for digital products.",
+  title: "Cancellation & Refund Policy",
+  description: "Learn about our cancellation and refund policies for downloadable digital goods on ScriptlyStore.",
+  alternates: {
+    canonical: "https://scriptly.store/refund",
+  },
 };
 
 export default function RefundPage() {

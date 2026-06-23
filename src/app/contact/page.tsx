@@ -4,8 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Contact Us | ScriptlyStore",
-  description: "Get in touch with customer support at ScriptlyStore.",
+  title: "Contact Support & Inquiries",
+  description: "Get in touch with ScriptlyStore support for payment assistance, order issues, or custom SaaS development requests.",
+  alternates: {
+    canonical: "https://scriptly.store/contact",
+  },
 };
 
 export default function ContactPage() {

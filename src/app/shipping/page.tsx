@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Shipping & Delivery Policy | ScriptlyStore",
-  description: "Immediate delivery policy for digital files and templates.",
+  title: "Shipping & Delivery Policy",
+  description: "Read our policy on instant electronic delivery of downloadable digital assets and code templates on ScriptlyStore.",
+  alternates: {
+    canonical: "https://scriptly.store/shipping",
+  },
 };
 
 export default function ShippingPage() {

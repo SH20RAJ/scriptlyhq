@@ -7,11 +7,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://scriptly.store";
 
   // Static routes
-  const routes = ["", "/search", "/dashboard"].map((route) => ({
+  const routes = [
+    "",
+    "/search",
+    "/explore",
+    "/offers",
+    "/docs/route-guide",
+    "/terms",
+    "/privacy",
+    "/refund",
+    "/shipping",
+    "/dmca",
+    "/licenses",
+    "/about",
+    "/contact"
+  ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,
-    priority: route === "" ? 1 : 0.8,
+    priority: route === "" ? 1.0 : (route === "/explore" || route === "/search") ? 0.9 : 0.7,
   }));
 
   // Dynamic products

@@ -9,8 +9,11 @@ import { Sparkles, Percent, Gift, ShoppingBag, ArrowRight } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Exclusive Deals, Offers & Coupons - ScriptlyStore",
+  title: "Exclusive Deals, Offers & Coupons",
   description: "Redeem active coupon codes and flat discounts on premium SaaS templates, browser extensions, automation scripts, and digital tools.",
+  alternates: {
+    canonical: "https://scriptly.store/offers",
+  },
 };
 
 export const dynamic = "force-dynamic";

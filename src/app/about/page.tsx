@@ -4,8 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Award, Compass, Heart, Shield } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About Us | ScriptlyStore",
-  description: "Learn about the mission and principles behind ScriptlyStore.",
+  title: "About Us - Our Mission & Principles",
+  description: "Discover the mission behind ScriptlyStore—helping developers launch products faster and retain 95% of their revenue.",
+  alternates: {
+    canonical: "https://scriptly.store/about",
+  },
 };
 
 export default function AboutPage() {

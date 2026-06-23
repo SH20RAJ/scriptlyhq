@@ -16,8 +16,11 @@ interface PageProps {
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const { search } = await searchParams;
   return {
-    title: search ? `Results for "${search}" | ScriptlyStore` : "Search Library | ScriptlyStore",
+    title: search ? `Results for "${search}"` : "Search Library",
     description: "Discover premium SaaS boilerplates, UI kits, and digital tools on ScriptlyStore.",
+    alternates: {
+      canonical: "https://scriptly.store/search",
+    },
   };
 }
 
