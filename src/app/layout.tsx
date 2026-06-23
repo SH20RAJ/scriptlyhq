@@ -90,6 +90,23 @@ export default function RootLayout({
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
 				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 				<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&family=Varela+Round&display=swap" rel="stylesheet" />
+				<script
+					type="application/ld+json"
+					dangerouslySetInnerHTML={{
+						__html: JSON.stringify({
+							"@context": "https://schema.org",
+							"@type": "WebSite",
+							"name": "ScriptlyStore",
+							"url": "https://scriptly.store",
+							"description": "Ready-to-use SaaS templates, developer scripts, design assets, and digital tools.",
+							"potentialAction": {
+								"@type": "SearchAction",
+								"target": "https://scriptly.store/search?search={search_term_string}",
+								"query-input": "required name=search_term_string"
+							}
+						})
+					}}
+				/>
 			</head>
 			<body className="antialiased bg-background text-foreground min-h-screen flex flex-col transition-colors duration-200">
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>

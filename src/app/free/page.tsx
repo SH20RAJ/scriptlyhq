@@ -39,7 +39,7 @@ export default async function FreeProductsPage({ searchParams }: PageProps) {
     priceType: "free", // Force only free products
     sortBy: currentSortBy,
     page: currentPage,
-    limit: 12,
+    limit: 36,
   });
 
   const categoriesList = await getCategoriesAction();

@@ -131,6 +131,35 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Product JSON-LD Schema for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.title,
+            "image": product.thumbnail ? [product.thumbnail] : [],
+            "description": product.shortDescription,
+            "sku": product.id,
+            "mpn": product.id,
+            "offers": {
+              "@type": "Offer",
+              "url": `https://scriptly.store/products/${product.slug}`,
+              "priceCurrency": "USD",
+              "price": (promo.effectivePrice / 100).toString(),
+              "priceValidUntil": "2030-01-01",
+              "itemCondition": "https://schema.org/NewCondition",
+              "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": product.rating || "5.0",
+              "reviewCount": product.ratingCount || 1
+            }
+          })
+        }}
+      />
       <div className="container max-w-7xl mx-auto px-4 py-8">
         <Button asChild variant="ghost" size="sm" className="-ml-3 text-muted-foreground hover:text-foreground mb-8">
           <Link href="/">

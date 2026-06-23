@@ -28,7 +28,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
   const { products: productsList, totalPages, total } = await getProductsAction({
     search: currentSearch,
     page: currentPage,
-    limit: 12,
+    limit: 36,
   });
 
   const categoriesList = await getCategoriesAction();

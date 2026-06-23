@@ -53,7 +53,7 @@ export default function Home({ searchParams }: PageProps) {
           priceType: "paid",
           sortBy: currentSortBy,
           page: currentPage,
-          limit: 12,
+          limit: 36,
         }),
         getProductsAction({
           priceType: "paid",

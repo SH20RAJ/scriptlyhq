@@ -130,20 +130,31 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
     });
   };
 
+  const getCategoryColor = (slug: string) => {
+    switch(slug) {
+      case "scripts": return "hover:border-[#1CB0F6]/40 hover:shadow-[#1CB0F6]/10";
+      case "saas-templates": return "hover:border-[#58CC02]/40 hover:shadow-[#58CC02]/10";
+      case "design-assets": return "hover:border-[#CE82FF]/40 hover:shadow-[#CE82FF]/10";
+      case "ai-prompts": return "hover:border-[#FFC800]/40 hover:shadow-[#FFC800]/10";
+      case "ebooks": return "hover:border-[#FF9600]/40 hover:shadow-[#FF9600]/10";
+      default: return "hover:border-primary/40 hover:shadow-primary/10";
+    }
+  };
+
   return (
     <Card 
-      className="border-border/50 bg-card group overflow-hidden rounded-2xl flex flex-col h-full [--card-spacing:0px] py-0 gap-0"
+      className={`border-border bg-card group overflow-hidden rounded-[2rem] flex flex-col h-full shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] hover:translate-y-[-6px] hover:shadow-[0_12px_0_var(--border)] active:translate-y-0.5 active:shadow-none transition-all duration-300 ${getCategoryColor(prod.category)}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/products/${prod.slug}`} className="block relative overflow-hidden rounded-t-[22px]">
-        <AspectRatio ratio={4 / 3} className="bg-muted">
+      <Link href={`/products/${prod.slug}`} className="block relative overflow-hidden rounded-t-[30px]">
+        <AspectRatio ratio={16 / 10} className="bg-muted overflow-hidden">
           {prod.thumbnail && (
             <img
               src={prod.thumbnail}
               alt={prod.title}
               loading="lazy"
-              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isHovered && prod.previewGif ? 'opacity-0' : 'opacity-100'}`}
+              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isHovered && prod.previewGif ? 'opacity-0 scale-100' : 'opacity-100'}`}
             />
           )}
           {prod.previewGif && (
@@ -157,33 +168,36 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
              </div>
           )}
           {!prod.thumbnail && !prod.previewGif && (
-            <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground uppercase font-bold tracking-widest bg-muted/50">
+            <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground uppercase font-black tracking-widest bg-muted/40">
               {prod.category}
             </div>
           )}
         </AspectRatio>
         
-        {/* Floating Category Label */}
-        <div className="absolute top-4.5 left-4.5 z-20">
-          <Badge className="bg-background/90 backdrop-blur-md text-foreground border border-border/40 text-[9px] uppercase font-black tracking-widest px-2.5 py-1 rounded-md shadow-sm">
+        {/* Floating Category Label & Star Rating */}
+        <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5">
+          <Badge className="bg-card/90 backdrop-blur-md text-foreground border border-border text-[9px] uppercase font-black tracking-widest px-3 py-1.5 rounded-xl shadow-md">
             {categoryName}
+          </Badge>
+          <Badge className="bg-[#FFC800] text-white border-none text-[9px] font-black tracking-wider px-2 py-1.5 rounded-xl shadow-md flex items-center gap-0.5">
+            ⭐ {prod.rating || "5.0"}
           </Badge>
         </div>
 
         {/* Floating Price & Discount Badge */}
-        <div className="absolute top-4.5 right-4.5 z-20 flex flex-col items-end gap-1.5">
+        <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-1.5">
           {promo.isFree ? (
-            <Badge className="bg-emerald-500 text-white border-none text-[9px] font-black tracking-wider px-2.5 py-1 rounded-md shadow-md uppercase">
+            <Badge className="bg-emerald-500 text-white border-none text-[9px] font-black tracking-widest px-3 py-1.5 rounded-xl shadow-md uppercase">
               Free
             </Badge>
           ) : (
             <>
               {promo.hasDiscount && (
-                <Badge className="bg-[#FF4B4B] text-white border-none text-[8.5px] font-black tracking-widest px-2 py-0.5 rounded-full uppercase shadow-sm">
+                <Badge className="bg-[#FF4B4B] text-white border-none text-[8.5px] font-black tracking-widest px-2.5 py-1 rounded-full uppercase shadow-md animate-pulse">
                   Save {prod.discountPercent}%
                 </Badge>
               )}
-              <Badge className="bg-foreground text-background border-none text-[10px] font-black tracking-tight px-3 py-1 rounded-md shadow-md">
+              <Badge className="bg-card/95 backdrop-blur-sm text-foreground border border-border text-[11px] font-black tracking-tight px-3 py-1.5 rounded-xl shadow-md">
                 ${(promo.effectivePrice / 100).toFixed(2)}
               </Badge>
             </>
@@ -191,23 +205,21 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
         </div>
       </Link>
       
-      <div className="flex flex-col flex-1 p-6 space-y-4">
+      <div className="flex flex-col flex-1 p-6 space-y-5 bg-card">
         <div className="space-y-2 flex-1">
-          <div className="space-y-1">
-            <Link href={`/products/${prod.slug}`}>
-              <h3 className="font-extrabold text-lg text-foreground tracking-tight line-clamp-1 group-hover:underline underline-offset-4 decoration-border transition-all">
-                {prod.title}
-              </h3>
-            </Link>
-          </div>
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed font-medium">
+          <Link href={`/products/${prod.slug}`}>
+            <h3 className="font-extrabold text-lg text-foreground tracking-tight line-clamp-1 group-hover:text-primary transition-colors leading-snug">
+              {prod.title}
+            </h3>
+          </Link>
+          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed font-bold opacity-85">
             {prod.shortDescription}
           </p>
           {prod.tags && (
-            <div className="flex flex-wrap gap-1.5 pt-1.5">
+            <div className="flex flex-wrap gap-1.5 pt-2">
               {prod.tags.split(",").slice(0, 3).map((tag: string) => (
-                <Badge key={tag} variant="outline" className="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-muted/30 text-muted-foreground border border-border/60">
-                  {tag.trim()}
+                <Badge key={tag} variant="outline" className="text-[8.5px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-muted/20 text-muted-foreground border border-border/40">
+                  #{tag.trim()}
                 </Badge>
               ))}
             </div>
@@ -215,18 +227,18 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-border/40">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-[9px] h-5 rounded-full border-border/60 text-muted-foreground font-mono">
+          <div className="flex items-center gap-1.5">
+            <Badge variant="outline" className="text-[8.5px] h-5.5 rounded-md border-border/40 text-muted-foreground font-mono font-bold">
               v{prod.version}
             </Badge>
             {prod.featured && (
-               <Badge variant="default" className="text-[9px] h-5 rounded-full px-1.5 uppercase font-black tracking-tighter">
+               <Badge variant="default" className="text-[8.5px] h-5.5 rounded-md px-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-white border-none uppercase font-black tracking-wider">
                   Pro
                </Badge>
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline" size="xs" className="h-8 px-2.5 uppercase tracking-widest text-[9px] font-bold rounded-lg cursor-pointer">
+            <Button asChild variant="outline" size="xs" className="h-8 px-3 uppercase tracking-widest text-[9px] font-black rounded-xl cursor-pointer">
               <Link href={`/products/${prod.slug}`}>Details</Link>
             </Button>
             <Button
@@ -234,9 +246,9 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
               disabled={inCart}
               variant={inCart ? "secondary" : "default"}
               size="xs"
-              className="h-8 px-2.5 font-bold uppercase tracking-widest text-[9px] rounded-lg transition-all cursor-pointer"
+              className="h-8 px-3.5 font-black uppercase tracking-widest text-[9px] rounded-xl transition-all cursor-pointer"
             >
-              {inCart ? "In Cart" : "Add to Cart"}
+              {inCart ? "In Cart" : "Get"}
             </Button>
           </div>
         </div>
