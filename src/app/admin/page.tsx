@@ -41,6 +41,14 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
   const [userCount] = await db.select({ count: sql<number>`count(*)` }).from(users);
   const totalUsers = userCount?.count || 0;
 
+  const [pendingCountQuery] = await db.select({ count: sql<number>`count(*)` }).from(products).where(eq(products.status, "pending"));
+  const pendingApprovals = pendingCountQuery?.count || 0;
+
+  const [creatorCountQuery] = await db.select({ count: sql<number>`count(*)` }).from(users).where(sql`store_name IS NOT NULL`);
+  const totalCreators = creatorCountQuery?.count || 0;
+
+  const aov = totalOrders > 0 ? (totalRevenue / totalOrders) : 0;
+
   // Fetch total count of orders for pagination
   const [totalOrdersCount] = await db
     .select({ count: sql<number>`count(*)` })
