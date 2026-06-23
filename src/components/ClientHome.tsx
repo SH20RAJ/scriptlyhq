@@ -450,9 +450,6 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
                   {item.text}
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-black text-xs text-primary">
-                    {item.initials}
-                  </div>
                   <div>
                     <h4 className="text-xs font-black text-foreground">{item.name}</h4>
                     <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">{item.role}</p>
