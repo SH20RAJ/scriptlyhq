@@ -187,7 +187,7 @@ export default function Home({ searchParams }: PageProps) {
                 placeholder="Search for SaaS templates, scripts, components..."
                 value={heroSearch}
                 onChange={(e) => setHeroSearch(e.target.value)}
-                className="w-full pl-14 pr-32 py-4.5 text-base font-semibold rounded-2xl border-2 border-border bg-card/60 backdrop-blur-md text-foreground placeholder:text-muted-foreground focus:outline-none transition-all shadow-[0_5px_0_var(--border)] dark:shadow-[0_5px_0_#2A3842] focus:translate-y-[2px] focus:shadow-[0_3px_0_var(--border)]"
+                className="w-full pl-16 pr-36 py-4 text-base font-semibold rounded-2xl border-2 border-border bg-card/60 backdrop-blur-md text-foreground placeholder:text-muted-foreground focus:outline-none transition-all shadow-[0_5px_0_var(--border)] dark:shadow-[0_5px_0_#2A3842] focus:translate-y-[2px] focus:shadow-[0_3px_0_var(--border)]"
               />
               <Search className="absolute left-5 w-6 h-6 text-muted-foreground group-focus-within:text-accent transition-colors" />
               <button
