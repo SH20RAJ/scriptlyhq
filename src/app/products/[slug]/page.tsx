@@ -124,7 +124,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const tagsList = product.tags ? product.tags.split(",").map((t) => t.trim()) : [];
   const screenshotsList = product.screenshots ? product.screenshots.split(",").map((s) => s.trim()) : [];
 
-  const htmlDescription = await marked.parse(product.description || "");
+  const customRenderer = new marked.Renderer();
+  customRenderer.link = function(token) {
+    return `<a href="${token.href}" title="${token.title || ""}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-600 underline">${token.text}</a>`;
+  };
+  const htmlDescription = await marked.parse(product.description || "", { renderer: customRenderer });
 
   const isTweet = product.videoUrl?.includes("twitter.com") || product.videoUrl?.includes("x.com");
   const tweetId = isTweet ? product.videoUrl?.match(/status\/(\d+)/)?.[1] : null;
