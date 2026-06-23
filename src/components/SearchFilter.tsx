@@ -163,7 +163,7 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
 
   return (
     <Card 
-      className={`border-border bg-card group overflow-hidden rounded-[2rem] flex flex-col h-full shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] hover:translate-y-[-6px] hover:shadow-[0_12px_0_var(--border)] active:translate-y-0.5 active:shadow-none transition-all duration-300 ${getCategoryColor(prod.category)}`}
+      className={`border-border bg-card group overflow-hidden rounded-[2rem] flex flex-col h-full shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] hover:translate-y-[-6px] hover:shadow-[0_12px_0_var(--border)] active:translate-y-0.5 active:shadow-none transition-all duration-300 p-0 ${getCategoryColor(prod.category)}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
