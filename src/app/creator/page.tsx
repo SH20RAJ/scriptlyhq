@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 export default async function CreatorConsolePage() {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/dashboard/creator");
+    redirect("/handler/sign-in?redirectTo=/creator");
   }
 
   // Fetch creator's products
@@ -87,7 +87,7 @@ export default async function CreatorConsolePage() {
           </p>
         </div>
         <Button asChild size="sm" className="rounded-xl h-10 px-5 font-black uppercase tracking-wider text-[10px] bg-[#58CC02] text-white hover:bg-[#58CC02]/90 cursor-pointer shadow-sm">
-          <Link href="/dashboard/creator/new">
+          <Link href="/creator/new">
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             List New Script
           </Link>
@@ -143,7 +143,7 @@ export default async function CreatorConsolePage() {
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed font-medium">
               You have not linked your bank account. Change your preferred payout method to **Direct Bank (via Razorpay Route)** and fill out your banking details.
-              <Link href="/dashboard/creator/payouts" className="inline-flex items-center gap-1 text-rose-600 dark:text-rose-400 hover:underline font-bold transition-all ml-1.5">
+              <Link href="/creator/payouts" className="inline-flex items-center gap-1 text-rose-600 dark:text-rose-400 hover:underline font-bold transition-all ml-1.5">
                 Setup Bank details <ArrowRight className="w-3 h-3" />
               </Link>
             </p>
@@ -213,7 +213,7 @@ export default async function CreatorConsolePage() {
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Creations Summary</h2>
-            <Link href="/dashboard/creator/products" className="text-[10px] font-black text-[#1CB0F6] uppercase tracking-widest hover:underline flex items-center gap-1">
+            <Link href="/creator/products" className="text-[10px] font-black text-[#1CB0F6] uppercase tracking-widest hover:underline flex items-center gap-1">
               View All <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -248,7 +248,7 @@ export default async function CreatorConsolePage() {
         <div className="lg:col-span-5 space-y-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Recent Activity</h2>
-            <Link href="/dashboard/creator/ledger" className="text-[10px] font-black text-[#1CB0F6] uppercase tracking-widest hover:underline flex items-center gap-1">
+            <Link href="/creator/ledger" className="text-[10px] font-black text-[#1CB0F6] uppercase tracking-widest hover:underline flex items-center gap-1">
               Ledger <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

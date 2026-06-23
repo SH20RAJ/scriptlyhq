@@ -248,7 +248,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
           if (!isEdit) {
             localStorage.removeItem("scriptlystore_new_product_draft");
           }
-          router.push(isCreatorConsole ? "/dashboard/creator" : "/admin/products");
+          router.push(isCreatorConsole ? "/creator" : "/admin/products");
           router.refresh();
         }
       } catch (err: any) {
@@ -265,7 +265,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
       <div className="flex items-center justify-between border-b border-neutral-900 pb-5">
         <div className="flex items-center gap-6">
           <Link
-            href={isCreatorConsole ? "/dashboard/creator" : "/admin/products"}
+            href={isCreatorConsole ? "/creator" : "/admin/products"}
             className="inline-flex items-center text-sm font-semibold text-neutral-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

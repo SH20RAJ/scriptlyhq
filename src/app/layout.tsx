@@ -74,15 +74,22 @@ export const viewport = {
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import BlogNavbar from "../components/BlogNavbar";
+import BlogFooter from "../components/BlogFooter";
+import { headers } from "next/headers";
 import { stack } from "../lib/stack";
 import { CartProvider } from "../components/CartContext";
 import { ThemeProvider } from "../components/ThemeProvider";
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const headersList = await headers();
+	const pathname = headersList.get("x-pathname") || "";
+	const isBlog = pathname.startsWith("/blog");
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
@@ -113,11 +120,11 @@ export default function RootLayout({
 					<HexclaveProvider app={stack}>
 						<HexclaveTheme>
 							<CartProvider>
-								<Navbar />
+								{isBlog ? <BlogNavbar /> : <Navbar />}
 								<main className="flex-1">
 									{children}
 								</main>
-								<Footer />
+								{isBlog ? <BlogFooter /> : <Footer />}
 							</CartProvider>
 						</HexclaveTheme>
 					</HexclaveProvider>

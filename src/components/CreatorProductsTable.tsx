@@ -183,7 +183,7 @@ export default function CreatorProductsTable({ products }: CreatorProductsTableP
                           <Eye className="w-4 h-4" />
                         </Link>
                         <Link
-                          href={`/dashboard/creator/${p.id}/edit`}
+                          href={`/creator/${p.id}/edit`}
                           className="p-2 text-neutral-400 hover:text-white bg-neutral-800/40 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-xl transition-all"
                           title="Edit Script"
                         >

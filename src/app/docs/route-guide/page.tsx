@@ -136,7 +136,7 @@ export default function RouteGuidePage() {
                 <div className="space-y-1">
                   <h4 className="font-bold text-white text-sm">Submit Bank Account Details</h4>
                   <p className="text-xs">
-                    Go to your <Link href="/dashboard/creator" className="text-purple-400 underline hover:text-purple-300">Creator Console</Link> and find the **Payout & Split Settings** editor. Select **Direct Bank (via Razorpay Route)** as your payout method. Fill in your Bank Name, Beneficiary Name, Account Number, and IFSC Code accurately.
+                    Go to your <Link href="/creator" className="text-purple-400 underline hover:text-purple-300">Creator Console</Link> and find the **Payout & Split Settings** editor. Select **Direct Bank (via Razorpay Route)** as your payout method. Fill in your Bank Name, Beneficiary Name, Account Number, and IFSC Code accurately.
                   </p>
                 </div>
               </div>

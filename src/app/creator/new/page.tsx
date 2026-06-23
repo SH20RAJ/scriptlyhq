@@ -6,15 +6,15 @@ export const metadata: Metadata = {
   title: "Submit New Product",
 };
 
-import { getCategoriesAction, getSubcategoriesAction } from "../../../../lib/actions/products";
-import { getOrCreateDbUser } from "../../../../lib/auth-utils";
-import ProductForm from "../../../../components/ProductForm";
+import { getCategoriesAction, getSubcategoriesAction } from "../../../lib/actions/products";
+import { getOrCreateDbUser } from "../../../lib/auth-utils";
+import ProductForm from "../../../components/ProductForm";
 import { redirect } from "next/navigation";
 
 export default async function CreatorNewScriptPage() {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/dashboard/creator/new");
+    redirect("/handler/sign-in?redirectTo=/creator/new");
   }
 
   const categoriesList = await getCategoriesAction();

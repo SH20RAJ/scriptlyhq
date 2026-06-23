@@ -15,32 +15,32 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   {
     name: "Overview",
-    href: "/dashboard/creator",
+    href: "/creator",
     icon: LayoutGrid,
   },
   {
     name: "Creations",
-    href: "/dashboard/creator/products",
+    href: "/creator/products",
     icon: Package,
   },
   {
     name: "Store Branding",
-    href: "/dashboard/creator/store",
+    href: "/creator/store",
     icon: Store,
   },
   {
     name: "Bank & Payouts",
-    href: "/dashboard/creator/payouts",
+    href: "/creator/payouts",
     icon: Coins,
   },
   {
     name: "Coupons",
-    href: "/dashboard/creator/coupons",
+    href: "/creator/coupons",
     icon: Gift,
   },
   {
     name: "Sales Ledger",
-    href: "/dashboard/creator/ledger",
+    href: "/creator/ledger",
     icon: Activity,
   },
 ];

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default async function CreatorLedgerPage() {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/dashboard/creator/ledger");
+    redirect("/handler/sign-in?redirectTo=/creator/ledger");
   }
 
   // Fetch creator's products

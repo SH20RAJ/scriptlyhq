@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default async function CreatorProductsPage() {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/dashboard/creator/products");
+    redirect("/handler/sign-in?redirectTo=/creator/products");
   }
 
   // Fetch creator's products
@@ -43,7 +43,7 @@ export default async function CreatorProductsPage() {
           </p>
         </div>
         <Button asChild size="sm" className="rounded-xl h-10 px-5 font-black uppercase tracking-wider text-[10px] bg-[#58CC02] text-white hover:bg-[#58CC02]/90 cursor-pointer shadow-sm">
-          <Link href="/dashboard/creator/new">
+          <Link href="/creator/new">
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             List New Script
           </Link>

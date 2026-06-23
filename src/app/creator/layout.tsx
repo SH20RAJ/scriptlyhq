@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 import Link from "next/link";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
-import { CyberBackground } from "../../../components/ui/CyberBackground";
+import { CyberBackground } from "../../components/ui/CyberBackground";
 import {
   LayoutGrid,
   Package,
@@ -27,7 +27,7 @@ export default async function CreatorDashboardLayout({
 }) {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/dashboard/creator");
+    redirect("/handler/sign-in?redirectTo=/creator");
   }
 
   return (

@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   title: "Edit Product",
 };
 
-import { db } from "../../../../../db";
-import { products } from "../../../../../db/schema";
+import { db } from "../../../../db";
+import { products } from "../../../../db/schema";
 import { eq } from "drizzle-orm";
-import { getCategoriesAction, getSubcategoriesAction } from "../../../../../lib/actions/products";
-import { getOrCreateDbUser } from "../../../../../lib/auth-utils";
-import ProductForm from "../../../../../components/ProductForm";
+import { getCategoriesAction, getSubcategoriesAction } from "../../../../lib/actions/products";
+import { getOrCreateDbUser } from "../../../../lib/auth-utils";
+import ProductForm from "../../../../components/ProductForm";
 import { notFound, redirect } from "next/navigation";
 
 interface PageProps {
@@ -23,7 +23,7 @@ interface PageProps {
 export default async function CreatorEditScriptPage({ params }: PageProps) {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/dashboard/creator");
+    redirect("/handler/sign-in?redirectTo=/creator");
   }
 
   const { id } = await params;

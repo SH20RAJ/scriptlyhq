@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default async function CreatorCouponsPage() {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/dashboard/creator/coupons");
+    redirect("/handler/sign-in?redirectTo=/creator/coupons");
   }
 
   // Fetch creator's specific store coupons

@@ -398,7 +398,7 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
 
           <div className="relative z-10 flex flex-col sm:flex-row gap-4 w-full md:w-auto items-center shrink-0">
             <Button asChild size="xl" className="w-full sm:w-auto font-black shadow-[0_5px_0_#46A302]">
-              <Link href="/dashboard/creator/products">
+              <Link href="/creator/products">
                 🚀 List Your Code
               </Link>
             </Button>

@@ -25,7 +25,7 @@ export async function updateCreatorStoreNameAction(storeName: string) {
     })
     .where(eq(users.id, user.id));
 
-  revalidatePath("/dashboard/creator");
+  revalidatePath("/creator");
   return { success: true };
 }
 
@@ -77,7 +77,7 @@ export async function createCreatorCouponAction(formData: FormData) {
     creatorId: user.id, // Linked specifically to this creator's items!
   });
 
-  revalidatePath("/dashboard/creator");
+  revalidatePath("/creator");
   return { success: true };
 }
 
@@ -97,7 +97,7 @@ export async function deleteCreatorCouponAction(couponId: string) {
 
   await db.delete(coupons).where(eq(coupons.id, couponId));
 
-  revalidatePath("/dashboard/creator");
+  revalidatePath("/creator");
   return { success: true };
 }
 
@@ -142,6 +142,6 @@ export async function updateCreatorPayoutSettingsAction(
     })
     .where(eq(users.id, user.id));
 
-  revalidatePath("/dashboard/creator");
+  revalidatePath("/creator");
   return { success: true };
 }
