@@ -9,7 +9,7 @@ import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import ProductCheckout from "../../../components/ProductCheckout";
 import Link from "next/link";
 import { getProductEffectivePrice } from "../../../lib/price-utils";
-import { ArrowLeft, ExternalLink, ShieldCheck, Zap } from "lucide-react";
+import { ArrowLeft, ExternalLink, ShieldCheck, Zap, Download, RefreshCw, Headphones, Lock, CheckCircle2 } from "lucide-react";
 import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import TweetEmbed from "../../../components/TweetEmbed";
 import ProductScreenshots from "../../../components/ProductScreenshots";
 import ProductMediaSwitcher from "../../../components/ProductMediaSwitcher";
 import ProductRating from "../../../components/ProductRating";
+import { CyberBackground } from "../../../components/ui/CyberBackground";
 
 
 interface PageProps {
@@ -160,6 +161,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           })
         }}
       />
+      <CyberBackground />
       <div className="container max-w-7xl mx-auto px-4 py-8">
         <Button asChild variant="ghost" size="sm" className="-ml-3 text-muted-foreground hover:text-foreground mb-8">
           <Link href="/">
@@ -305,6 +307,37 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   )}
 
                   <ShareButton productTitle={product.title} productSlug={product.slug} />
+                </div>
+
+                {/* High-Conversion Inclusions Box */}
+                <div className="p-6 border-2 border-border bg-card/65 backdrop-blur-md shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] rounded-[2rem] space-y-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-foreground border-b border-border/40 pb-2.5 flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-primary" /> Purchase Inclusions
+                  </h4>
+                  <ul className="space-y-3 text-xs font-bold text-muted-foreground">
+                    <li className="flex items-start gap-2.5">
+                      <Download className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                      <span>Instant Secure Download (Access files immediately after checkout)</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                      <span>100% Audited & Verified Codebase (Safe and zero malware)</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <RefreshCw className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
+                      <span>Lifetime Access & Free Updates (No recurring fees)</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <Headphones className="w-4 h-4 text-[#FF9600] shrink-0 mt-0.5" />
+                      <span>Premium Developer Support (Dedicated creator help desk)</span>
+                    </li>
+                  </ul>
+                  
+                  <div className="pt-2 border-t border-border/30 flex items-center justify-between text-[10px] text-muted-foreground uppercase font-black tracking-widest">
+                    <span className="flex items-center gap-1">
+                      <Lock className="w-3.5 h-3.5 text-emerald-500" /> Secure 256-bit SSL Checkout
+                    </span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
