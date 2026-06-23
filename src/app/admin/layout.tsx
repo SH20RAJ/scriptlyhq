@@ -8,6 +8,7 @@ import { db } from "../../db";
 import { products } from "../../db/schema";
 import { eq, sql } from "drizzle-orm";
 import type { Metadata } from "next";
+import { CyberBackground } from "../../components/ui/CyberBackground";
 
 export const metadata: Metadata = {
   title: "Admin Console",
@@ -34,10 +35,11 @@ export default async function AdminLayout({
   const pendingCount = pendingCountResult?.count || 0;
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen bg-background text-foreground relative overflow-hidden">
+      <CyberBackground />
       
       {/* Admin Sidebar */}
-      <aside className="w-64 border-r border-border bg-card/30 flex flex-col justify-between flex-shrink-0">
+      <aside className="w-64 border-r border-border/40 bg-card/25 backdrop-blur-xl flex flex-col justify-between flex-shrink-0 relative z-10">
         <div className="p-6 space-y-8">
           <div className="flex items-center space-x-2 text-foreground font-semibold tracking-tight uppercase text-xs">
             <ShieldAlert className="w-4 h-4" />
@@ -116,7 +118,7 @@ export default async function AdminLayout({
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-12">
+      <main className="flex-1 overflow-y-auto p-12 relative z-10">
         {children}
       </main>
     </div>

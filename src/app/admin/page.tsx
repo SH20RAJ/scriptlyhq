@@ -9,11 +9,13 @@ export const metadata: Metadata = {
 import { db } from "../../db";
 import { products, orders, users } from "../../db/schema";
 import { eq, sql, desc } from "drizzle-orm";
-import { Package, DollarSign, CreditCard, Clock, TrendingUp, Users } from "lucide-react";
+import { Package, DollarSign, CreditCard, Clock, TrendingUp, Users, ShieldAlert } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 import { ProductPagination } from "../../components/ProductPagination";
 
@@ -83,21 +85,39 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
         <p className="text-sm text-muted-foreground font-medium">Business performance and marketplace analytics.</p>
       </div>
 
+      {pendingApprovals > 0 && (
+        <div className="flex items-center justify-between p-5 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-500 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <ShieldAlert className="w-5 h-5 animate-pulse text-rose-400" />
+            <div className="space-y-0.5">
+              <p className="text-sm font-bold text-white uppercase tracking-wider">Pending Script Approvals</p>
+              <p className="text-xs text-rose-400/80 font-semibold">There are {pendingApprovals} script submissions awaiting review.</p>
+            </div>
+          </div>
+          <Button asChild size="sm" variant="outline" className="border-rose-500/20 text-rose-400 hover:bg-rose-500/10 hover:text-white rounded-xl">
+            <Link href="/admin/approvals">Moderate Submissions</Link>
+          </Button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-border/50 bg-card/50 rounded-2xl">
+        <Card className="border-border/50 bg-card/45 rounded-2xl backdrop-blur-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-6">
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Revenue</CardTitle>
             <DollarSign className="w-4 h-4 text-emerald-500" />
           </CardHeader>
           <CardContent className="p-6 pt-0">
             <div className="text-2xl font-black tracking-tight">${(totalRevenue / 100).toFixed(2)}</div>
-            <p className="text-[10px] text-emerald-500 font-bold mt-1 flex items-center gap-1">
-               <TrendingUp className="w-3 h-3" /> Net Earnings
-            </p>
+            <div className="mt-1 flex items-center justify-between text-[10px] text-emerald-500 font-bold">
+              <span className="flex items-center gap-1">
+                 <TrendingUp className="w-3 h-3" /> Net Earnings
+              </span>
+              <span className="text-muted-foreground">AOV: ${(aov / 100).toFixed(2)}</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border/50 bg-card/50 rounded-2xl">
+        <Card className="border-border/50 bg-card/45 rounded-2xl backdrop-blur-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-6">
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Volume</CardTitle>
             <CreditCard className="w-4 h-4 text-primary" />
@@ -108,7 +128,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-border/50 bg-card/50 rounded-2xl">
+        <Card className="border-border/50 bg-card/45 rounded-2xl backdrop-blur-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-6">
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Catalog</CardTitle>
             <Package className="w-4 h-4 text-amber-500" />
@@ -119,14 +139,17 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-border/50 bg-card/50 rounded-2xl">
+        <Card className="border-border/50 bg-card/45 rounded-2xl backdrop-blur-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-6">
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Base</CardTitle>
             <Users className="w-4 h-4 text-blue-500" />
           </CardHeader>
           <CardContent className="p-6 pt-0">
             <div className="text-2xl font-black tracking-tight">{totalUsers}</div>
-            <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase tracking-wider">Registered Users</p>
+            <div className="mt-1 flex items-center justify-between text-[10px] text-blue-500 font-bold">
+              <span className="uppercase tracking-wider">Registered Users</span>
+              <span className="text-muted-foreground">Creators: {totalCreators}</span>
+            </div>
           </CardContent>
         </Card>
       </div>

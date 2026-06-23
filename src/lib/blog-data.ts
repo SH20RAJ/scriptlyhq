@@ -1311,5 +1311,268 @@ ScriptlyStore provides clear transaction records for your sales. We recommend co
 
 #### What's the best way to market my digital products?
 Build in public! Share your progress on Twitter/X, write blog posts about the technical challenges you solved (like this one!), and engage with developer communities on Discord and Reddit.`
+  },
+  {
+    slug: "unlocking-nextjs-15-react-19-features",
+    title: "Unlocking Next.js 15 and React 19: Server Actions, Async Components, and Optimistic UI",
+    excerpt: "Dive deep into the new paradigms of React 19 and Next.js 15. Learn how to implement Server Actions, handle async form submissions, and use the useOptimistic hook.",
+    category: "SaaS",
+    readTime: "12 min read",
+    createdAt: "2026-06-22",
+    thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=600&auto=format&fit=crop",
+    author: {
+      name: "Team",
+      role: "ScriptlyStore Core Engine"
+    },
+    content: `React 19 and Next.js 15 have finalized server-centric APIs that fundamentally change how we build web applications. By merging the boundaries between the server and the client, these updates allow developers to build incredibly fast, responsive, and secure applications with less boilerplate.
+
+This guide explores the key paradigms introduced in this release and provides step-by-step instructions on implementing Server Actions, async transitions, and optimistic state updates in your SaaS applications.
+
+---
+
+### Key React 19 & Next.js 15 Upgrades
+
+| Feature | Pre-React 19 | React 19 / Next.js 15 | Benefit |
+|---|---|---|---|
+| **Data Mutations** | API Route handlers + fetch | Server Actions (\`'use server'\`) | No endpoint configuration, type safety |
+| **Pending States** | Manual \`isLoading\` states | \`useTransition\` / Actions | Declarative loading states |
+| **Optimistic Updates** | Complex state logic | \`useOptimistic\` hook | Instant user feedback on slow networks |
+| **Component Fetching** | Client-side \`useEffect\` | Async Server Components | Zero client-side JavaScript, direct database queries |
+
+---
+
+### Step 1: Writing Your First Server Action
+Server Actions allow you to define server-side logic that can be invoked directly from client-side components. They are secure, type-safe, and automatically handle POST requests behind the scenes.
+
+Create an action file at \`src/lib/actions/products.ts\`:
+\`\`\`typescript
+'use server';
+
+import { db } from "@/db";
+import { products } from "@/db/schema";
+import { revalidatePath } from "next/cache";
+
+export async function updateProductPrice(productId: string, newPricePaise: number) {
+  try {
+    // Perform authorization checks on the server
+    const user = await checkUserAuth();
+    if (!user || user.role !== 'admin') {
+      throw new Error("Unauthorized");
+    }
+
+    await db
+      .update(products)
+      .set({ price: newPricePaise })
+      .where(eq(products.id, productId));
+
+    revalidatePath("/admin/products");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+\`\`\`
+
+---
+
+### Step 2: Using the Action in a Form with useActionState
+React 19 introduces \`useActionState\` (formerly \`useFormState\`) to manage form actions with built-in pending state indicators.
+
+\`\`\`typescript
+'use client';
+
+import { useActionState } from "react";
+import { updateProductPrice } from "@/lib/actions/products";
+
+export function PriceEditor({ productId, currentPrice }: { productId: string; currentPrice: number }) {
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: any, formData: FormData) => {
+      const price = Number(formData.get("price")) * 100;
+      const res = await updateProductPrice(productId, price);
+      return res;
+    },
+    null
+  );
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="number" name="price" defaultValue={currentPrice / 100} className="border p-2 rounded" />
+      <button type="submit" disabled={isPending} className="bg-primary text-white p-2 rounded">
+        {isPending ? "Saving..." : "Update Price"}
+      </button>
+      {state && !state.success && <p className="text-red-500">{state.error}</p>}
+    </form>
+  );
+}
+\`\`\`
+
+---
+
+### Step 3: Implementing Optimistic UI Updates
+For the ultimate premium experience, use the \`useOptimistic\` hook to update the UI instantly before the server acknowledges the transaction.
+
+\`\`\`typescript
+'use client';
+
+import { useOptimistic, startTransition } from "react";
+import { updateProductPrice } from "@/lib/actions/products";
+
+export function OptimisticPrice({ productId, initialPrice }: { productId: string; initialPrice: number }) {
+  const [optimisticPrice, setOptimisticPrice] = useOptimistic(
+    initialPrice,
+    (state, newPrice: number) => newPrice
+  );
+
+  const handleUpdate = async (formData: FormData) => {
+    const newPrice = Number(formData.get("price")) * 100;
+    
+    // Instantly update UI optimistically
+    startTransition(() => {
+      setOptimisticPrice(newPrice);
+    });
+
+    // Run actual server update
+    await updateProductPrice(productId, newPrice);
+  };
+
+  return (
+    <form action={handleUpdate} className="flex gap-2">
+      <span className="font-bold">Price: \`\$\${(optimisticPrice / 100).toFixed(2)}\`</span>
+      <input type="number" name="price" placeholder="New price" className="border px-2 py-1 text-xs" />
+      <button type="submit" className="bg-blue-500 text-white text-xs px-2 py-1">Save</button>
+    </form>
+  );
+}
+\`\`\`
+
+> **🚀 Build Production SaaS Instantly**
+> React 19 and Next.js 15 bring unmatched developer velocity, but configuring routers, components, and server logic from scratch takes time. Skip the setup and launch your SaaS over a single weekend with our [Next.js React Mobile Boilerplate](https://scriptly.store/products/react-native-expo-mobile-boilerplate) or browse our [SaaS Templates](https://scriptly.store/?category=saas-templates).
+`
+  },
+  {
+    slug: "neon-postgres-branching-migrations-cicd",
+    title: "Database Branching with Neon Postgres: Master Your CI/CD Schema Migrations",
+    excerpt: "Learn how to use Neon database branching to create isolated preview environments, run schema migrations automatically in GitHub Actions, and reduce deployment risks.",
+    category: "Databases",
+    readTime: "14 min read",
+    createdAt: "2026-06-20",
+    thumbnail: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80&w=600&auto=format&fit=crop",
+    author: {
+      name: "Team",
+      role: "ScriptlyStore Core Engine"
+    },
+    content: `Relational database schema changes have historically been the most nerve-wracking part of deploying web applications. If a migration goes wrong, it can lock tables, corrupt production data, or crash your service.
+
+With Neon Postgres, the concept of **Database Branching** eliminates this risk. Just like git branching, Neon lets you create copy-on-write database branches in seconds, allowing you to run migrations on isolated copies of production data before pushing changes live.
+
+This guide outlines how to configure Drizzle migrations, automate preview branch creation in GitHub Actions, and achieve zero-downtime schema deployments.
+
+---
+
+### The Database Branching Paradigm
+
+| Deployment Phase | Traditional Database | Neon Postgres Branching | Risk Level |
+|---|---|---|---|
+| **Local Development** | Shared staging or local SQLite | Isolated dev branch cloned from prod | Low |
+| **Pull Request Review** | None (untested db state) | Ephemeral PR branch with actual schemas | Low |
+| **Migration Testing** | Staging migrations, manual checks | Run migrations against copy of prod | Low |
+| **Production Rollout** | Run migration directly on live DB | Apply validated SQL schema to Main branch | Medium |
+
+---
+
+### Step 1: Configuring Drizzle Kit for Migrations
+First, ensure Drizzle Kit is configured to generate and output migrations into your project.
+
+Create a \`drizzle.config.ts\` file:
+\`\`\`typescript
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./src/db/schema.ts",
+  out: "./src/db/migrations",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+\`\`\`
+
+Generate your migration files:
+\`\`\`bash
+npx drizzle-kit generate
+\`\`\`
+
+This command outputs SQL migration files under \`src/db/migrations/\`.
+
+---
+
+### Step 2: Setting Up Neon CLI for Branching
+Using the Neon CLI, you can create a temporary branch for testing migrations in your CI pipeline.
+
+1. Install the Neon CLI:
+   \`\`\`bash
+   npm install -g @neondatabase/api-client
+   \`\`\`
+2. Create a branch of your production database:
+   \`\`\`bash
+   neon branches create --project-id <project-id> --name pr-preview-db --parent main
+   \`\`\`
+This creates a new connection string representing an isolated database containing a copy of your main schema and data.
+
+---
+
+### Step 3: Automating PR Migrations in GitHub Actions
+By combining Neon database branching with GitHub Actions, you can run migrations automatically on every pull request. If the migrations run successfully, the PR passes. If they fail, the PR fails, protecting your production database.
+
+\`\`\`yaml
+name: Test Database Migrations
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create Neon Database Branch
+        id: create-branch
+        run: |
+          # Use Neon API to create branch and get connection string
+          CONNECTION_STRING=$(curl -X POST "https://console.neon.tech/api/v2/projects/\${{ secrets.NEON_PROJECT_ID }}/branches" \\
+            -H "Authorization: Bearer \${{ secrets.NEON_API_KEY }}" \\
+            -H "Content-Type: application/json" \\
+            -d '{"branch": {"name": "pr-\${{ github.event.number }}-db", "parent_id": "main"}}' \\
+            | jq -r '.connection_uri')
+          echo "DATABASE_URL=\$CONNECTION_STRING" >> \$GITHUB_ENV
+
+      - name: Run Schema Migrations
+        run: npx drizzle-kit migrate
+        
+      - name: Delete Neon Branch
+        if: always()
+        run: |
+          curl -X DELETE "https://console.neon.tech/api/v2/projects/\${{ secrets.NEON_PROJECT_ID }}/branches/pr-\${{ github.event.number }}-db" \\
+            -H "Authorization: Bearer \${{ secrets.NEON_API_KEY }}"
+\`\`\`
+
+---
+
+### Best Practices for Zero-Downtime SQL Migrations
+Even with branching, follow these rules to ensure your app stays online during schema changes:
+1. **Never Rename Columns**: Instead, add a new column, dual-write to both columns in your app code, backfill existing records, and then drop the old column.
+2. **Add Columns with Defaults**: Always allow new columns to be NULL or supply a DEFAULT value so that older versions of your application code can still write to the database.
+3. **Use Indexes Carefully**: Creating indexes can lock tables. In Postgres, always run index creation using the \`CONCURRENTLY\` keyword to prevent blocking reads and writes.
+
+> **⚡ Deploy High-Performance Serverless Apps**
+> database bottlenecks and slow queries are a thing of the past when combining Neon with edge runtimes. Get a pre-configured, production-ready backend stack. Buy our premium [Node.js REST API Express Starter](https://scriptly.store/products/node-js-rest-api-express-starter) or browse our [Scripts Collection](https://scriptly.store/?category=scripts).
+`
   }
 ];
