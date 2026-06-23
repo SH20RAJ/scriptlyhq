@@ -5,11 +5,16 @@ import SearchFilter, { ProductCard } from "../components/SearchFilter";
 import { ProductPagination } from "../components/ProductPagination";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Cpu, HelpCircle, HeartHandshake, Layers, Tags, ChevronRight, ArrowRight } from "lucide-react";
+import { 
+  Sparkles, Cpu, HelpCircle, HeartHandshake, Layers, Tags, 
+  ChevronRight, ArrowRight, Terminal, Palette, Bot, BookOpen, 
+  Search, Star, Zap, ShieldCheck, Coins, LayoutGrid 
+} from "lucide-react";
 import { getProductEffectivePrice } from "../lib/price-utils";
 import { CyberBackground } from "../components/ui/CyberBackground";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface PageProps {
   searchParams: Promise<{
@@ -23,8 +28,11 @@ interface PageProps {
 }
 
 export default function Home({ searchParams }: PageProps) {
+  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [resolvedParams, setResolvedParams] = useState<any>(null);
+  const [heroSearch, setHeroSearch] = useState("");
+  const [activeTab, setActiveTab] = useState<"featured" | "newest" | "free">("featured");
 
   useEffect(() => {
     async function load() {
@@ -37,7 +45,7 @@ export default function Home({ searchParams }: PageProps) {
       const currentSortBy = params.sortBy || "newest";
       const currentPage = parseInt(params.page || "1");
 
-      const [productsData, featuredData, categories, subcategories] = await Promise.all([
+      const [productsData, featuredData, freeData, categories, subcategories] = await Promise.all([
         getProductsAction({
           category: currentCategory,
           subcategory: currentSubcategory,
@@ -49,8 +57,13 @@ export default function Home({ searchParams }: PageProps) {
         }),
         getProductsAction({
           priceType: "paid",
-          limit: 3,
+          limit: 6,
           sortBy: "rating",
+        }),
+        getProductsAction({
+          priceType: "free",
+          limit: 6,
+          sortBy: "newest",
         }),
         getCategoriesAction(),
         getSubcategoriesAction()
@@ -60,6 +73,7 @@ export default function Home({ searchParams }: PageProps) {
         productsList: productsData.products,
         totalPages: productsData.totalPages,
         featuredPremiumList: featuredData.products,
+        freeProductsList: freeData.products,
         categoriesList: categories,
         subcategoriesList: subcategories,
         currentCategory,
@@ -74,525 +88,428 @@ export default function Home({ searchParams }: PageProps) {
   }, [searchParams]);
 
   if (!data) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+    <div className="flex items-center justify-center min-h-[80vh] bg-background">
+      <div className="relative">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <div className="absolute inset-0 w-12 h-12 border-4 border-accent/20 rounded-full pointer-events-none" />
+      </div>
     </div>
   );
 
   const { 
-    productsList, totalPages, featuredPremiumList, categoriesList, 
+    productsList, totalPages, featuredPremiumList, freeProductsList, categoriesList, 
     subcategoriesList, currentCategory, currentSubcategory, 
     currentSearch, currentPriceType, currentSortBy, currentPage 
   } = data;
 
-  const featuredProducts = productsList.filter((p: any) => p.featured);
-  const regularProducts = productsList.filter((p: any) => !p.featured);
+  const handleHeroSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (heroSearch.trim()) {
+      router.push(`/search?search=${encodeURIComponent(heroSearch.trim())}`);
+    }
+  };
+
+  const getCategoryIcon = (slug: string) => {
+    switch(slug) {
+      case "scripts": return <Terminal className="w-6 h-6 text-[#1CB0F6]" />;
+      case "saas-templates": return <Zap className="w-6 h-6 text-[#58CC02]" />;
+      case "design-assets": return <Palette className="w-6 h-6 text-[#CE82FF]" />;
+      case "ai-prompts": return <Bot className="w-6 h-6 text-[#FFC800]" />;
+      case "ebooks": return <BookOpen className="w-6 h-6 text-[#FF9600]" />;
+      default: return <LayoutGrid className="w-6 h-6 text-primary" />;
+    }
+  };
+
+  const getCategoryTheme = (slug: string) => {
+    switch(slug) {
+      case "scripts": return "hover:border-[#1CB0F6]/40 hover:shadow-[#1CB0F6]/5 text-[#1CB0F6]";
+      case "saas-templates": return "hover:border-[#58CC02]/40 hover:shadow-[#58CC02]/5 text-[#58CC02]";
+      case "design-assets": return "hover:border-[#CE82FF]/40 hover:shadow-[#CE82FF]/5 text-[#CE82FF]";
+      case "ai-prompts": return "hover:border-[#FFC800]/40 hover:shadow-[#FFC800]/5 text-[#FFC800]";
+      case "ebooks": return "hover:border-[#FF9600]/40 hover:shadow-[#FF9600]/5 text-[#FF9600]";
+      default: return "hover:border-primary/40 hover:shadow-primary/5 text-primary";
+    }
+  };
 
   return (
-    <div className="flex flex-col min-h-screen text-foreground relative">
+    <div className="flex flex-col min-h-screen text-foreground relative bg-background">
       <CyberBackground />
 
-      {/* Main Content Area */}
-      <div className="container max-w-7xl mx-auto px-4 py-8 space-y-12">
-        
-        {/* Content-Only Hero Section */}
-        <header className="py-12 space-y-10 max-w-5xl mx-auto overflow-hidden">
-          <div className="text-center max-w-3xl mx-auto space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground font-sans leading-[1.1]">
-                Ready-To-Use <span className="text-primary">Digital Products</span> & <span className="text-[#1CB0F6]">Developer Scripts</span>
-              </h1>
-            </motion.div>
-            
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
+      {/* 1. High-Impact Hero Section */}
+      <section className="relative overflow-hidden pt-16 pb-20 md:pt-24 md:pb-28">
+        <div className="container max-w-7xl mx-auto px-4 text-center relative z-10 space-y-8">
+          
+          {/* Neon Floating Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-card border-2 border-border shadow-[0_3px_0_var(--border)] dark:shadow-[0_3px_0_#2A3842]"
+          >
+            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+              DEVELOPER-FIRST MARKETPLACE & PLATFORM
+            </span>
+          </motion.div>
+
+          {/* Main Title & Subtitle */}
+          <div className="max-w-4xl mx-auto space-y-4">
+            <motion.h1 
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-sm md:text-lg text-muted-foreground font-bold leading-relaxed max-w-2xl mx-auto"
+              className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter leading-[1.05]"
             >
-              Ship 10x faster with verified full-stack boilerplates, browser extensions, automation bots, and system prompts.
-            </motion.p>
-
-            {/* Centered Premium/Free Switcher */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
+              Buy & Sell <span className="bg-gradient-to-r from-primary via-[#1CB0F6] to-[#CE82FF] bg-clip-text text-transparent">Production-Ready</span> Code
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex items-center justify-center gap-4 pt-6"
+              className="text-base sm:text-xl text-muted-foreground font-bold max-w-2xl mx-auto leading-relaxed"
             >
-              <Link 
-                href="/" 
-                className="px-8 py-4 bg-primary text-white border-2 border-primary rounded-2xl text-[12px] font-black uppercase tracking-wider transition-all shadow-[0_5px_0_#46A302] hover:-translate-y-0.5 active:translate-y-[4px] active:shadow-none cursor-pointer"
-              >
-                💎 Premium Marketplace
-              </Link>
-              <Link 
-                href="/free" 
-                className="px-8 py-4 bg-card/50 backdrop-blur-md text-muted-foreground border-2 border-border rounded-2xl text-[12px] font-black uppercase tracking-wider transition-all shadow-[0_5px_0_var(--border)] hover:-translate-y-0.5 active:translate-y-[4px] active:shadow-none cursor-pointer"
-              >
-                🎁 Free Scripts
-              </Link>
-            </motion.div>
+              Ship your SaaS apps, extensions, and bots in minutes using pre-built templates. Keep 95% of your earnings when you sell.
+            </motion.p>
           </div>
 
-          {/* Featured Content Posts */}
-          {featuredPremiumList && featuredPremiumList.length > 0 && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="space-y-6 pt-10"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4 flex-1">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#CE82FF] flex items-center gap-1.5 whitespace-nowrap">
-                    <Sparkles className="w-3.5 h-3.5 text-[#CE82FF] animate-pulse" />
-                    Featured Premium Releases
-                  </h3>
-                  <div className="h-px flex-1 bg-gradient-to-r from-border/40 to-transparent" />
-                  <Link 
-                    href="/featured" 
-                    className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5"
-                  >
-                    View All <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {featuredPremiumList.map((post: any, idx: number) => {
-                  const promo = getProductEffectivePrice(post);
-                  return (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.1 }}
-                    >
-                      <Link
-                        href={`/products/${post.slug}`}
-                        className="group flex flex-col bg-card/30 backdrop-blur-md border-2 border-white/5 hover:border-primary/40 rounded-3xl overflow-hidden transition-all duration-300 shadow-xl hover:shadow-primary/5 hover:-translate-y-1 active:translate-y-0"
-                      >
-                        <div className="aspect-[16/10] w-full overflow-hidden relative border-b border-white/5 bg-muted">
-                          <img
-                            src={post.thumbnail || "/placeholder.jpg"}
-                            alt={post.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                          />
-                          {/* Rating Badge */}
-                          <span className="absolute top-4 left-4 bg-background/90 backdrop-blur-md text-foreground text-[10px] font-black uppercase px-3 py-1.5 rounded-xl border border-white/10 shadow-lg flex items-center gap-1">
-                            ⭐ {post.rating}
-                          </span>
-                          {/* Discount Badge */}
-                          {promo.hasDiscount && (
-                            <span className="absolute top-4 right-4 bg-[#FF4B4B] text-white text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider shadow-lg">
-                              SAVE {post.discountPercent}%
-                            </span>
-                          )}
-                        </div>
-                        <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
-                          <div className="space-y-3">
-                            <h4 className="text-base font-black text-foreground group-hover:text-primary transition-colors line-clamp-1 leading-snug">
-                              {post.title}
-                            </h4>
-                            <p className="text-xs text-muted-foreground font-medium line-clamp-2 leading-relaxed opacity-80">
-                              {post.shortDescription}
-                            </p>
-                          </div>
-                          <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg font-black text-foreground">
-                                ${(promo.effectivePrice / 100).toFixed(2)}
-                              </span>
-                              {promo.hasDiscount && (
-                                <span className="text-[11px] text-muted-foreground line-through font-bold">
-                                  ${(post.price / 100).toFixed(2)}
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-[10px] text-primary font-black uppercase tracking-widest group-hover:underline flex items-center gap-1 transition-all">
-                              Details &rarr;
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-        </header>
-
-        {/* Filter & Search Dashboard */}
-        <div className="sticky top-[3.5rem] z-30 bg-background/80 backdrop-blur-sm py-5 border-b border-border">
-          <SearchFilter categories={categoriesList} />
-        </div>
-
-        {/* Scalable Directory Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          
-          {/* Left Column: Sidebar Filters */}
-          <aside className="hidden lg:block lg:col-span-3 space-y-8 lg:sticky lg:top-[9rem] max-h-[calc(100vh-11rem)] overflow-y-auto scrollbar-none bg-card/10 p-6 border border-border/40 rounded-3xl">
-            
-            {/* Free Scripts Promo Link */}
-            <div className="pb-6 border-b border-border/40">
-              <Link
-                href="/free"
-                className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30 hover:border-purple-500/60 rounded-2xl text-xs uppercase tracking-wider font-extrabold text-purple-400 hover:text-purple-300 transition-all shadow-[0_3px_0_rgba(168,85,247,0.2)] active:translate-y-[3px] active:shadow-none"
+          {/* Glowing Hero Search Bar */}
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            onSubmit={handleHeroSearchSubmit}
+            className="max-w-2xl mx-auto w-full relative group"
+          >
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                placeholder="Search for SaaS templates, scripts, components..."
+                value={heroSearch}
+                onChange={(e) => setHeroSearch(e.target.value)}
+                className="w-full pl-14 pr-32 py-4.5 text-base font-semibold rounded-2xl border-2 border-border bg-card/60 backdrop-blur-md text-foreground placeholder:text-muted-foreground focus:outline-none transition-all shadow-[0_5px_0_var(--border)] dark:shadow-[0_5px_0_#2A3842] focus:translate-y-[2px] focus:shadow-[0_3px_0_var(--border)]"
+              />
+              <Search className="absolute left-5 w-6 h-6 text-muted-foreground group-focus-within:text-accent transition-colors" />
+              <button
+                type="submit"
+                className="absolute right-3 px-6 py-2.5 text-sm font-black uppercase bg-primary text-white rounded-xl shadow-[0_4px_0_#46A302] hover:brightness-105 active:translate-y-[2px] active:shadow-none transition-all"
               >
-                <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-                <span>🎁 Free Scripts (100% Free)</span>
-              </Link>
+                Search
+              </button>
             </div>
-
-            {/* Category Directory Tree */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Layers className="w-3.5 h-3.5 text-primary" />
-                Categories
-              </h3>
-              <div className="flex flex-col gap-1 text-sm font-bold">
+            
+            {/* Quick Suggestions */}
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-4 text-xs font-bold text-muted-foreground">
+              <span>Popular:</span>
+              {["Next.js", "SaaS Boilerplate", "Chrome Extension", "Figma Kit", "Python Bot"].map((term) => (
                 <Link
-                  href={{
-                    pathname: "/",
-                    query: {
-                      ...(currentSearch && { search: currentSearch }),
-                      ...(currentPriceType !== "all" && { priceType: currentPriceType }),
-                      ...(currentSortBy !== "newest" && { sortBy: currentSortBy }),
-                    }
-                  }}
-                  className={`px-3 py-2 rounded-xl transition-all text-xs uppercase tracking-wide ${currentCategory === "all" ? "bg-primary/10 text-primary font-black" : "hover:bg-muted text-muted-foreground hover:text-foreground"}`}
+                  key={term}
+                  href={`/search?search=${encodeURIComponent(term)}`}
+                  className="px-2.5 py-1 bg-card hover:bg-muted border border-border rounded-lg transition-colors"
                 >
-                  All Categories
+                  {term}
                 </Link>
-                
-                {categoriesList.map((cat: any) => {
-                  const isCatActive = currentCategory === cat.slug;
-                  const catSubs = subcategoriesList.filter((sub: any) => sub.categoryId === cat.id);
-                  
-                  return (
-                    <div key={cat.id} className="space-y-1">
-                      <Link
-                        href={{
-                          pathname: "/",
-                          query: {
-                            category: cat.slug,
-                            ...(currentSearch && { search: currentSearch }),
-                            ...(currentPriceType !== "all" && { priceType: currentPriceType }),
-                            ...(currentSortBy !== "newest" && { sortBy: currentSortBy }),
-                          }
-                        }}
-                        className={`flex items-center justify-between px-3 py-2 rounded-xl transition-all text-xs uppercase tracking-wide ${isCatActive && !currentSubcategory ? "bg-primary/10 text-primary font-black" : "hover:bg-muted text-muted-foreground hover:text-foreground"}`}
-                      >
-                        <span>{cat.name}</span>
-                        {catSubs.length > 0 && (
-                          <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 ${isCatActive ? "rotate-90 text-primary" : "text-muted-foreground/60"}`} />
-                        )}
-                      </Link>
-                      
-                      {/* Subcategories list */}
-                      {isCatActive && catSubs.length > 0 && (
-                        <div className="pl-4 flex flex-col gap-1.5 border-l-2 border-border/80 ml-3 py-1">
-                          {catSubs.map((sub: any) => {
-                            const isSubActive = currentSubcategory === sub.slug;
-                            return (
-                              <Link
-                                key={sub.id}
-                                href={{
-                                  pathname: "/",
-                                  query: {
-                                    category: cat.slug,
-                                    subcategory: sub.slug,
-                                    ...(currentSearch && { search: currentSearch }),
-                                    ...(currentPriceType !== "all" && { priceType: currentPriceType }),
-                                    ...(currentSortBy !== "newest" && { sortBy: currentSortBy }),
-                                  }
-                                }}
-                                className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${isSubActive ? "text-primary bg-primary/5 font-black" : "text-muted-foreground hover:text-foreground hover:bg-muted/40"}`}
-                              >
-                                {sub.name}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              ))}
             </div>
+          </motion.form>
+        </div>
+      </section>
 
-            {/* Price Filter Facet */}
-            <div className="space-y-4 border-t border-border/40 pt-6">
-              <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Tags className="w-3.5 h-3.5 text-primary" />
-                Price Filters
-              </h3>
-              <div className="flex flex-col gap-1 text-sm font-bold">
-                {[
-                  { label: "All Products", value: "all" },
-                  { label: "Free Scripts", value: "free" },
-                  { label: "Premium Boilerplates", value: "paid" },
-                ].map((item) => (
-                  <Link
-                    key={item.value}
-                    href={{
-                      pathname: "/",
-                      query: {
-                        ...(currentCategory !== "all" && { category: currentCategory }),
-                        ...(currentSubcategory && { subcategory: currentSubcategory }),
-                        ...(currentSearch && { search: currentSearch }),
-                        priceType: item.value,
-                        ...(currentSortBy !== "newest" && { sortBy: currentSortBy }),
-                      }
-                    }}
-                    className={`px-3 py-2 rounded-xl transition-all text-xs uppercase tracking-wide ${currentPriceType === item.value ? "bg-primary/10 text-primary font-black" : "hover:bg-muted text-muted-foreground hover:text-foreground"}`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Sorting Facet */}
-            <div className="space-y-4 border-t border-border/40 pt-6">
-              <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Cpu className="w-3.5 h-3.5 text-primary" />
-                Sort Options
-              </h3>
-              <div className="flex flex-col gap-1 text-sm font-bold">
-                {[
-                  { label: "Newest Releases", value: "newest" },
-                  { label: "Highest Rated", value: "rating" },
-                  { label: "Price: Low to High", value: "price_asc" },
-                  { label: "Price: High to Low", value: "price_desc" },
-                ].map((item) => (
-                  <Link
-                    key={item.value}
-                    href={{
-                      pathname: "/",
-                      query: {
-                        ...(currentCategory !== "all" && { category: currentCategory }),
-                        ...(currentSubcategory && { subcategory: currentSubcategory }),
-                        ...(currentSearch && { search: currentSearch }),
-                        ...(currentPriceType !== "all" && { priceType: currentPriceType }),
-                        sortBy: item.value,
-                      }
-                    }}
-                    className={`px-3 py-2 rounded-xl transition-all text-xs uppercase tracking-wide ${currentSortBy === item.value ? "bg-primary/10 text-primary font-black" : "hover:bg-muted text-muted-foreground hover:text-foreground"}`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-          </aside>
-
-          {/* Right Column: Catalog Grid & Spotlights */}
-          <div className="lg:col-span-9 space-y-12">
+      {/* 2. Platform Statistics Row */}
+      <section className="border-y border-border bg-card/20 backdrop-blur-sm py-10">
+        <div className="container max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             
-            {/* Active Filters Summary Header */}
-            {(currentCategory !== "all" || currentSubcategory || currentPriceType !== "all" || currentSearch) && (
-              <div className="flex flex-wrap items-center gap-2 p-4 bg-muted/30 border border-border/40 rounded-2xl">
-                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mr-1">Active Filters:</span>
-                {currentCategory !== "all" && (
-                  <Link href={{ pathname: "/", query: { ...(currentSearch && { search: currentSearch }), ...(currentPriceType !== "all" && { priceType: currentPriceType }), ...(currentSortBy !== "newest" && { sortBy: currentSortBy }) } }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20">
-                    Category: {categoriesList.find((c: any) => c.slug === currentCategory)?.name || currentCategory} ✕
-                  </Link>
-                )}
-                {currentSubcategory && (
-                  <Link href={{ pathname: "/", query: { category: currentCategory, ...(currentSearch && { search: currentSearch }), ...(currentPriceType !== "all" && { priceType: currentPriceType }), ...(currentSortBy !== "newest" && { sortBy: currentSortBy }) } }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20">
-                    Subcategory: {subcategoriesList.find((s: any) => s.slug === currentSubcategory)?.name || currentSubcategory} ✕
-                  </Link>
-                )}
-                {currentPriceType !== "all" && (
-                  <Link href={{ pathname: "/", query: { ...(currentCategory !== "all" && { category: currentCategory }), ...(currentSubcategory && { subcategory: currentSubcategory }), ...(currentSearch && { search: currentSearch }), ...(currentSortBy !== "newest" && { sortBy: currentSortBy }) } }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20">
-                    Price: {currentPriceType === "free" ? "Free" : "Premium"} ✕
-                  </Link>
-                )}
-                {currentSearch && (
-                  <Link href={{ pathname: "/", query: { ...(currentCategory !== "all" && { category: currentCategory }), ...(currentSubcategory && { subcategory: currentSubcategory }), ...(currentPriceType !== "all" && { priceType: currentPriceType }), ...(currentSortBy !== "newest" && { sortBy: currentSortBy }) } }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20">
-                    Search: "{currentSearch}" ✕
-                  </Link>
-                )}
-                <Link href="/" className="text-[10px] font-black uppercase text-muted-foreground hover:text-foreground ml-auto underline">
-                  Clear All
-                </Link>
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2.5">
+                <Coins className="w-6 h-6 text-primary" />
+                <span className="text-3xl font-black tracking-tight">95% split</span>
               </div>
-            )}
-
-            {/* Featured Drops Spotlight */}
-            {featuredProducts.length > 0 && !currentSearch && !currentSubcategory && currentCategory === "all" && (
-              <section className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#CE82FF] flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#CE82FF] animate-pulse" />
-                    Featured Spotlight
-                  </h2>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {featuredProducts.slice(0, 2).map((prod: any) => (
-                    <ProductCard 
-                      key={prod.id} 
-                      prod={prod} 
-                      categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Regular Catalog Section */}
-            <section className="space-y-6">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4 flex-1">
-                  <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
-                    {currentSearch || currentCategory !== "all" || currentSubcategory ? "Filtered Catalog" : "All Releases"}
-                  </h2>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest whitespace-nowrap bg-muted border border-border px-3 py-1 rounded-lg">
-                  {productsList.length} Items
-                </span>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                Keep almost everything you sell
+              </p>
+            </div>
+            
+            <div className="space-y-2 border-y md:border-y-0 md:border-x border-border/80 py-6 md:py-0">
+              <div className="flex items-center justify-center gap-2.5">
+                <Zap className="w-6 h-6 text-[#1CB0F6]" />
+                <span className="text-3xl font-black tracking-tight">900+ Scripts</span>
               </div>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                Curated boilerplates & codebase kits
+              </p>
+            </div>
 
-              {productsList.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-28 border border-dashed border-border rounded-3xl bg-muted/25 text-center space-y-4">
-                  <Cpu className="w-10 h-10 text-muted-foreground/50" />
-                  <div className="space-y-1">
-                    <p className="text-sm font-bold text-foreground">No matching releases found</p>
-                    <p className="text-xs text-muted-foreground">Try adjusting your filters or search keywords.</p>
-                  </div>
-                  <Button asChild variant="link" className="text-xs text-muted-foreground hover:text-foreground">
-                    <Link href="/">Reset all filters</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                  {(currentSearch || currentCategory !== "all" || currentSubcategory ? productsList : regularProducts).map((prod: any) => (
-                    <ProductCard 
-                      key={prod.id} 
-                      prod={prod} 
-                      categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
-                    />
-                  ))}
-                </div>
-              )}
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2.5">
+                <ShieldCheck className="w-6 h-6 text-[#CE82FF]" />
+                <span className="text-3xl font-black tracking-tight">100% Verified</span>
+              </div>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                Safe download packages & demo previews
+              </p>
+            </div>
 
-              {totalPages > 1 && (
-                <div className="pt-10 border-t border-border">
-                  <ProductPagination totalPages={totalPages} currentPage={currentPage} />
-                </div>
-              )}
-            </section>
           </div>
         </div>
+      </section>
 
-        {/* User Testimonials V2 Revamp feature */}
-        <section className="space-y-8 pt-8 border-t border-border/40">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-              <HeartHandshake className="w-4 h-4 text-[#1CB0F6]" />
-              Developer Feedback
+      {/* 3. Re-designed Category Cards */}
+      <section className="py-20 bg-muted/10">
+        <div className="container max-w-7xl mx-auto px-4 space-y-12">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              Browse by Coding Category
             </h2>
-            <div className="h-px flex-1 bg-border" />
+            <p className="text-sm font-bold text-muted-foreground">
+              Filter through curated solutions tailored to accelerate your project building speed.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                "The SaaS boilerplate on Scriptly saved me at least 40 hours of initial database setup, auth configuration, and layout structuring. Ship rate is insane!"
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center font-bold text-xs text-foreground border border-border">
-                  MK
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            {categoriesList.map((cat: any) => (
+              <Link
+                key={cat.id}
+                href={{
+                  pathname: "/explore",
+                  query: { category: cat.slug }
+                }}
+                className={`group p-6 bg-card border-2 border-border shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] hover:translate-y-[-4px] hover:shadow-[0_8px_0_var(--border)] active:translate-y-1 active:shadow-none rounded-3xl transition-all duration-200 flex flex-col items-center text-center space-y-4 ${getCategoryTheme(cat.slug)}`}
+              >
+                <div className="p-4 bg-muted/40 rounded-2xl group-hover:scale-110 transition-transform">
+                  {getCategoryIcon(cat.slug)}
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-foreground">Mikael K.</h4>
-                  <p className="text-[9px] text-muted-foreground font-semibold uppercase">Independent SaaS Builder</p>
+                  <h4 className="text-sm font-black uppercase tracking-wider text-foreground">
+                    {cat.name}
+                  </h4>
+                  <p className="text-[10px] font-bold text-muted-foreground mt-1">
+                    Explore Assets &rarr;
+                  </p>
                 </div>
-              </div>
-            </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            <div className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                "Having instant download bundles alongside video preview demos makes finding reliable scripts easy. The interface is gorgeous."
+      {/* 4. Tab Switcher Catalog Grid */}
+      <section className="py-20">
+        <div className="container max-w-7xl mx-auto px-4 space-y-12">
+          
+          {/* Tab Switcher Headers */}
+          <div className="flex flex-col md:flex-row items-center justify-between border-b border-border pb-6 gap-6">
+            <div className="space-y-1 text-center md:text-left">
+              <h2 className="text-3xl font-extrabold tracking-tight">
+                Developer Marketplace
+              </h2>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                Discover top-rated templates and free tools
               </p>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center font-bold text-xs text-foreground border border-border">
-                  AS
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-foreground">Arjun S.</h4>
-                  <p className="text-[9px] text-muted-foreground font-semibold uppercase">Chrome Extension Developer</p>
-                </div>
-              </div>
             </div>
-
-            <div className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                "Listed two automation extensions as a creator and payouts were handled manually. Everything runs cleanly. Highly recommended portal!"
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center font-bold text-xs text-foreground border border-border">
-                  JD
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-foreground">Janice D.</h4>
-                  <p className="text-[9px] text-muted-foreground font-semibold uppercase">Automation Engineer</p>
-                </div>
-              </div>
+            
+            {/* Custom Duolingo-styled tab badges */}
+            <div className="flex items-center bg-card p-1.5 border-2 border-border rounded-2xl shadow-[0_3px_0_var(--border)] dark:shadow-[0_3px_0_#2A3842] gap-1 select-none">
+              <button
+                onClick={() => setActiveTab("featured")}
+                className={`px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider font-black transition-all ${activeTab === "featured" ? "bg-primary text-white shadow-[0_3px_0_#46A302]" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                ⭐ Popular Releases
+              </button>
+              <button
+                onClick={() => setActiveTab("newest")}
+                className={`px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider font-black transition-all ${activeTab === "newest" ? "bg-[#1CB0F6] text-white shadow-[0_3px_0_#1899D6]" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                ✨ New Arrivals
+              </button>
+              <button
+                onClick={() => setActiveTab("free")}
+                className={`px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider font-black transition-all ${activeTab === "free" ? "bg-[#CE82FF] text-white shadow-[0_3px_0_#B86CE6]" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                🎁 Free Downloads
+              </button>
             </div>
           </div>
-        </section>
 
-        {/* FAQ Accordion Section V2 */}
-        <section className="space-y-8">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-              <HelpCircle className="w-4 h-4 text-[#58CC02]" />
-              Frequently Asked Questions
+          {/* Grid list Content with animated switcher transitions */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {activeTab === "featured" && featuredPremiumList && (
+                featuredPremiumList.map((prod: any) => (
+                  <ProductCard 
+                    key={prod.id} 
+                    prod={prod} 
+                    categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
+                  />
+                ))
+              )}
+              {activeTab === "newest" && productsList && (
+                productsList.slice(0, 6).map((prod: any) => (
+                  <ProductCard 
+                    key={prod.id} 
+                    prod={prod} 
+                    categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
+                  />
+                ))
+              )}
+              {activeTab === "free" && freeProductsList && (
+                freeProductsList.map((prod: any) => (
+                  <ProductCard 
+                    key={prod.id} 
+                    prod={prod} 
+                    categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
+                  />
+                ))
+              )}
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="flex justify-center pt-8">
+            <Button asChild size="xl" variant="secondary" className="font-black">
+              <Link href="/explore" className="flex items-center gap-2">
+                Browse Entire Catalog <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Creator Split call-to-action Section */}
+      <section className="py-20 container max-w-7xl mx-auto px-4">
+        <div className="relative rounded-[2.5rem] border-2 border-border shadow-[0_8px_0_var(--border)] dark:shadow-[0_8px_0_#2A3842] bg-card overflow-hidden p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
+          {/* Pulse gradient glow backdrops */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-[#1CB0F6]/5 to-[#CE82FF]/5 pointer-events-none" />
+          
+          <div className="space-y-4 max-w-xl relative z-10 text-center md:text-left">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#CE82FF] px-3.5 py-1.5 bg-[#CE82FF]/10 rounded-full border border-[#CE82FF]/20">
+              JOIN THE BETA CREATOR NETWORK
+            </span>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+              Sell Your Code. <br/>Keep <span className="text-primary">95% Revenue.</span>
             </h2>
-            <div className="h-px flex-1 bg-border" />
+            <p className="text-sm font-semibold text-muted-foreground leading-relaxed">
+              Don't let third-party marketplaces eat your commissions. Upload your templates, bots, or prompts to ScriptlyStore, connect your payout methods, and enjoy immediate payouts.
+            </p>
+          </div>
+
+          <div className="relative z-10 flex flex-col sm:flex-row gap-4 w-full md:w-auto items-center shrink-0">
+            <Button asChild size="xl" className="w-full sm:w-auto font-black shadow-[0_5px_0_#46A302]">
+              <Link href="/dashboard/creator/products">
+                🚀 List Your Code
+              </Link>
+            </Button>
+            <Button asChild size="xl" variant="outline" className="w-full sm:w-auto font-black">
+              <Link href="/docs/api">
+                📖 Read Docs
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Developer Feedback / Testimonials */}
+      <section className="py-20 border-t border-border bg-muted/5">
+        <div className="container max-w-7xl mx-auto px-4 space-y-12">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <h2 className="text-3xl font-extrabold tracking-tight">
+              Loved by Builders
+            </h2>
+            <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+              What indie developers say about using ScriptlyStore
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                text: `"The NextJS SaaS boilerplate saved me at least 40 hours of initial database setup, auth configuration, and layout structuring. Ship rate is insane!"`,
+                name: "Mikael K.",
+                role: "Independent SaaS Builder",
+                initials: "MK"
+              },
+              {
+                text: `"Having instant secure downloads alongside video previews and live demo links makes finding reliable web assets easy. Interface feels extremely responsive."`,
+                name: "Arjun S.",
+                role: "Chrome Extension Developer",
+                initials: "AS"
+              },
+              {
+                text: `"I listed two custom automation extensions as a creator and profits were directly routed to my settings bank account with next to zero platform cuts. The 95% split is real."`,
+                name: "Janice D.",
+                role: "Automation Engineer",
+                initials: "JD"
+              }
+            ].map((item, idx) => (
+              <div key={idx} className="p-8 rounded-3xl border-2 border-border bg-card shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] flex flex-col justify-between space-y-6">
+                <p className="text-sm leading-relaxed text-muted-foreground italic">
+                  {item.text}
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-black text-xs text-primary">
+                    {item.initials}
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-foreground">{item.name}</h4>
+                    <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">{item.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. FAQ Accordion Section */}
+      <section className="py-20 border-t border-border">
+        <div className="container max-w-5xl mx-auto px-4 space-y-12">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <h2 className="text-3xl font-extrabold tracking-tight">
+              Got Questions?
+            </h2>
+            <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+              Answers to popular questions about ScriptlyStore
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">How do product downloads work?</h3>
+            <div className="p-6 border border-border/60 bg-card/45 rounded-2xl space-y-2">
+              <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">How do product downloads work?</h3>
               <p className="text-xs leading-relaxed text-muted-foreground">
                 Immediately upon completing the Razorpay checkout flow, files are unlocked inside your personal account inventory. Secure access keys are served automatically.
               </p>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Can I request publishing moderation?</h3>
+            <div className="p-6 border border-border/60 bg-card/45 rounded-2xl space-y-2">
+              <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">Can I request publishing moderation?</h3>
               <p className="text-xs leading-relaxed text-muted-foreground">
                 Yes! Creators can list code tools from the Creator Console. Submissions undergo manual verification before staging on the marketplace.
               </p>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">How do payouts and profit splits work?</h3>
+            <div className="p-6 border border-border/60 bg-card/45 rounded-2xl space-y-2">
+              <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">How do payouts and profit splits work?</h3>
               <p className="text-xs leading-relaxed text-muted-foreground">
-                Scriptly Store is developer-first: you keep 95% of all gross sales (the platform only charges a flat 5% fee). Split payouts are automatically and instantly transferred directly to your bank account via Razorpay Route once your Direct Bank settings are configured. Other methods are manually settled during our Beta phase.
+                Scriptly Store is developer-first: you keep 95% of all gross sales. Split payouts are automatically and instantly transferred directly to your bank account via Razorpay Route once your Direct Bank settings are configured.
               </p>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">What formats are supported for previews?</h3>
+            <div className="p-6 border border-border/60 bg-card/45 rounded-2xl space-y-2">
+              <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider">What formats are supported for previews?</h3>
               <p className="text-xs leading-relaxed text-muted-foreground">
                 We support static poster files, browser GIFs, YouTube embeds, and direct MP4 streams to demonstrate script code in action.
               </p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-      </div>
     </div>
   );
 }
