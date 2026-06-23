@@ -58,10 +58,10 @@ export default function PayoutSettingsEditor({
   return (
     <form
       onSubmit={handleSave}
-      className="p-6 rounded-2xl border-2 border-border bg-card shadow-sm space-y-4 h-full flex flex-col justify-between"
+      className="p-6 rounded-2xl border border-border/40 bg-card/35 backdrop-blur-md shadow-sm space-y-4 h-full flex flex-col justify-between"
     >
       <div className="space-y-4">
-        <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border pb-3">
+        <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border/40 pb-3">
           <Coins className="w-4 h-4 text-[#CE82FF]" />
           Payout & Split Settings
         </h3>
@@ -81,7 +81,7 @@ export default function PayoutSettingsEditor({
         </div>
 
         {/* Bank Transfer Details Form */}
-        <div className="space-y-3 p-3 rounded-xl border-2 border-border bg-background/50">
+        <div className="space-y-3 p-3 rounded-xl border border-border/40 bg-background/30">
           <p className="text-[9px] text-primary font-black uppercase tracking-wider">
             Razorpay Route Linked Account Details
           </p>

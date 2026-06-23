@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BLOG_POSTS } from "../../lib/blog-data";
 import { Compass, Sparkles, BookOpen, Clock, Calendar, ArrowRight, Search, FileText } from "lucide-react";
 import { Metadata } from "next";
+import { CyberBackground } from "../../components/ui/CyberBackground";
 
 export const dynamic = "force-dynamic";
 
@@ -44,13 +45,7 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden">
-      
-      {/* Mesh Background Lights */}
-      <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-purple-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute top-[600px] left-[-300px] w-[600px] h-[600px] bg-blue-500/5 blur-[160px] rounded-full pointer-events-none -z-10" />
-
-      {/* Cyberpunk Grid Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none -z-20" />
+      <CyberBackground />
 
       <div className="container max-w-6xl mx-auto px-4 py-12 md:py-20 space-y-16">
         

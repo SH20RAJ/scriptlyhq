@@ -63,28 +63,48 @@ export default function SearchFilter({
       router.push(`${targetPath}?${params.toString()}`, { scroll: false });
     });
   }
+  const getCategoryBtnStyle = (slug: string, isActive: boolean) => {
+    const baseClass = "rounded-full h-9 px-4.5 text-[9px] uppercase tracking-widest font-black transition-all cursor-pointer border-2 ";
+    if (!isActive) {
+      return baseClass + "bg-card/45 text-muted-foreground border-border/50 hover:text-foreground hover:border-foreground/30 shadow-[0_3px_0_var(--border)] active:translate-y-[2px] active:shadow-none";
+    }
+    switch (slug) {
+      case "all":
+        return baseClass + "bg-primary text-white border-primary shadow-[0_3px_0_#46A302]";
+      case "scripts":
+        return baseClass + "bg-[#1CB0F6] text-white border-[#1CB0F6] shadow-[0_3px_0_#148FCA]";
+      case "saas-templates":
+        return baseClass + "bg-[#58CC02] text-white border-[#58CC02] shadow-[0_3px_0_#46A302]";
+      case "design-assets":
+        return baseClass + "bg-[#CE82FF] text-white border-[#CE82FF] shadow-[0_3px_0_#A85BE2]";
+      case "ai-prompts":
+        return baseClass + "bg-[#FFC800] text-white border-[#FFC800] shadow-[0_3px_0_#CCA000]";
+      case "ebooks":
+        return baseClass + "bg-[#FF9600] text-white border-[#FF9600] shadow-[0_3px_0_#CC7800]";
+      default:
+        return baseClass + "bg-primary text-white border-primary shadow-[0_3px_0_#46A302]";
+    }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-5 py-2">
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none flex-1 lg:hidden">
-        <Button
-          variant={currentCategory === "all" ? "default" : "outline"}
-          size="sm"
-          className="rounded-full h-9 px-4 text-[11px] uppercase tracking-wider font-extrabold transition-all cursor-pointer"
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none flex-1">
+        <button
+          type="button"
+          className={getCategoryBtnStyle("all", currentCategory === "all")}
           onClick={() => handleCategorySelect("all")}
         >
           All
-        </Button>
+        </button>
         {categories.map((cat) => (
-          <Button
+          <button
             key={cat.id}
-            variant={currentCategory === cat.slug ? "default" : "outline"}
-            size="sm"
-            className="rounded-full h-9 px-4 text-[11px] uppercase tracking-wider font-extrabold whitespace-nowrap transition-all cursor-pointer"
+            type="button"
+            className={getCategoryBtnStyle(cat.slug, currentCategory === cat.slug)}
             onClick={() => handleCategorySelect(cat.slug)}
           >
             {cat.name}
-          </Button>
+          </button>
         ))}
       </div>
 

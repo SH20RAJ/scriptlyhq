@@ -2,6 +2,7 @@ import { getProductsAction, getCategoriesAction } from "../../lib/actions/produc
 import SearchFilter, { ProductCard } from "../../components/SearchFilter";
 import { ProductPagination } from "../../components/ProductPagination";
 import { Metadata } from "next";
+import { CyberBackground } from "../../components/ui/CyberBackground";
 
 export const dynamic = "force-dynamic";
 
@@ -34,8 +35,9 @@ export default async function SearchPage({ searchParams }: PageProps) {
   const categoriesList = await getCategoriesAction();
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="container max-w-7xl mx-auto px-4 py-12 md:py-20 space-y-12">
+    <div className="flex flex-col min-h-screen relative overflow-hidden bg-background">
+      <CyberBackground />
+      <div className="container max-w-7xl mx-auto px-4 py-12 md:py-20 space-y-12 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border/60 pb-10">
           <div className="space-y-2">
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-foreground">

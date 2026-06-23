@@ -51,7 +51,7 @@ export default async function CreatorProductsPage() {
       </div>
 
       {/* Table */}
-      <div className="border-2 border-border bg-card rounded-2xl p-4 shadow-sm overflow-hidden">
+      <div className="border border-border/40 bg-card/45 backdrop-blur-md rounded-2xl p-4 shadow-sm overflow-hidden">
         <CreatorProductsTable products={creatorProducts} />
       </div>
 

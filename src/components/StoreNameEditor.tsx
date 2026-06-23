@@ -30,8 +30,8 @@ export default function StoreNameEditor({ initialStoreName }: StoreNameEditorPro
   };
 
   return (
-    <form onSubmit={handleSave} className="p-6 rounded-2xl border-2 border-border bg-card shadow-sm space-y-4">
-      <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border pb-3">
+    <form onSubmit={handleSave} className="p-6 rounded-2xl border border-border/40 bg-card/35 backdrop-blur-md shadow-sm space-y-4">
+      <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border/40 pb-3">
         <Store className="w-4 h-4 text-[#CE82FF]" />
         Storefront Branding
       </h3>

@@ -73,8 +73,8 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       {/* Create Coupon Form */}
-      <form onSubmit={handleCreate} className="lg:col-span-5 p-6 rounded-2xl border-2 border-border bg-card shadow-sm space-y-4">
-        <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border pb-3">
+      <form onSubmit={handleCreate} className="lg:col-span-5 p-6 rounded-2xl border border-border/40 bg-card/35 backdrop-blur-md shadow-sm space-y-4">
+        <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border/40 pb-3">
           <Gift className="w-4 h-4 text-[#58CC02]" />
           Create Store Coupon
         </h3>
@@ -160,7 +160,7 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
         </h3>
 
         {couponsList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 border border-neutral-800/80 rounded-2xl bg-neutral-900/10 text-center space-y-3">
+          <div className="flex flex-col items-center justify-center py-16 border border-border/40 rounded-2xl bg-card/25 backdrop-blur-xl text-center space-y-3">
             <AlertCircle className="w-8 h-8 text-neutral-600" />
             <div className="space-y-1">
               <p className="text-xs font-bold text-neutral-400">No active coupons</p>
@@ -168,20 +168,20 @@ export default function CreatorCouponsManager({ initialCoupons }: CreatorCoupons
             </div>
           </div>
         ) : (
-          <div className="border border-neutral-800/80 rounded-2xl overflow-hidden bg-neutral-950/20">
+          <div className="border border-border/40 rounded-2xl overflow-hidden bg-card/35 backdrop-blur-md">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-neutral-800/80 bg-neutral-950/40 text-[9px] font-black uppercase tracking-wider text-neutral-500">
+                  <tr className="border-b border-border/40 bg-muted/20 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
                     <th className="py-3 px-4">Coupon Code</th>
                     <th className="py-3 px-4">Discount</th>
                     <th className="py-3 px-4">Min Spend</th>
                     <th className="py-3 px-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-800/40 text-xs font-medium text-neutral-300">
+                <tbody className="divide-y divide-border/40 text-xs font-medium text-muted-foreground">
                   {couponsList.map((coupon) => (
-                    <tr key={coupon.id} className="hover:bg-neutral-800/10 transition-colors">
+                    <tr key={coupon.id} className="hover:bg-muted/10 transition-colors">
                       <td className="py-3 px-4 font-mono font-bold text-white tracking-wider">
                         {coupon.code}
                       </td>

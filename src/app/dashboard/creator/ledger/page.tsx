@@ -59,13 +59,13 @@ export default async function CreatorLedgerPage() {
       </div>
 
       {/* Main Ledger Content */}
-      <Card className="rounded-2xl border-2 border-border shadow-sm">
-        <CardHeader className="border-b border-border py-4 flex flex-row items-center justify-between">
+      <Card className="rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md shadow-sm">
+        <CardHeader className="border-b border-border/40 py-4 flex flex-row items-center justify-between">
           <span className="text-xs font-black uppercase tracking-wider text-muted-foreground flex items-center gap-2">
             <Activity className="w-4 h-4 text-primary" />
             Payout Settlement Records
           </span>
-          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest bg-muted border border-border px-3 py-1 rounded-lg">
+          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest bg-muted/40 border border-border/40 px-3 py-1 rounded-lg">
             {salesHistory.length} Completed Sales
           </span>
         </CardHeader>
@@ -84,7 +84,7 @@ export default async function CreatorLedgerPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-border bg-muted/30 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                  <tr className="border-b border-border/40 bg-muted/20 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
                     <th className="py-3 px-6">Transaction Date</th>
                     <th className="py-3 px-6">Product Title</th>
                     <th className="py-3 px-6">Transaction ID</th>

@@ -153,53 +153,53 @@ export default async function CreatorConsolePage() {
 
       {/* Analytics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="rounded-2xl border-2 border-border shadow-sm">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+        <Card className="rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md shadow-sm hover:translate-y-[-4px] hover:shadow-[0_8px_0_var(--border)] transition-all duration-300">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0 p-6">
             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               Total Uploads
             </span>
-            <LayoutGrid className="w-4 h-4 text-muted-foreground/60" />
+            <LayoutGrid className="w-4 h-4 text-purple-400" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6 pt-0">
             <div className="text-2xl font-black text-foreground">{creatorProducts.length}</div>
             <p className="text-[9px] text-muted-foreground font-semibold mt-1">Scripts added to catalog</p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-2 border-border shadow-sm">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+        <Card className="rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md shadow-sm hover:translate-y-[-4px] hover:shadow-[0_8px_0_var(--border)] transition-all duration-300">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0 p-6">
             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               Total Unlocks
             </span>
-            <Package className="w-4 h-4 text-muted-foreground/60" />
+            <Package className="w-4 h-4 text-blue-400" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6 pt-0">
             <div className="text-2xl font-black text-foreground">{totalSold}</div>
             <p className="text-[9px] text-muted-foreground font-semibold mt-1">Times your scripts were bought</p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-2 border-border shadow-sm">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+        <Card className="rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md shadow-sm hover:translate-y-[-4px] hover:shadow-[0_8px_0_var(--border)] transition-all duration-300">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0 p-6">
             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               Gross Revenue
             </span>
-            <Coins className="w-4 h-4 text-muted-foreground/60" />
+            <Coins className="w-4 h-4 text-emerald-400" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6 pt-0">
             <div className="text-2xl font-black text-foreground">${(grossSales / 100).toFixed(2)}</div>
             <p className="text-[9px] text-muted-foreground font-semibold mt-1">Total revenue processed</p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-2 border-primary/20 bg-primary/5 shadow-sm">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+        <Card className="rounded-2xl border border-primary/20 bg-primary/5 backdrop-blur-md shadow-sm hover:translate-y-[-4px] hover:shadow-[0_8px_0_rgba(88,204,2,0.15)] transition-all duration-300">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0 p-6">
             <span className="text-[10px] font-black uppercase tracking-widest text-primary">
               Your Share (95%)
             </span>
             <Sparkles className="w-4 h-4 text-primary animate-pulse" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6 pt-0">
             <div className="text-2xl font-black text-foreground">${(creatorShare / 100).toFixed(2)}</div>
             <p className="text-[9px] text-primary/80 font-semibold mt-1">Net pending settlement</p>
           </CardContent>
@@ -218,7 +218,7 @@ export default async function CreatorConsolePage() {
             </Link>
           </div>
           
-          <div className="border-2 border-border rounded-2xl overflow-hidden bg-card shadow-sm">
+          <div className="border border-border/40 rounded-2xl overflow-hidden bg-card/35 backdrop-blur-md shadow-sm">
             {creatorProducts.length === 0 ? (
               <div className="p-8 text-center text-xs text-muted-foreground font-medium">
                 You haven't listed any scripts yet.
@@ -253,7 +253,7 @@ export default async function CreatorConsolePage() {
             </Link>
           </div>
 
-          <div className="p-5 border-2 border-border bg-card rounded-2xl shadow-sm space-y-4">
+          <div className="p-5 border border-border/40 bg-card/35 backdrop-blur-md rounded-2xl shadow-sm space-y-4">
             <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border pb-3">
               <Activity className="w-4 h-4 text-[#CE82FF]" />
               Earning Ledger
