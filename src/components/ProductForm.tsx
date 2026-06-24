@@ -331,6 +331,15 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Hire Me helper link */}
+          <Link
+            href="/hire-me"
+            className="flex items-center gap-1.5 text-xs font-bold text-[#1CB0F6] hover:text-[#1CB0F6]/80 bg-[#1CB0F6]/10 border border-[#1CB0F6]/20 px-3.5 py-2 rounded-xl transition-all"
+          >
+            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+            Hire Developer
+          </Link>
+
           {/* Blogger post helper link */}
           <a
             href="https://www.blogger.com/blog/posts/446251549562029884"
