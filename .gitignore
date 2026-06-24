@@ -55,3 +55,4 @@ todo.md
 /scriptly-assets/
 send.md
 published_to_blogger.json
+src/scripts/seed-reviews.ts
