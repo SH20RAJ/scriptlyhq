@@ -76,6 +76,13 @@ export default async function ReceiptPage({ params }: PageProps) {
   const discount = orderRecord.discountApplied / 100;
   const totalAmount = orderRecord.amount / 100;
 
+  const editCopyPrice = orderRecord.addOnEditCopy ? Math.round(productRecord.price / 3) : 0;
+  const setupDeployPrice = orderRecord.addOnSetupDeploy ? Math.round(productRecord.price / 3) : 0;
+  const editCopyPriceUsd = editCopyPrice / 100;
+  const setupDeployPriceUsd = setupDeployPrice / 100;
+  
+  const subtotalAmount = basePrice + editCopyPriceUsd + setupDeployPriceUsd;
+
   return (
     <div className="min-h-screen bg-background text-foreground py-10 px-4 md:py-16">
       <div className="max-w-3xl mx-auto space-y-6">
@@ -174,6 +181,32 @@ export default async function ReceiptPage({ params }: PageProps) {
                     ${basePrice.toFixed(2)}
                   </td>
                 </tr>
+                {orderRecord.addOnEditCopy && (
+                  <tr>
+                    <td className="p-4 pl-6">
+                      <p className="font-bold text-foreground">Edit Copy & Content Support</p>
+                      <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">
+                        Add-on service (1/3 product price)
+                      </p>
+                    </td>
+                    <td className="p-4 text-right pr-6 font-semibold text-foreground">
+                      ${editCopyPriceUsd.toFixed(2)}
+                    </td>
+                  </tr>
+                )}
+                {orderRecord.addOnSetupDeploy && (
+                  <tr>
+                    <td className="p-4 pl-6">
+                      <p className="font-bold text-foreground">Setup & Deployment Support</p>
+                      <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">
+                        Add-on service (1/3 product price)
+                      </p>
+                    </td>
+                    <td className="p-4 text-right pr-6 font-semibold text-foreground">
+                      ${setupDeployPriceUsd.toFixed(2)}
+                    </td>
+                  </tr>
+                )}
                 {orderRecord.couponCode && (
                   <tr className="text-[#FF4B4B] bg-[#FF4B4B]/5">
                     <td className="p-4 pl-6 text-xs font-bold uppercase tracking-wider">
@@ -193,7 +226,7 @@ export default async function ReceiptPage({ params }: PageProps) {
             <div className="w-full sm:w-72 space-y-3 text-sm">
               <div className="flex justify-between font-bold text-muted-foreground">
                 <span>Subtotal</span>
-                <span>${basePrice.toFixed(2)}</span>
+                <span>${subtotalAmount.toFixed(2)}</span>
               </div>
               {orderRecord.couponCode && (
                 <div className="flex justify-between font-bold text-[#FF4B4B]">

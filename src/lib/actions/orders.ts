@@ -24,10 +24,14 @@ export async function createRazorpayOrderAction({
   productId,
   productIds,
   couponCode,
+  addOnEditCopy = false,
+  addOnSetupDeploy = false,
 }: {
   productId?: string;
   productIds?: string[];
   couponCode?: string;
+  addOnEditCopy?: boolean;
+  addOnSetupDeploy?: boolean;
 }) {
   const user = await getOrCreateDbUser();
   if (!user) {
@@ -64,7 +68,24 @@ export async function createRazorpayOrderAction({
     };
   });
 
-  // Calculate Subtotal (USD cents)
+  // Calculate Addon Costs per product (1/3rd of original MRP per add-on)
+  const selectedProductsWithAddons = selectedProducts.map(p => {
+    let addonPrice = 0;
+    if (addOnEditCopy) {
+      addonPrice += Math.round(p.originalPrice / 3);
+    }
+    if (addOnSetupDeploy) {
+      addonPrice += Math.round(p.originalPrice / 3);
+    }
+    return {
+      ...p,
+      addonPrice,
+    };
+  });
+
+  const totalAddonCost = selectedProductsWithAddons.reduce((sum, p) => sum + p.addonPrice, 0);
+
+  // Calculate Subtotal (USD cents) (without addons)
   const subtotal = selectedProducts.reduce((sum, p) => sum + p.price, 0);
 
   // 1. Calculate Automatic 20% Discount over $60.00 (6000 cents)
@@ -114,15 +135,15 @@ export async function createRazorpayOrderAction({
   }
 
   const totalDiscount = autoDiscount + couponDiscount;
-  const finalAmount = Math.max(subtotal - totalDiscount, 0);
+  const finalAmount = Math.max(subtotal - totalDiscount, 0) + totalAddonCost;
 
   // Check if checkout is free
   if (finalAmount === 0) {
     const freeOrderId = "free_checkout_" + crypto.randomBytes(8).toString("hex");
     const insertedOrders = [];
 
-    for (let i = 0; i < selectedProducts.length; i++) {
-      const product = selectedProducts[i];
+    for (let i = 0; i < selectedProductsWithAddons.length; i++) {
+      const product = selectedProductsWithAddons[i];
       const orderId = crypto.randomUUID();
 
       await db.insert(orders).values({
@@ -135,6 +156,8 @@ export async function createRazorpayOrderAction({
         status: "completed", // Completed instantly
         couponCode: validatedCouponCode,
         discountApplied: product.originalPrice - product.price + Math.round(totalDiscount / selectedProducts.length),
+        addOnEditCopy,
+        addOnSetupDeploy,
       });
 
       insertedOrders.push({ id: orderId, productTitle: product.title });
@@ -186,21 +209,21 @@ export async function createRazorpayOrderAction({
     ? await db.query.users.findMany({ where: inArray(users.id, creatorIds) })
     : [];
 
-  for (let i = 0; i < selectedProducts.length; i++) {
-    const product = selectedProducts[i];
-    const isLast = i === selectedProducts.length - 1;
+  for (let i = 0; i < selectedProductsWithAddons.length; i++) {
+    const product = selectedProductsWithAddons[i];
+    const isLast = i === selectedProductsWithAddons.length - 1;
 
     let itemAmount = 0;
     if (isLast) {
-      itemAmount = razorpayAmount - distributedAmountSum;
+      itemAmount = (razorpayAmount - totalAddonCost) - distributedAmountSum;
     } else {
       const ratio = product.price / subtotal;
-      const itemDiscount = Math.round(totalDiscount * ratio);
-      itemAmount = Math.round(razorpayAmount * ratio);
-
-      distributedDiscountSum += itemDiscount;
+      itemAmount = Math.round((razorpayAmount - totalAddonCost) * ratio);
       distributedAmountSum += itemAmount;
     }
+
+    // Add product-specific addon price to its item amount
+    itemAmount += product.addonPrice;
 
     const itemAmountInInrPaise = Math.round(itemAmount * usdToInrRate);
     const creatorSplitInInrPaise = Math.round(itemAmountInInrPaise * 0.95);
@@ -249,24 +272,27 @@ export async function createRazorpayOrderAction({
   distributedAmountSum = 0;
   distributedDiscountSum = 0;
 
-  for (let i = 0; i < selectedProducts.length; i++) {
-    const product = selectedProducts[i];
-    const isLast = i === selectedProducts.length - 1;
+  for (let i = 0; i < selectedProductsWithAddons.length; i++) {
+    const product = selectedProductsWithAddons[i];
+    const isLast = i === selectedProductsWithAddons.length - 1;
 
     let itemDiscount = 0;
     let itemAmount = 0;
 
     if (isLast) {
       itemDiscount = totalDiscount - distributedDiscountSum;
-      itemAmount = razorpayAmount - distributedAmountSum;
+      itemAmount = (razorpayAmount - totalAddonCost) - distributedAmountSum;
     } else {
       const ratio = product.price / subtotal;
       itemDiscount = Math.round(totalDiscount * ratio);
-      itemAmount = Math.round(razorpayAmount * ratio);
+      itemAmount = Math.round((razorpayAmount - totalAddonCost) * ratio);
 
       distributedDiscountSum += itemDiscount;
       distributedAmountSum += itemAmount;
     }
+
+    // Add product-specific addon price to its item amount
+    itemAmount += product.addonPrice;
 
     const orderId = crypto.randomUUID();
 
@@ -279,6 +305,8 @@ export async function createRazorpayOrderAction({
       status: "pending",
       couponCode: validatedCouponCode,
       discountApplied: itemDiscount + (product.originalPrice - product.price),
+      addOnEditCopy,
+      addOnSetupDeploy,
     });
 
     insertedOrders.push({ id: orderId, productTitle: product.title });

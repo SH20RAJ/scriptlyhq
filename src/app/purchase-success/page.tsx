@@ -36,10 +36,13 @@ export default async function PurchaseSuccessPage({ searchParams }: PageProps) {
       amount: orders.amount,
       paymentId: orders.razorpayPaymentId,
       status: orders.status,
+      addOnEditCopy: orders.addOnEditCopy,
+      addOnSetupDeploy: orders.addOnSetupDeploy,
       product: {
         id: products.id,
         title: products.title,
         slug: products.slug,
+        price: products.price,
       },
     })
     .from(orders)
@@ -52,6 +55,10 @@ export default async function PurchaseSuccessPage({ searchParams }: PageProps) {
   if (!receipt || receipt.status !== "completed") {
     redirect("/dashboard");
   }
+
+  const editCopyPrice = receipt.addOnEditCopy ? Math.round(receipt.product.price / 3) : 0;
+  const setupDeployPrice = receipt.addOnSetupDeploy ? Math.round(receipt.product.price / 3) : 0;
+  const baseProductPaid = receipt.amount - editCopyPrice - setupDeployPrice;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-20 text-center space-y-12">
@@ -82,6 +89,22 @@ export default async function PurchaseSuccessPage({ searchParams }: PageProps) {
               <span className="text-muted-foreground">Product</span>
               <span className="text-foreground font-medium">{receipt.product.title}</span>
             </div>
+            <div className="flex justify-between text-xs text-muted-foreground pl-3">
+              <span>Base Product</span>
+              <span className="font-semibold">${(baseProductPaid / 100).toFixed(2)}</span>
+            </div>
+            {receipt.addOnEditCopy && (
+              <div className="flex justify-between text-xs text-muted-foreground pl-3">
+                <span>+ Edit Copy & Content Support Add-on</span>
+                <span className="font-mono font-semibold">${(editCopyPrice / 100).toFixed(2)}</span>
+              </div>
+            )}
+            {receipt.addOnSetupDeploy && (
+              <div className="flex justify-between text-xs text-muted-foreground pl-3">
+                <span>+ Setup & Deployment Support Add-on</span>
+                <span className="font-mono font-semibold">${(setupDeployPrice / 100).toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">Order ID</span>
               <span className="font-mono text-xs text-foreground uppercase">{receipt.orderId.slice(0, 12)}...</span>

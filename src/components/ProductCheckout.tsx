@@ -42,9 +42,21 @@ export default function ProductCheckout({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [addOnEditCopy, setAddOnEditCopy] = useState(false);
+  const [addOnSetupDeploy, setAddOnSetupDeploy] = useState(false);
   const { addToCart, removeFromCart, isInCart } = useCart();
 
   const inCart = isInCart(product.id);
+
+  const editCopyPrice = Math.round(product.price / 3);
+  const setupDeployPrice = Math.round(product.price / 3);
+
+  const promo = getProductEffectivePrice(product);
+  const baseEffectivePrice = isFree ? 0 : promo.effectivePrice;
+
+  let totalDisplayPrice = baseEffectivePrice;
+  if (addOnEditCopy) totalDisplayPrice += editCopyPrice;
+  if (addOnSetupDeploy) totalDisplayPrice += setupDeployPrice;
 
   if (hasPurchased) {
     return (
@@ -66,7 +78,11 @@ export default function ProductCheckout({
     setError(null);
     startTransition(async () => {
       try {
-        const orderData = await createRazorpayOrderAction({ productId: product.id });
+        const orderData = await createRazorpayOrderAction({ 
+          productId: product.id,
+          addOnEditCopy,
+          addOnSetupDeploy,
+        });
 
         if (!orderData.success) {
           setError("Failed to initialize order. Please try again.");
@@ -133,7 +149,6 @@ export default function ProductCheckout({
     if (inCart) {
       removeFromCart(product.id);
     } else {
-      const promo = getProductEffectivePrice(product);
       addToCart({
         id: product.id,
         title: product.title,
@@ -147,19 +162,65 @@ export default function ProductCheckout({
   };
 
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-4">
+      {/* Stylish Add-on Checkboxes */}
+      <div className="space-y-3 bg-card/60 border-2 border-border/80 p-4 rounded-2xl shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842]">
+        <div className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground pb-2 border-b border-border/40">
+          Customize & Support Add-ons
+        </div>
+        
+        {/* Add-on 1: Copy Edit */}
+        <label className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${addOnEditCopy ? 'border-primary bg-primary/5 shadow-[0_3px_0_rgba(88,204,2,0.2)]' : 'border-border/60 hover:border-border hover:bg-muted/10'}`}>
+          <input 
+            type="checkbox" 
+            checked={addOnEditCopy} 
+            onChange={(e) => setAddOnEditCopy(e.target.checked)} 
+            className="mt-1 w-4 h-4 accent-primary rounded cursor-pointer shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between items-baseline gap-2">
+              <span className="text-[11px] font-black uppercase tracking-wider text-foreground">Edit Copy & Content</span>
+              <span className="text-[11px] font-black text-primary font-mono shrink-0">+${(editCopyPrice / 100).toFixed(2)}</span>
+            </div>
+            <p className="text-[9px] font-bold text-muted-foreground mt-1 leading-normal">Customize placeholder texts, branding copy, colors, and design components.</p>
+          </div>
+        </label>
+
+        {/* Add-on 2: Setup/Deployment */}
+        <label className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${addOnSetupDeploy ? 'border-primary bg-primary/5 shadow-[0_3px_0_rgba(88,204,2,0.2)]' : 'border-border/60 hover:border-border hover:bg-muted/10'}`}>
+          <input 
+            type="checkbox" 
+            checked={addOnSetupDeploy} 
+            onChange={(e) => setAddOnSetupDeploy(e.target.checked)} 
+            className="mt-1 w-4 h-4 accent-primary rounded cursor-pointer shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between items-baseline gap-2">
+              <span className="text-[11px] font-black uppercase tracking-wider text-foreground">Setup & Deployment</span>
+              <span className="text-[11px] font-black text-primary font-mono shrink-0">+${(setupDeployPrice / 100).toFixed(2)}</span>
+            </div>
+            <p className="text-[9px] font-bold text-muted-foreground mt-1 leading-normal">Complete setup. We will deploy the codebase live on Cloudflare/Vercel for you.</p>
+          </div>
+        </label>
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-3">
         <Button
           onClick={handleCheckout}
           disabled={isPending}
-          className="flex-1 min-h-[48px] px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer"
+          className="flex-1 min-h-[48px] px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer bg-primary hover:bg-primary/95 text-white"
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : (
             <CreditCard className="w-4 h-4 mr-2" />
           )}
-          <span>{userLoggedIn ? (isFree ? "Claim Free" : `Buy Now`) : "Sign in to Buy"}</span>
+          <span>
+            {userLoggedIn 
+              ? (totalDisplayPrice === 0 ? "Claim Free" : `Pay $${(totalDisplayPrice / 100).toFixed(2)}`) 
+              : "Sign in to Buy"
+            }
+          </span>
         </Button>
 
         <Button

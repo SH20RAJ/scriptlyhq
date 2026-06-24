@@ -91,6 +91,8 @@ export const orders = pgTable("orders", {
   status: text("status").default("pending").notNull(), // 'pending', 'completed', 'failed'
   couponCode: text("coupon_code"),
   discountApplied: integer("discount_applied").default(0).notNull(),
+  addOnEditCopy: boolean("add_on_edit_copy").default(false).notNull(),
+  addOnSetupDeploy: boolean("add_on_setup_deploy").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
