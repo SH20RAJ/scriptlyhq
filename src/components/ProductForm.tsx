@@ -46,6 +46,10 @@ interface ProductFormProps {
     promoEnd?: Date | string | null;
     redirectDownload?: boolean;
     personal?: boolean;
+    views?: number;
+    downloadsCount?: number;
+    saves?: number;
+    showStats?: boolean;
   };
 }
 
@@ -70,6 +74,10 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
   const [featured, setFeatured] = useState(initialData?.featured || false);
   const [published, setPublished] = useState(initialData ? initialData.published : true);
   const [personal, setPersonal] = useState(initialData?.personal || false);
+  const [showStats, setShowStats] = useState(initialData?.showStats || false);
+  const [views, setViews] = useState(initialData?.views?.toString() || "0");
+  const [downloadsCount, setDownloadsCount] = useState(initialData?.downloadsCount?.toString() || "0");
+  const [saves, setSaves] = useState(initialData?.saves?.toString() || "0");
   
   const [isFree, setIsFree] = useState(initialData?.isFree || false);
   const [discountPercent, setDiscountPercent] = useState(initialData?.discountPercent?.toString() || "0");
@@ -270,6 +278,10 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
     formData.set("discountPercent", isFree ? "0" : discountPercent);
     formData.set("promoStart", promoStart);
     formData.set("promoEnd", promoEnd);
+    formData.set("showStats", showStats ? "true" : "false");
+    formData.set("views", views);
+    formData.set("downloadsCount", downloadsCount);
+    formData.set("saves", saves);
 
     startTransition(async () => {
       try {
@@ -887,6 +899,47 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
                     <p className="text-[9px] text-neutral-500">Allow customers to view and purchase this item</p>
                   </div>
                   <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
+                  <div className="space-y-0.5">
+                    <h4 className="text-xs font-bold text-neutral-300 uppercase">Show Trust Stats</h4>
+                    <p className="text-[9px] text-neutral-500">Show views, downloads, and saves counts on detail page</p>
+                  </div>
+                  <input type="checkbox" checked={showStats} onChange={(e) => setShowStats(e.target.checked)} className="w-4.5 h-4.5 rounded accent-white cursor-pointer" />
+                </div>
+
+                <div className="pt-4 border-t border-neutral-800 space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-wider text-[#1CB0F6]">Override Statistics</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-neutral-400 uppercase">Views</label>
+                      <input 
+                        type="number" 
+                        value={views} 
+                        onChange={(e) => setViews(e.target.value)} 
+                        className="w-full px-3 py-1.5 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs outline-none" 
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-neutral-400 uppercase">Downloads</label>
+                      <input 
+                        type="number" 
+                        value={downloadsCount} 
+                        onChange={(e) => setDownloadsCount(e.target.value)} 
+                        className="w-full px-3 py-1.5 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs outline-none" 
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-neutral-400 uppercase">Saves</label>
+                      <input 
+                        type="number" 
+                        value={saves} 
+                        onChange={(e) => setSaves(e.target.value)} 
+                        className="w-full px-3 py-1.5 rounded-lg border border-neutral-800 bg-neutral-950 text-white text-xs outline-none" 
+                      />
+                    </div>
+                  </div>
                 </div>
               </>
             ) : (

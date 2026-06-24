@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "../../db";
-import { products, reviews, userInteractions, users } from "../../db/schema";
-import { eq, and, sql, desc } from "drizzle-orm";
+import { products, reviews, userInteractions, users, reviewLikes } from "../../db/schema";
+import { eq, and, sql, desc, isNull } from "drizzle-orm";
 import { getOrCreateDbUser } from "../auth-utils";
 import { revalidatePath } from "next/cache";
 
@@ -126,7 +126,7 @@ export async function checkInteractionStatusAction(productId: string) {
   }
 }
 
-export async function submitReviewAction(productId: string, rating: number, comment: string) {
+export async function submitReviewAction(productId: string, rating: number, comment: string, parentId?: string) {
   try {
     const user = await getOrCreateDbUser();
     if (!user) {
@@ -148,23 +148,29 @@ export async function submitReviewAction(productId: string, rating: number, comm
       productId,
       rating,
       comment: comment.trim(),
+      parentId: parentId || null,
     });
 
-    // Recalculate average rating
-    const allReviews = await db.query.reviews.findMany({
-      where: eq(reviews.productId, productId),
-    });
+    // Only recalculate average rating if it's a top-level review (not a reply)
+    if (!parentId) {
+      const allReviews = await db.query.reviews.findMany({
+        where: and(
+          eq(reviews.productId, productId),
+          isNull(reviews.parentId)
+        ),
+      });
 
-    const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
-    const avgRating = (totalRating / allReviews.length).toFixed(1);
+      const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
+      const avgRating = allReviews.length > 0 ? (totalRating / allReviews.length).toFixed(1) : "5.0";
 
-    await db
-      .update(products)
-      .set({
-        rating: avgRating,
-        ratingCount: allReviews.length,
-      })
-      .where(eq(products.id, productId));
+      await db
+        .update(products)
+        .set({
+          rating: avgRating,
+          ratingCount: allReviews.length,
+        })
+        .where(eq(products.id, productId));
+    }
 
     revalidatePath(`/products/${productId}`);
     return { success: true };
@@ -174,16 +180,51 @@ export async function submitReviewAction(productId: string, rating: number, comm
   }
 }
 
+export async function toggleReviewLikeAction(reviewId: string) {
+  try {
+    const user = await getOrCreateDbUser();
+    if (!user) {
+      return { error: "Unauthorized: Sign in required." };
+    }
+
+    const existing = await db.query.reviewLikes.findFirst({
+      where: and(
+        eq(reviewLikes.userId, user.id),
+        eq(reviewLikes.reviewId, reviewId)
+      ),
+    });
+
+    if (existing) {
+      await db.delete(reviewLikes).where(eq(reviewLikes.id, existing.id));
+      return { success: true, liked: false };
+    } else {
+      await db.insert(reviewLikes).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        reviewId,
+      });
+      return { success: true, liked: true };
+    }
+  } catch (error: any) {
+    console.error("Failed to toggle review like:", error);
+    return { error: error.message || "Failed to toggle like" };
+  }
+}
+
 export async function getProductReviewsAction(productId: string) {
   try {
+    const user = await getOrCreateDbUser();
+
+    // Fetch all reviews (both top-level and replies)
     const list = await db.query.reviews.findMany({
       where: eq(reviews.productId, productId),
       orderBy: [desc(reviews.createdAt)],
     });
 
-    // Populate user names / emails
-    const reviewsWithUsers = await Promise.all(
+    // Populate user names / emails, like counts, and reply mapping
+    const mappedReviews = await Promise.all(
       list.map(async (r) => {
+        // User profile
         const u = await db.query.users.findFirst({
           where: eq(users.id, r.userId),
           columns: {
@@ -191,14 +232,27 @@ export async function getProductReviewsAction(productId: string) {
             email: true,
           },
         });
+
+        // Likes count
+        const likes = await db.query.reviewLikes.findMany({
+          where: eq(reviewLikes.reviewId, r.id),
+        });
+
+        // User liked status
+        const userLiked = user 
+          ? likes.some(l => l.userId === user.id)
+          : false;
+
         return {
           ...r,
           user: u || { name: "Anonymous Builder", email: "anon@scriptly.store" },
+          likesCount: likes.length,
+          userLiked,
         };
       })
     );
 
-    return { success: true, reviews: reviewsWithUsers };
+    return { success: true, reviews: mappedReviews };
   } catch (error: any) {
     console.error("Failed to get product reviews:", error);
     return { error: "Failed to get reviews", reviews: [] };

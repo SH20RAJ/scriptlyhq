@@ -60,6 +60,16 @@ export async function createProductAction(formData: FormData) {
   const fileUrl = formData.get("fileUrl") as string;
   const redirectDownload = formData.get("redirectDownload") !== "false";
   const personal = formData.get("personal") === "true";
+  const showStats = formData.get("showStats") === "true";
+
+  const viewsVal = parseInt(formData.get("views") as string || "0", 10);
+  const views = isNaN(viewsVal) ? 0 : viewsVal;
+
+  const downloadsVal = parseInt(formData.get("downloadsCount") as string || "0", 10);
+  const downloadsCount = isNaN(downloadsVal) ? 0 : downloadsVal;
+
+  const savesVal = parseInt(formData.get("saves") as string || "0", 10);
+  const saves = isNaN(savesVal) ? 0 : savesVal;
 
   const id = crypto.randomUUID();
 
@@ -90,6 +100,10 @@ export async function createProductAction(formData: FormData) {
     promoStart,
     promoEnd,
     personal,
+    showStats,
+    views,
+    downloadsCount,
+    saves,
   });
 
   revalidatePath("/");
@@ -166,6 +180,16 @@ export async function updateProductAction(id: string, formData: FormData) {
   const fileUrl = formData.get("fileUrl") as string;
   const redirectDownload = formData.get("redirectDownload") !== "false";
   const personal = formData.get("personal") === "true";
+  const showStats = formData.get("showStats") === "true";
+
+  const viewsVal = parseInt(formData.get("views") as string || "0", 10);
+  const views = isNaN(viewsVal) ? 0 : viewsVal;
+
+  const downloadsVal = parseInt(formData.get("downloadsCount") as string || "0", 10);
+  const downloadsCount = isNaN(downloadsVal) ? 0 : downloadsVal;
+
+  const savesVal = parseInt(formData.get("saves") as string || "0", 10);
+  const saves = isNaN(savesVal) ? 0 : savesVal;
 
   await db
     .update(products)
@@ -194,6 +218,10 @@ export async function updateProductAction(id: string, formData: FormData) {
       promoStart,
       promoEnd,
       personal,
+      showStats,
+      views,
+      downloadsCount,
+      saves,
       updatedAt: new Date(),
     })
     .where(eq(products.id, id));

@@ -64,6 +64,7 @@ export const products = pgTable("products", {
   downloadsCount: integer("downloads_count").default(0).notNull(),
   saves: integer("saves").default(0).notNull(),
   personal: boolean("personal").default(false).notNull(),
+  showStats: boolean("show_stats").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -118,6 +119,14 @@ export const reviews = pgTable("reviews", {
   productId: text("product_id").references(() => products.id, { onDelete: "cascade" }).notNull(),
   rating: integer("rating").notNull(),
   comment: text("comment").notNull(),
+  parentId: text("parent_id"), // Self-reference for replies
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const reviewLikes = pgTable("review_likes", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  reviewId: text("review_id").references(() => reviews.id, { onDelete: "cascade" }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

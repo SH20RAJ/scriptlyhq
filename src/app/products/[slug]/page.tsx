@@ -52,14 +52,48 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Product Not Found | ScriptlyStore" };
   }
 
+  // Parse screenshots list
+  const screenshotsList = product.screenshots ? product.screenshots.split(",").map((s) => s.trim()) : [];
+  
+  // Construct dynamic list of images for OG/Twitter
+  const ogImages: { url: string }[] = [];
+  if (product.thumbnail) ogImages.push({ url: product.thumbnail });
+  if (product.previewGif) ogImages.push({ url: product.previewGif });
+  screenshotsList.forEach((src) => {
+    if (src) ogImages.push({ url: src });
+  });
+
+  const keywords = product.tags 
+    ? product.tags.split(",").map(t => t.trim()) 
+    : [product.category, "digital asset", "source code", "boilerplate"];
+
   return {
     title: `${product.title} - ScriptlyStore`,
     description: product.shortDescription,
+    keywords,
+    alternates: {
+      canonical: `https://scriptly.store/products/${product.slug}`,
+    },
     openGraph: {
       title: `${product.title} - ScriptlyStore`,
       description: product.shortDescription,
-      images: product.thumbnail ? [{ url: product.thumbnail }] : [],
+      url: `https://scriptly.store/products/${product.slug}`,
+      siteName: "ScriptlyStore",
+      type: "article",
+      images: ogImages,
+      videos: product.videoUrl ? [{ url: product.videoUrl }] : undefined,
     },
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.title} - ScriptlyStore`,
+      description: product.shortDescription,
+      images: product.thumbnail ? [product.thumbnail] : [],
+      creator: "@SH20RAJ",
+    },
+    other: {
+      "apple-mobile-web-app-title": product.title,
+      "msapplication-TileImage": product.thumbnail || "",
+    }
   };
 }
 
@@ -225,6 +259,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   initialRating={product.rating || "5.0"}
                   initialRatingCount={product.ratingCount || 0}
                   userLoggedIn={!!user}
+                  showStats={product.showStats}
                 />
               </div>
             </div>
