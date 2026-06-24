@@ -269,7 +269,7 @@ export default function ProductInteractionAndReviews({
         </div>
 
         {/* Input Box for review / reply */}
-        <div className="p-6 border-2 border-border bg-card/65 backdrop-blur-md rounded-[2rem] space-y-4">
+        <div id="review-input-form" className="p-6 border-2 border-border bg-card/65 backdrop-blur-md rounded-[2rem] space-y-4">
           {replyToReview && (
             <div className="flex items-center justify-between px-3.5 py-2 bg-[#1CB0F6]/10 border border-[#1CB0F6]/20 rounded-xl text-xs text-[#1CB0F6] font-bold animate-in slide-in-from-top-2 duration-200">
               <span className="flex items-center gap-1.5">
@@ -337,6 +337,7 @@ export default function ProductInteractionAndReviews({
 
               <div className="space-y-2">
                 <textarea
+                  id="review-comment-textarea"
                   value={commentInput}
                   onChange={(e) => setCommentInput(e.target.value)}
                   placeholder={replyToReview ? "Write a reply..." : "What did you think of this product? Mention code quality, usability, or features..."}
@@ -443,9 +444,16 @@ export default function ProductInteractionAndReviews({
                           {/* Reply Button */}
                           <button
                             onClick={() => {
+                              if (!userLoggedIn) {
+                                toast.error("Please sign in to reply!");
+                                return;
+                              }
                               setReplyToReview(review);
-                              const reviewInputSection = document.getElementById("hire-me-page-root"); // scroll helper
+                              const reviewInputSection = document.getElementById("review-input-form");
                               reviewInputSection?.scrollIntoView({ behavior: "smooth" });
+                              setTimeout(() => {
+                                document.getElementById("review-comment-textarea")?.focus();
+                              }, 100);
                             }}
                             className="hover:text-primary transition-colors cursor-pointer"
                           >
@@ -504,6 +512,26 @@ export default function ProductInteractionAndReviews({
                                       >
                                         <Heart className={`w-3 h-3 ${reply.userLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
                                         <span>{reply.likesCount} {reply.likesCount === 1 ? 'like' : 'likes'}</span>
+                                      </button>
+                                      
+                                      {/* Reply Button */}
+                                      <button
+                                        onClick={() => {
+                                          if (!userLoggedIn) {
+                                            toast.error("Please sign in to reply!");
+                                            return;
+                                          }
+                                          setReplyToReview(review);
+                                          setCommentInput(`@${reply.user.name || "builder"} `);
+                                          const reviewInputSection = document.getElementById("review-input-form");
+                                          reviewInputSection?.scrollIntoView({ behavior: "smooth" });
+                                          setTimeout(() => {
+                                            document.getElementById("review-comment-textarea")?.focus();
+                                          }, 100);
+                                        }}
+                                        className="hover:text-primary transition-colors cursor-pointer"
+                                      >
+                                        Reply
                                       </button>
                                     </div>
                                   </div>
