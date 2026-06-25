@@ -1,11 +1,11 @@
-import { db } from "../../db";
-import { coupons } from "../../db/schema";
+import { db } from "@/db";
+import { coupons } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Percent, Gift, ShoppingBag, ArrowRight } from "lucide-react";
+import { Sparkles, Percent, Gift, ArrowRight } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

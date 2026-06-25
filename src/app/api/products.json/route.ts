@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../db";
-import { products, users, categories, subcategories } from "../../../db/schema";
+import { db } from "@/db";
+import { products, users, categories, subcategories } from "@/db/schema";
 import { eq, and, SQL } from "drizzle-orm";
-import { getProductEffectivePrice } from "../../../lib/price-utils";
+import { getProductEffectivePrice } from "@/lib/price-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { Edit2, Eye, Trash2, Search, Filter, Loader2, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
-import { deleteProductAction } from "../lib/actions/products";
+import { deleteProductAction } from "@/lib/actions/products";
 import { toast } from "sonner";
 
 interface CreatorProduct {

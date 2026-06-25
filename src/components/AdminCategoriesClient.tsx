@@ -4,8 +4,8 @@ import useSWR from "swr";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { LayoutGrid, Trash, Plus, FolderKanban, Loader2, AlertCircle, CheckCircle2, ChevronRight } from "lucide-react";
+
+import { Trash, Plus, FolderKanban, Loader2, AlertCircle, CheckCircle2, ChevronRight } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

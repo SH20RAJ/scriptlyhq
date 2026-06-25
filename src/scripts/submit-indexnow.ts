@@ -1,4 +1,4 @@
-import sitemap from "../app/sitemap";
+import sitemap from "@/app/sitemap";
 
 async function main() {
   console.log("Fetching sitemap URLs...");

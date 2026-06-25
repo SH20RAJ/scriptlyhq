@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Book, Code, Globe, Zap, Info } from "lucide-react";
+import { ArrowLeft, Book, Code, Zap, Info } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "API Documentation",

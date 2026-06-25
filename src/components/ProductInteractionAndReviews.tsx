@@ -1,21 +1,11 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
-import { 
-  Eye, Download, Heart, Star, Send, ShieldCheck, 
-  MessageSquare, Loader2, Sparkles, CornerDownRight, X 
-} from "lucide-react";
+import { Eye, Download, Heart, Star, Send, MessageSquare, Loader2, Sparkles, CornerDownRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { 
-  incrementViewAction, 
-  toggleInteractionAction, 
-  checkInteractionStatusAction, 
-  submitReviewAction, 
-  getProductReviewsAction,
-  toggleReviewLikeAction
-} from "../lib/actions/interactions";
+import { incrementViewAction, toggleInteractionAction, checkInteractionStatusAction, submitReviewAction, getProductReviewsAction, toggleReviewLikeAction } from "@/lib/actions/interactions";
 
 interface Review {
   id: string;

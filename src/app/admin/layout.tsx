@@ -1,14 +1,14 @@
-import { isAdmin } from "../../lib/auth-utils";
+import { isAdmin } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LayoutDashboard, ShoppingCart, Package, Home, ShieldAlert, FolderKanban, Gift, CheckSquare, Store, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { db } from "../../db";
-import { products } from "../../db/schema";
+import { db } from "@/db";
+import { products } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
-import type { Metadata } from "next";
-import { CyberBackground } from "../../components/ui/CyberBackground";
+import { Metadata } from "next";
+import { CyberBackground } from "@/components/ui/CyberBackground";
 
 export const metadata: Metadata = {
   title: "Admin Console",

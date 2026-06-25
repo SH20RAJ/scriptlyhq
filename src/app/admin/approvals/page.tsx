@@ -1,17 +1,17 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Approvals",
 };
 
-import { db } from "../../../db";
-import { products, users } from "../../../db/schema";
-import { eq, and } from "drizzle-orm";
-import { getOrCreateDbUser } from "../../../lib/auth-utils";
+import { db } from "@/db";
+import { products, users } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
-import AdminApprovalsList from "../../../components/AdminApprovalsList";
+import AdminApprovalsList from "@/components/AdminApprovalsList";
 
 export default async function AdminApprovalsPage() {
   const user = await getOrCreateDbUser();

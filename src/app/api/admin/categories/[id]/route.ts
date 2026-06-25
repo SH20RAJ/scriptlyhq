@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../../../db";
-import { categories, subcategories } from "../../../../../db/schema";
+import { db } from "@/db";
+import { categories, subcategories } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { isAdmin } from "../../../../../lib/auth-utils";
+import { isAdmin } from "@/lib/auth-utils";
 
 export async function DELETE(
   request: NextRequest,

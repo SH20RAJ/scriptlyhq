@@ -1,5 +1,5 @@
-import { db } from "../db";
-import { products } from "../db/schema";
+import { db } from "@/db";
+import { products } from "@/db/schema";
 import { marked } from "marked";
 import fs from "fs";
 import path from "path";

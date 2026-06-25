@@ -1,21 +1,21 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Orders",
 };
 
-import { db } from "../../../db";
-import { orders, products, users } from "../../../db/schema";
+import { db } from "@/db";
+import { orders, products, users } from "@/db/schema";
 import { eq, desc, ilike, or, sql, asc } from "drizzle-orm";
-import { ShoppingCart, AlertCircle, Calendar, Hash, User, CreditCard } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { AlertCircle, Hash, User } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import AdminOrdersSearchSort from "./AdminOrdersSearchSort";
+import AdminOrdersSearchSort from "@/app/admin/orders/AdminOrdersSearchSort";
 
 interface PageProps {
   searchParams: Promise<{

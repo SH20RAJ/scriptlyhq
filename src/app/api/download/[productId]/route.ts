@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { db } from "../../../../db";
-import { products, orders, downloads, users } from "../../../../db/schema";
+import { db } from "@/db";
+import { products, orders, downloads, users } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { hexclave } from "../../../../lib/hexclave";
+import { hexclave } from "@/lib/hexclave";
 
 export async function GET(
   req: Request,

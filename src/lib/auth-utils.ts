@@ -1,7 +1,7 @@
-import { db } from "../db";
-import { users } from "../db/schema";
+import { db } from "@/db";
+import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { hexclave } from "./hexclave";
+import { hexclave } from "@/lib/hexclave";
 
 export async function getOrCreateDbUser() {
   const hexclaveUser = await hexclave.getUser();

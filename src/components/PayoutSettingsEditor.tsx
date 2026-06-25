@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateCreatorPayoutSettingsAction } from "../lib/actions/creator";
+import { updateCreatorPayoutSettingsAction } from "@/lib/actions/creator";
 import { toast } from "sonner";
 import { Coins, Loader2, Save, Landmark } from "lucide-react";
 

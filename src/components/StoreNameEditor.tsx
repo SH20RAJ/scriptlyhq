@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateCreatorStoreNameAction } from "../lib/actions/creator";
+import { updateCreatorStoreNameAction } from "@/lib/actions/creator";
 import { toast } from "sonner";
 import { Store, Loader2, Save } from "lucide-react";
 

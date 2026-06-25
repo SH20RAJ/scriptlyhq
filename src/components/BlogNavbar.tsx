@@ -2,16 +2,14 @@
 
 import Link from "next/link";
 import { Suspense } from "react";
-import AuthButtons from "./AuthButtons";
-import CartIcon from "./CartIcon";
-import { ThemeToggle } from "./ThemeToggle";
+import AuthButtons from "@/components/AuthButtons";
+import CartIcon from "@/components/CartIcon";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { 
-  Menu, Terminal, Compass, BookOpen, Tag, ChevronRight 
-} from "lucide-react";
+import { Menu, Terminal, Compass, BookOpen, Tag, ChevronRight } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/blog", label: "Blog Home", desc: "Read developer tutorials", icon: BookOpen },

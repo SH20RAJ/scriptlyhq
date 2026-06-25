@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import CartClient from "../../components/CartClient";
+import CartClient from "@/components/CartClient";
 
 export const metadata: Metadata = {
   title: "Shopping Cart | ScriptlyStore",

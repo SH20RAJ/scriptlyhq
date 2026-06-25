@@ -1,9 +1,9 @@
 "use server";
 
-import { db } from "../../db";
-import { products, reviews, userInteractions, users, reviewLikes } from "../../db/schema";
+import { db } from "@/db";
+import { products, reviews, userInteractions, users, reviewLikes } from "@/db/schema";
 import { eq, and, sql, desc, isNull } from "drizzle-orm";
-import { getOrCreateDbUser } from "../auth-utils";
+import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
 
 export async function incrementViewAction(productId: string) {

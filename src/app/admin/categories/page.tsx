@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import AdminCategoriesClient from "../../../components/AdminCategoriesClient";
+import AdminCategoriesClient from "@/components/AdminCategoriesClient";
 
 export const metadata: Metadata = {
   title: "Admin Categories Manager | ScriptlyStore",

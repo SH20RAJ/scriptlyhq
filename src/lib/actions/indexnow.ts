@@ -1,6 +1,6 @@
 "use server";
 
-import sitemap from "../../app/sitemap";
+import sitemap from "@/app/sitemap";
 
 export async function getSitemapUrlsAction() {
   try {

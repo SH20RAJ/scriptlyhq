@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import { db } from "../../db";
+import { Metadata } from "next";
+import { db } from "@/db";
 
 export const metadata: Metadata = {
   title: "Purchase Successful",
   description: "Your purchase was successful! Download your files from your ScriptlyStore dashboard.",
 };
 
-import { orders, products } from "../../db/schema";
+import { orders, products } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Link from "next/link";

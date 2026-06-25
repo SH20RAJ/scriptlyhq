@@ -1,7 +1,5 @@
 import { Metadata } from "next";
-import { 
-  Mail, Globe, ExternalLink, Sparkles, Terminal, CheckCircle2 
-} from "lucide-react";
+import { Mail, Globe, ExternalLink, Sparkles, Terminal, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 

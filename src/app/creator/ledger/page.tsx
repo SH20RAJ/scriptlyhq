@@ -1,14 +1,14 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { db } from "@/db";
 import { products, orders } from "@/db/schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
-import { Landmark, ArrowRight, ShieldCheck, Activity, AlertCircle } from "lucide-react";
+import { Activity, AlertCircle } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 
 export const metadata: Metadata = {
   title: "Sales Ledger | Creator Console",

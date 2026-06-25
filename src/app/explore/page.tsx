@@ -1,10 +1,10 @@
-import { getProductsAction, getCategoriesAction } from "../../lib/actions/products";
-import { ProductCard } from "../../components/SearchFilter";
+import { getProductsAction, getCategoriesAction } from "@/lib/actions/products";
+import { ProductCard } from "@/components/SearchFilter";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight, Compass, Terminal, Zap, Palette, Bot, BookOpen, LayoutGrid, HelpCircle } from "lucide-react";
+import { ArrowRight, Compass, Terminal, Zap, Palette, Bot, BookOpen, LayoutGrid } from "lucide-react";
 import { Metadata } from "next";
-import { CyberBackground } from "../../components/ui/CyberBackground";
+import { CyberBackground } from "@/components/ui/CyberBackground";
 
 export const dynamic = "force-dynamic";
 

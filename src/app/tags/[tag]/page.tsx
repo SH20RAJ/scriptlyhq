@@ -1,6 +1,6 @@
-import { getProductsAction, getCategoriesAction } from "../../../lib/actions/products";
-import { ProductCard } from "../../../components/SearchFilter";
-import { ProductPagination } from "../../../components/ProductPagination";
+import { getProductsAction, getCategoriesAction } from "@/lib/actions/products";
+import { ProductCard } from "@/components/SearchFilter";
+import { ProductPagination } from "@/components/ProductPagination";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";

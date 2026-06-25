@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-import { db } from "../../../db";
+import { Metadata } from "next";
+import { db } from "@/db";
 
 export const metadata: Metadata = {
   title: "Stores & Creators",
 };
 
-import { users, products } from "../../../db/schema";
+import { users } from "@/db/schema";
 import { desc } from "drizzle-orm";
-import { isAdmin } from "../../../lib/auth-utils";
+import { isAdmin } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Store, Gift, Package, UserCheck } from "lucide-react";
-import StoresClient from "./StoresClient";
+import StoresClient from "@/app/admin/stores/StoresClient";
 
 export const dynamic = "force-dynamic";
 

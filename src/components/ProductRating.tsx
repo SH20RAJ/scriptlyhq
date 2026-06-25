@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Star } from "lucide-react";
-import { rateProductAction } from "../lib/actions/products";
+import { rateProductAction } from "@/lib/actions/products";
 import { toast } from "sonner";
 
 interface ProductRatingProps {

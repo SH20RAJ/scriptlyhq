@@ -1,13 +1,13 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "New Product",
 };
 
-import { getCategoriesAction, getSubcategoriesAction } from "../../../../lib/actions/products";
-import ProductForm from "../../../../components/ProductForm";
+import { getCategoriesAction, getSubcategoriesAction } from "@/lib/actions/products";
+import ProductForm from "@/components/ProductForm";
 
 export default async function NewProductPage() {
   const categoriesList = await getCategoriesAction();

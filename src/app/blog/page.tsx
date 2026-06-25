@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { BLOG_POSTS } from "../../lib/blog-data";
-import { Compass, Sparkles, BookOpen, Clock, Calendar, ArrowRight, Search, FileText } from "lucide-react";
+import { BLOG_POSTS } from "@/lib/blog-data";
+import { Sparkles, BookOpen, Clock, ArrowRight, Search, FileText } from "lucide-react";
 import { Metadata } from "next";
-import { CyberBackground } from "../../components/ui/CyberBackground";
+import { CyberBackground } from "@/components/ui/CyberBackground";
 
 export const dynamic = "force-dynamic";
 

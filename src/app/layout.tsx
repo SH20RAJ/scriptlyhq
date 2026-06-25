@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { HexclaveProvider, HexclaveTheme } from "@hexclave/next";
 import Script from "next/script";
-import "./globals.css";
+import "@/app/globals.css";
 
 export const metadata: Metadata = {
 	title: {
@@ -72,14 +72,14 @@ export const viewport = {
 	maximumScale: 1,
 };
 
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import BlogNavbar from "../components/BlogNavbar";
-import BlogFooter from "../components/BlogFooter";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import BlogNavbar from "@/components/BlogNavbar";
+import BlogFooter from "@/components/BlogFooter";
 import { headers } from "next/headers";
-import { stack } from "../lib/stack";
-import { CartProvider } from "../components/CartContext";
-import { ThemeProvider } from "../components/ThemeProvider";
+import { stack } from "@/lib/stack";
+import { CartProvider } from "@/components/CartContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default async function RootLayout({
 	children,

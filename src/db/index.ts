@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import * as schema from "./schema";
+import * as schema from "@/db/schema";
 
 const getDbInstance = () => {
   const connectionString = process.env.DATABASE_URL || "postgres://localhost:5432/scriptlystore";

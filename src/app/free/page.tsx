@@ -1,11 +1,11 @@
 export const dynamic = "force-dynamic";
 
-import { getProductsAction, getCategoriesAction, getSubcategoriesAction } from "../../lib/actions/products";
-import SearchFilter, { ProductCard } from "../../components/SearchFilter";
-import { ProductPagination } from "../../components/ProductPagination";
+import { getProductsAction, getCategoriesAction, getSubcategoriesAction } from "@/lib/actions/products";
+import SearchFilter, { ProductCard } from "@/components/SearchFilter";
+import { ProductPagination } from "@/components/ProductPagination";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Sparkles, Cpu, HelpCircle, HeartHandshake, Layers, ChevronRight } from "lucide-react";
+
+import { Sparkles, HelpCircle, Layers, ChevronRight } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

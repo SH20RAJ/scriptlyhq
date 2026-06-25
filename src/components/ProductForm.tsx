@@ -1,17 +1,13 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
-import { createProductAction, updateProductAction } from "../lib/actions/products";
-import { uploadImageAction } from "../lib/actions/upload";
-import { uploadToGithubReleaseAction } from "../lib/actions/github-releases";
+import { createProductAction, updateProductAction } from "@/lib/actions/products";
+import { uploadImageAction } from "@/lib/actions/upload";
+import { uploadToGithubReleaseAction } from "@/lib/actions/github-releases";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  ArrowLeft, Save, Upload, Loader2, Info, Image as ImageIcon, 
-  Sparkles, Globe, FileUp, Eye, FileArchive, Video, Link as LinkIcon, 
-  HelpCircle, Settings, FileText 
-} from "lucide-react";
+import { ArrowLeft, Save, Upload, Loader2, Info, Image as ImageIcon, Sparkles, Globe, FileUp, FileArchive, Video, Link as LinkIcon, HelpCircle, Settings, FileText } from "lucide-react";
 import Link from "next/link";
 import { marked } from "marked";
 import { Tweet } from "react-tweet";

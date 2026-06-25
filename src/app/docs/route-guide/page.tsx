@@ -1,22 +1,9 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Coins,
-  Landmark,
-  User,
-  Shield,
-  Key,
-  Sparkles,
-  Building,
-  Info,
-  AlertTriangle,
-  ArrowRight,
-  ChevronRight,
-  BookOpen
-} from "lucide-react";
+import { Coins, Landmark, User, Shield, Key, Sparkles, Building, Info, AlertTriangle, ChevronRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 
 export default function RouteGuidePage() {

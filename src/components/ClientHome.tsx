@@ -1,14 +1,11 @@
 "use client";
 
-import { getProductsAction, getCategoriesAction, getSubcategoriesAction } from "../lib/actions/products";
-import SearchFilter, { ProductCard } from "./SearchFilter";
+import { getProductsAction, getCategoriesAction, getSubcategoriesAction } from "@/lib/actions/products";
+import { ProductCard } from "@/components/SearchFilter";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { 
-  Sparkles, Terminal, Palette, Bot, BookOpen, 
-  Search, Zap, ShieldCheck, Coins, LayoutGrid, ArrowRight
-} from "lucide-react";
-import { CyberBackground } from "./ui/CyberBackground";
+import { Sparkles, Terminal, Palette, Bot, BookOpen, Zap, ShieldCheck, Coins, LayoutGrid, ArrowRight } from "lucide-react";
+import { CyberBackground } from "@/components/ui/CyberBackground";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";

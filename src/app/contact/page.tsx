@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Mail, ShieldCheck, HelpCircle, Phone } from "lucide-react";
+import { Mail, ShieldCheck, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 

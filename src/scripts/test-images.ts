@@ -1,4 +1,4 @@
-import { BLOG_POSTS } from "../lib/blog-data";
+import { BLOG_POSTS } from "@/lib/blog-data";
 
 async function main() {
   console.log("TESTING BLOG IMAGES:");

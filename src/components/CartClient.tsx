@@ -1,6 +1,6 @@
 "use client";
 
-import { useCart } from "./CartContext";
+import { useCart } from "@/components/CartContext";
 import { useState, useTransition, useEffect } from "react";
 import useSWR from "swr";
 import Link from "next/link";
@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { createRazorpayOrderAction, verifyPaymentAction } from "../lib/actions/orders";
-import { Trash, CreditCard, ShoppingBag, Loader2, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { createRazorpayOrderAction, verifyPaymentAction } from "@/lib/actions/orders";
+import { Trash, CreditCard, ShoppingBag, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

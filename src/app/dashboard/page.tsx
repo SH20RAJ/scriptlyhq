@@ -1,18 +1,18 @@
 export const dynamic = "force-dynamic";
 
-import { db } from "../../db";
-import { orders, products } from "../../db/schema";
+import { db } from "@/db";
+import { orders, products } from "@/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
-import { getOrCreateDbUser } from "../../lib/auth-utils";
+import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Download, ShoppingBag, CreditCard, ExternalLink, Calendar, Package, FileText } from "lucide-react";
+import { Download, ShoppingBag, CreditCard, ExternalLink, Calendar, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ProductPagination } from "../../components/ProductPagination";
-import type { Metadata } from "next";
+import { ProductPagination } from "@/components/ProductPagination";
+import { Metadata } from "next";
 
 interface PageProps {
   searchParams: Promise<{

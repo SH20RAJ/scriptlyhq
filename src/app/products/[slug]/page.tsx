@@ -1,30 +1,26 @@
 export const dynamic = "force-dynamic";
 
-import { db } from "../../../db";
-import { products, orders, users } from "../../../db/schema";
+import { db } from "@/db";
+import { products, orders, users } from "@/db/schema";
 import { eq, and, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { ProductCard } from "../../../components/SearchFilter";
-import { getOrCreateDbUser } from "../../../lib/auth-utils";
-import ProductCheckout from "../../../components/ProductCheckout";
+import { ProductCard } from "@/components/SearchFilter";
+import { getOrCreateDbUser } from "@/lib/auth-utils";
+import ProductCheckout from "@/components/ProductCheckout";
 import Link from "next/link";
-import { getProductEffectivePrice } from "../../../lib/price-utils";
-import { ArrowLeft, ExternalLink, ShieldCheck, Zap, Download, RefreshCw, Headphones, Lock, CheckCircle2, Sparkles } from "lucide-react";
+import { getProductEffectivePrice } from "@/lib/price-utils";
+import { ArrowLeft, ExternalLink, ShieldCheck, Zap, Download, RefreshCw, Headphones, Lock, Sparkles } from "lucide-react";
 import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { marked } from "marked";
-import ShareButton from "../../../components/ShareButton";
-import { isAdmin } from "../../../lib/auth-utils";
-import AdminToolbar from "./AdminToolbar";
-import TweetEmbed from "../../../components/TweetEmbed";
-import ProductScreenshots from "../../../components/ProductScreenshots";
-import ProductMediaSwitcher from "../../../components/ProductMediaSwitcher";
-import ProductRating from "../../../components/ProductRating";
-import { CyberBackground } from "../../../components/ui/CyberBackground";
-import ProductInteractionAndReviews from "../../../components/ProductInteractionAndReviews";
+import ShareButton from "@/components/ShareButton";
+import AdminToolbar from "@/app/products/[slug]/AdminToolbar";
+import ProductScreenshots from "@/components/ProductScreenshots";
+import ProductMediaSwitcher from "@/components/ProductMediaSwitcher";
+import ProductRating from "@/components/ProductRating";
+import { CyberBackground } from "@/components/ui/CyberBackground";
+import ProductInteractionAndReviews from "@/components/ProductInteractionAndReviews";
 
 
 interface PageProps {

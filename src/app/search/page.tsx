@@ -1,8 +1,8 @@
-import { getProductsAction, getCategoriesAction } from "../../lib/actions/products";
-import SearchFilter, { ProductCard } from "../../components/SearchFilter";
-import { ProductPagination } from "../../components/ProductPagination";
+import { getProductsAction, getCategoriesAction } from "@/lib/actions/products";
+import SearchFilter, { ProductCard } from "@/components/SearchFilter";
+import { ProductPagination } from "@/components/ProductPagination";
 import { Metadata } from "next";
-import { CyberBackground } from "../../components/ui/CyberBackground";
+import { CyberBackground } from "@/components/ui/CyberBackground";
 
 export const dynamic = "force-dynamic";
 

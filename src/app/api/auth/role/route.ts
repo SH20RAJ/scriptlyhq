@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getOrCreateDbUser } from "../../../../lib/auth-utils";
+import { getOrCreateDbUser } from "@/lib/auth-utils";
 
 export async function GET() {
   try {

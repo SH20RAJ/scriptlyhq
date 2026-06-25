@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../../db";
-import { coupons } from "../../../../db/schema";
+import { db } from "@/db";
+import { coupons } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { isAdmin } from "../../../../lib/auth-utils";
+import { isAdmin } from "@/lib/auth-utils";
 
 export async function GET() {
   const authorized = await isAdmin();

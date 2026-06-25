@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { db } from "@/db";
 import { coupons } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";

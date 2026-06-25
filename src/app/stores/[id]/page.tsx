@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { db } from "../../../db";
-import { users, products, coupons } from "../../../db/schema";
+import { Metadata } from "next";
+import { db } from "@/db";
+import { users, products, coupons } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { ProductCard } from "../../../components/SearchFilter";
+import { ProductCard } from "@/components/SearchFilter";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Landmark, ArrowLeft, Code, Tag, ShoppingBag, Globe } from "lucide-react";

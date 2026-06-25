@@ -1,12 +1,12 @@
 "use server";
 
 import Razorpay from "razorpay";
-import { getOrCreateDbUser } from "../auth-utils";
-import { db } from "../../db";
-import { products, orders, coupons, users, payouts } from "../../db/schema";
+import { getOrCreateDbUser } from "@/lib/auth-utils";
+import { db } from "@/db";
+import { products, orders, coupons, users, payouts } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
 import crypto from "crypto";
-import { getProductEffectivePrice } from "../price-utils";
+import { getProductEffectivePrice } from "@/lib/price-utils";
 
 let razorpayInstance: any = null;
 

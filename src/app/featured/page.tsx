@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
 
-import { getProductsAction, getCategoriesAction } from "../../lib/actions/products";
-import { ProductCard } from "../../components/SearchFilter";
-import { ProductPagination } from "../../components/ProductPagination";
+import { getProductsAction, getCategoriesAction } from "@/lib/actions/products";
+import { ProductCard } from "@/components/SearchFilter";
+import { ProductPagination } from "@/components/ProductPagination";
 import { Sparkles, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";

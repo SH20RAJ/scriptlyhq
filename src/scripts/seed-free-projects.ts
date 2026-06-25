@@ -1,6 +1,6 @@
-import { db } from "../db";
-import { products } from "../db/schema";
-import { eq, like } from "drizzle-orm";
+import { db } from "@/db";
+import { products } from "@/db/schema";
+import { like } from "drizzle-orm";
 
 const FREE_PROJECTS = [
   // 1. SaaS Templates (saas-templates)

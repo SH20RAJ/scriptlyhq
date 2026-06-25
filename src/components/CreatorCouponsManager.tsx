@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createCreatorCouponAction, deleteCreatorCouponAction } from "../lib/actions/creator";
+import { createCreatorCouponAction, deleteCreatorCouponAction } from "@/lib/actions/creator";
 import { toast } from "sonner";
 import { Gift, Plus, Trash2, Loader2, AlertCircle } from "lucide-react";
 

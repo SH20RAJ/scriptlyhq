@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../../db";
-import { products } from "../../../../db/schema";
+import { db } from "@/db";
+import { products } from "@/db/schema";
 import { eq, and, like } from "drizzle-orm";
 import crypto from "crypto";
 

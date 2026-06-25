@@ -1,5 +1,5 @@
-import { db } from "../db";
-import { products } from "../db/schema";
+import { db } from "@/db";
+import { products } from "@/db/schema";
 
 async function main() {
   console.log("Setting all products to drafts...");

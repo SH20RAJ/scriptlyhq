@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
-import { db } from "../../../db";
+import { Metadata } from "next";
+import { db } from "@/db";
 
 export const metadata: Metadata = {
   title: "Payouts",
 };
 
-import { users, products, orders, payouts } from "../../../db/schema";
+import { users, orders, payouts } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
-import { isAdmin } from "../../../lib/auth-utils";
+import { isAdmin } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
-import PayoutsClient from "./PayoutsClient";
+import PayoutsClient from "@/app/admin/payouts/PayoutsClient";
 
 export const dynamic = "force-dynamic";
 

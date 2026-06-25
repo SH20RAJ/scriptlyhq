@@ -7,7 +7,7 @@ import { eq, desc } from "drizzle-orm";
 import { ProductCard } from "@/components/SearchFilter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { ArrowLeft, ExternalLink, ShieldCheck, Globe, Star, FileText } from "lucide-react";
 import { CyberBackground } from "@/components/ui/CyberBackground";
 

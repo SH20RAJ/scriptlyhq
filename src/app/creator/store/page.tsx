@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import StoreNameEditor from "@/components/StoreNameEditor";

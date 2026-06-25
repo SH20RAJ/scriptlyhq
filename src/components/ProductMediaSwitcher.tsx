@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Play, Image as ImageIcon, Film, Eye } from "lucide-react";
-import TweetEmbed from "./TweetEmbed";
+import TweetEmbed from "@/components/TweetEmbed";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 

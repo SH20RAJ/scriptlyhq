@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import ClientHome from "../components/ClientHome";
+import ClientHome from "@/components/ClientHome";
 
 export const metadata: Metadata = {
   title: "ScriptlyStore - Premium Digital Products, Templates & Developer Scripts",

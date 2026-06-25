@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
-import { getSitemapUrlsAction, submitUrlsToIndexNowAction } from "../../lib/actions/indexnow";
-import { Globe, RefreshCw, CheckCircle2, AlertTriangle, ExternalLink, List, FileText, ArrowRight, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { getSitemapUrlsAction, submitUrlsToIndexNowAction } from "@/lib/actions/indexnow";
+import { Globe, RefreshCw, CheckCircle2, AlertTriangle, ExternalLink, List, FileText, Loader2 } from "lucide-react";
+
 
 export default function IndexNowPage() {
   const [urls, setUrls] = useState<string[]>([]);

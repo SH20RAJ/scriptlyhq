@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-import { useCart } from "./CartContext";
+import { useCart } from "@/components/CartContext";
 import { useEffect, useState } from "react";
 
 export default function CartIcon() {

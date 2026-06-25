@@ -1,23 +1,23 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Admin Overview",
 };
 
-import { db } from "../../db";
-import { products, orders, users } from "../../db/schema";
+import { db } from "@/db";
+import { products, orders, users } from "@/db/schema";
 import { eq, sql, desc } from "drizzle-orm";
 import { Package, DollarSign, CreditCard, Clock, TrendingUp, Users, ShieldAlert } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-import { ProductPagination } from "../../components/ProductPagination";
+import { ProductPagination } from "@/components/ProductPagination";
 
 interface PageProps {
   searchParams: Promise<{

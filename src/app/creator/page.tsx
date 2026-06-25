@@ -1,24 +1,13 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { db } from "@/db";
 import { products, orders } from "@/db/schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import {
-  Package,
-  Sparkles,
-  AlertTriangle,
-  Plus,
-  LayoutGrid,
-  Coins,
-  Activity,
-  ArrowRight,
-  ShieldCheck,
-  Hourglass,
-} from "lucide-react";
+import { Package, Sparkles, AlertTriangle, Plus, LayoutGrid, Coins, Activity, ArrowRight, ShieldCheck, Hourglass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";

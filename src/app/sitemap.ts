@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
-import { db } from "../db";
-import { products, categories } from "../db/schema";
-import { BLOG_POSTS } from "../lib/blog-data";
+import { db } from "@/db";
+import { products } from "@/db/schema";
+import { BLOG_POSTS } from "@/lib/blog-data";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://scriptly.store";

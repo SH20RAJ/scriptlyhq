@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createRazorpayOrderAction, verifyPaymentAction } from "../lib/actions/orders";
+import { createRazorpayOrderAction, verifyPaymentAction } from "@/lib/actions/orders";
 import { CreditCard, Download, Loader2, ShoppingCart, Trash, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useCart } from "./CartContext";
+import { useCart } from "@/components/CartContext";
 
-import { getProductEffectivePrice } from "../lib/price-utils";
+import { getProductEffectivePrice } from "@/lib/price-utils";
 
 declare global {
   interface Window {

@@ -6,17 +6,12 @@ import { Search } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 
-import { useCart } from "./CartContext";
-import { getProductEffectivePrice } from "../lib/price-utils";
+import { useCart } from "@/components/CartContext";
+import { getProductEffectivePrice } from "@/lib/price-utils";
 
 export default function SearchFilter({
   categories,

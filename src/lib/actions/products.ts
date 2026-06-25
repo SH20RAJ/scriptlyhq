@@ -1,9 +1,9 @@
 "use server";
 
-import { db } from "../../db";
-import { products } from "../../db/schema";
+import { db } from "@/db";
+import { products } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { isAdmin, getOrCreateDbUser } from "../auth-utils";
+import { isAdmin, getOrCreateDbUser } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
 
 export async function createProductAction(formData: FormData) {
@@ -290,7 +290,7 @@ export async function toggleProductPublishAction(id: string) {
   return { success: true };
 }
 
-import { categories as categoriesTable, subcategories } from "../../db/schema";
+import { categories as categoriesTable, subcategories } from "@/db/schema";
 
 export async function ensureCategoriesSeeded() {
   try {

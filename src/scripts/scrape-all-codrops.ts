@@ -6,8 +6,8 @@
  * and inserts them into ScriptlyStore as products priced $20-$50.
  */
 
-import { db } from "../db";
-import { products } from "../db/schema";
+import { db } from "@/db";
+import { products } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 

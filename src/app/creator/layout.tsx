@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -8,16 +8,8 @@ export const metadata: Metadata = {
 
 import Link from "next/link";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
-import { CyberBackground } from "../../components/ui/CyberBackground";
-import {
-  LayoutGrid,
-  Package,
-  Store,
-  Coins,
-  Gift,
-  Activity,
-  ArrowLeft,
-} from "lucide-react";
+import { CyberBackground } from "@/components/ui/CyberBackground";
+import { ArrowLeft } from "lucide-react";
 import SidebarNav from "@/components/SidebarNav";
 
 export default async function CreatorDashboardLayout({

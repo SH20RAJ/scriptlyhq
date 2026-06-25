@@ -1,9 +1,9 @@
-import { BLOG_POSTS, BlogPost } from "../../../lib/blog-data";
+import { BLOG_POSTS } from "@/lib/blog-data";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock, Calendar, ChevronRight, Share2, Sparkles } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, ChevronRight } from "lucide-react";
 import { Metadata } from "next";
-import { CyberBackground } from "../../../components/ui/CyberBackground";
+import { CyberBackground } from "@/components/ui/CyberBackground";
 
 export const dynamic = "force-dynamic";
 

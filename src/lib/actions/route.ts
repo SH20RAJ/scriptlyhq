@@ -1,9 +1,9 @@
 "use server";
 
-import { db } from "../../db";
-import { users } from "../../db/schema";
+import { db } from "@/db";
+import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { isAdmin } from "../auth-utils";
+import { isAdmin } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
 
 export async function updateCreatorRazorpayAccountIdAction(userId: string, accountId: string) {

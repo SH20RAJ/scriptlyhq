@@ -1,7 +1,7 @@
-import { db } from "../../db";
-import { products } from "../../db/schema";
+import { db } from "@/db";
+import { products } from "@/db/schema";
 import { desc } from "drizzle-orm";
-import { BLOG_POSTS } from "../../lib/blog-data";
+import { BLOG_POSTS } from "@/lib/blog-data";
 
 function escapeXml(unsafe: string): string {
   return unsafe

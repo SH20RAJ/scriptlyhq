@@ -1,20 +1,20 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Purchase Receipt",
 };
 
-import { db } from "../../../../db";
-import { orders, products, users } from "../../../../db/schema";
+import { db } from "@/db";
+import { orders, products, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { getOrCreateDbUser } from "../../../../lib/auth-utils";
+import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PrintButton } from "../../../../components/PrintButton";
+import { PrintButton } from "@/components/PrintButton";
 
 interface PageProps {
   params: Promise<{

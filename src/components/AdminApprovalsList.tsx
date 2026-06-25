@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { approveProductAction, rejectProductAction } from "../lib/actions/products";
+import { approveProductAction, rejectProductAction } from "@/lib/actions/products";
 import { toast } from "sonner";
-import { Check, X, Eye, Download, ShieldAlert, Loader2, Calendar, User, Mail, DollarSign } from "lucide-react";
+import { Check, X, Eye, Download, ShieldAlert, Loader2, Calendar, User, Mail } from "lucide-react";
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 interface PendingProduct {
   id: string;

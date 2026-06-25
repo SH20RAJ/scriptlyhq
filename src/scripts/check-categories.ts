@@ -1,5 +1,5 @@
-import { db } from "../db";
-import { products } from "../db/schema";
+import { db } from "@/db";
+import { products } from "@/db/schema";
 import { like } from "drizzle-orm";
 
 async function main() {

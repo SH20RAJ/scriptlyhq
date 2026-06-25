@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import AdminCouponsClient from "../../../components/AdminCouponsClient";
+import AdminCouponsClient from "@/components/AdminCouponsClient";
 
 export const metadata: Metadata = {
   title: "Admin Coupons Manager | ScriptlyStore",

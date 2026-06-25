@@ -1,28 +1,14 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
-import { recordPayoutAction } from "../../../lib/actions/payouts";
+import { recordPayoutAction } from "@/lib/actions/payouts";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Coins, 
-  DollarSign, 
-  Plus, 
-  Calendar, 
-  Mail, 
-  UserCheck, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2,
-  X,
-  CreditCard,
-  Search,
-  Filter
-} from "lucide-react";
+import { Coins, DollarSign, Plus, Calendar, Mail, CheckCircle2, AlertCircle, Loader2, X, CreditCard, Search, Filter } from "lucide-react";
 
 interface PayoutsClientProps {
   creators: {

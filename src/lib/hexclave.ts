@@ -1,5 +1,5 @@
 import { HexclaveServerApp } from "@hexclave/next";
-import { stack } from "./stack";
+import { stack } from "@/lib/stack";
 
 export const hexclave = new HexclaveServerApp({
   projectId: process.env.NEXT_PUBLIC_HEXCLAVE_PROJECT_ID!,
