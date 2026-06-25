@@ -96,6 +96,16 @@ export default function HireMePage() {
     <div className="container max-w-5xl mx-auto px-4 py-16 md:py-24 space-y-16" id="hire-me-page-root">
       {/* 1. Header Hero section */}
       <div className="text-center space-y-6 max-w-2xl mx-auto">
+        <div className="flex justify-center select-none pb-2">
+          <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-[#1CB0F6]/20 bg-[#1CB0F6]/5 shadow-xl shadow-primary/5">
+            <img 
+              src="https://sh20raj.github.io/profile.jpg" 
+              alt="Shaswat Raj Profile Picture"
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
+          </div>
+        </div>
         <Badge variant="outline" className="rounded-full px-4 py-1 text-[10px] uppercase font-black tracking-[0.2em] border-[#1CB0F6]/20 text-[#1CB0F6] bg-[#1CB0F6]/5">
           <Sparkles className="w-3.5 h-3.5 mr-1.5 animate-pulse text-[#1CB0F6]" />
           Available for Hire

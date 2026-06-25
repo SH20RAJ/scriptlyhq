@@ -9,7 +9,7 @@ import { getOrCreateDbUser } from "../../../lib/auth-utils";
 import ProductCheckout from "../../../components/ProductCheckout";
 import Link from "next/link";
 import { getProductEffectivePrice } from "../../../lib/price-utils";
-import { ArrowLeft, ExternalLink, ShieldCheck, Zap, Download, RefreshCw, Headphones, Lock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, ShieldCheck, Zap, Download, RefreshCw, Headphones, Lock, CheckCircle2, Sparkles } from "lucide-react";
 import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -359,6 +359,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   )}
 
                   <ShareButton productTitle={product.title} productSlug={product.slug} />
+                  
+                  <Button asChild variant="outline" className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-[10px] border-2 border-dashed border-[#1CB0F6]/30 hover:border-[#1CB0F6]/60 text-foreground hover:bg-[#1CB0F6]/5 transition-all duration-300">
+                    <Link href="/hire-me" className="flex items-center justify-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-[#1CB0F6] animate-pulse" />
+                      Hire Developer for Custom Edits
+                    </Link>
+                  </Button>
                 </div>
 
                 {/* High-Conversion Inclusions Box */}

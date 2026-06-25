@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { createRazorpayOrderAction, verifyPaymentAction } from "../lib/actions/orders";
-import { CreditCard, Download, Loader2, ShoppingCart, Trash } from "lucide-react";
+import { CreditCard, Download, Loader2, ShoppingCart, Trash, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCart } from "./CartContext";
@@ -44,6 +44,7 @@ export default function ProductCheckout({
   const [error, setError] = useState<string | null>(null);
   const [addOnEditCopy, setAddOnEditCopy] = useState(false);
   const [addOnSetupDeploy, setAddOnSetupDeploy] = useState(false);
+  const [isAddonsExpanded, setIsAddonsExpanded] = useState(false);
   const { addToCart, removeFromCart, isInCart } = useCart();
 
   const inCart = isInCart(product.id);
@@ -163,45 +164,61 @@ export default function ProductCheckout({
 
   return (
     <div className="w-full space-y-4">
-      {/* Stylish Add-on Checkboxes */}
-      <div className="space-y-3 bg-card/60 border-2 border-border/80 p-4 rounded-2xl shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842]">
-        <div className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground pb-2 border-b border-border/40">
-          Customize & Support Add-ons
-        </div>
-        
-        {/* Add-on 1: Copy Edit */}
-        <label className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${addOnEditCopy ? 'border-primary bg-primary/5 shadow-[0_3px_0_rgba(88,204,2,0.2)]' : 'border-border/60 hover:border-border hover:bg-muted/10'}`}>
-          <input 
-            type="checkbox" 
-            checked={addOnEditCopy} 
-            onChange={(e) => setAddOnEditCopy(e.target.checked)} 
-            className="mt-1 w-4 h-4 accent-primary rounded cursor-pointer shrink-0"
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-baseline gap-2">
-              <span className="text-[11px] font-black uppercase tracking-wider text-foreground">Edit Copy & Content</span>
-              <span className="text-[11px] font-black text-primary font-mono shrink-0">+${(editCopyPrice / 100).toFixed(2)}</span>
-            </div>
-            <p className="text-[9px] font-bold text-muted-foreground mt-1 leading-normal">Customize placeholder texts, branding copy, colors, and design components.</p>
+      {/* Accordion: Customize & Support Add-ons */}
+      <div className="bg-card/60 border-2 border-border/80 rounded-2xl shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setIsAddonsExpanded(!isAddonsExpanded)}
+          className="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-muted/10 transition-colors text-left"
+        >
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground">
+              Customize & Support Add-ons
+            </span>
+            <p className="text-[9px] font-bold text-primary uppercase tracking-wider">
+              {addOnEditCopy || addOnSetupDeploy ? "✓ Add-ons Selected" : "+ Click to view options"}
+            </p>
           </div>
-        </label>
+          <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${isAddonsExpanded ? "rotate-180" : ""}`} />
+        </button>
 
-        {/* Add-on 2: Setup/Deployment */}
-        <label className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${addOnSetupDeploy ? 'border-primary bg-primary/5 shadow-[0_3px_0_rgba(88,204,2,0.2)]' : 'border-border/60 hover:border-border hover:bg-muted/10'}`}>
-          <input 
-            type="checkbox" 
-            checked={addOnSetupDeploy} 
-            onChange={(e) => setAddOnSetupDeploy(e.target.checked)} 
-            className="mt-1 w-4 h-4 accent-primary rounded cursor-pointer shrink-0"
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-baseline gap-2">
-              <span className="text-[11px] font-black uppercase tracking-wider text-foreground">Setup & Deployment</span>
-              <span className="text-[11px] font-black text-primary font-mono shrink-0">+${(setupDeployPrice / 100).toFixed(2)}</span>
-            </div>
-            <p className="text-[9px] font-bold text-muted-foreground mt-1 leading-normal">Complete setup. We will deploy the codebase live on Cloudflare/Vercel for you.</p>
+        {isAddonsExpanded && (
+          <div className="p-4 pt-0 border-t border-border/40 space-y-3 animate-in slide-in-from-top-2 duration-300">
+            {/* Add-on 1: Copy Edit */}
+            <label className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${addOnEditCopy ? 'border-primary bg-primary/5 shadow-[0_3px_0_rgba(88,204,2,0.2)]' : 'border-border/60 hover:border-border hover:bg-muted/10'}`}>
+              <input 
+                type="checkbox" 
+                checked={addOnEditCopy} 
+                onChange={(e) => setAddOnEditCopy(e.target.checked)} 
+                className="mt-1 w-4 h-4 accent-primary rounded cursor-pointer shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-foreground">Edit Copy & Content</span>
+                  <span className="text-[11px] font-black text-primary font-mono shrink-0">+${(editCopyPrice / 100).toFixed(2)}</span>
+                </div>
+                <p className="text-[9px] font-bold text-muted-foreground mt-1 leading-normal">Customize placeholder texts, branding copy, colors, and design components.</p>
+              </div>
+            </label>
+
+            {/* Add-on 2: Setup/Deployment */}
+            <label className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${addOnSetupDeploy ? 'border-primary bg-primary/5 shadow-[0_3px_0_rgba(88,204,2,0.2)]' : 'border-border/60 hover:border-border hover:bg-muted/10'}`}>
+              <input 
+                type="checkbox" 
+                checked={addOnSetupDeploy} 
+                onChange={(e) => setAddOnSetupDeploy(e.target.checked)} 
+                className="mt-1 w-4 h-4 accent-primary rounded cursor-pointer shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-foreground">Setup & Deployment</span>
+                  <span className="text-[11px] font-black text-primary font-mono shrink-0">+${(setupDeployPrice / 100).toFixed(2)}</span>
+                </div>
+                <p className="text-[9px] font-bold text-muted-foreground mt-1 leading-normal">Complete setup. We will deploy the codebase live on Cloudflare/Vercel for you.</p>
+              </div>
+            </label>
           </div>
-        </label>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
