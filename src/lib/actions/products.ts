@@ -456,10 +456,10 @@ export async function ensureCategoriesSeeded() {
           category: "ebooks",
           subcategory: "creator-business-guides",
           tags: "saas,indie-hacking,micro-saas,business",
-          thumbnail: "/thumbnails/solo_dev_micro_saas.png",
+          thumbnail: "https://iili.io/CAQrjUX.jpg",
           demoUrl: null,
           fileUrl: "/mock/solo-developers-guide-to-micro-saas.pdf",
-          price: 49900, // ₹499.00
+          price: 1900, // $19.00
           version: "1.0.0",
           featured: true,
           published: true,
@@ -480,10 +480,10 @@ export async function ensureCategoriesSeeded() {
           category: "ebooks",
           subcategory: "seo-checklists",
           tags: "seo,marketing,nextjs,nextjs-seo",
-          thumbnail: "/thumbnails/seo_for_developers.png",
+          thumbnail: "https://iili.io/CAQreOG.jpg",
           demoUrl: null,
           fileUrl: "/mock/seo-for-developers.pdf",
-          price: 39900, // ₹399.00
+          price: 1200, // $12.00
           version: "1.0.0",
           featured: true,
           published: true,
@@ -504,10 +504,10 @@ export async function ensureCategoriesSeeded() {
           category: "ebooks",
           subcategory: "creator-business-guides",
           tags: "design,tailwind,ui-ux,css",
-          thumbnail: "/thumbnails/design_for_developers.png",
+          thumbnail: "https://iili.io/CAQrrfS.jpg",
           demoUrl: null,
           fileUrl: "/mock/design-for-developers-tailwind.pdf",
-          price: 45000, // ₹450.00
+          price: 1500, // $15.00
           version: "1.0.0",
           featured: true,
           published: true,
@@ -528,10 +528,10 @@ export async function ensureCategoriesSeeded() {
           category: "ebooks",
           subcategory: "coding-handbooks",
           tags: "api,backend,nextjs,serverless,edge",
-          thumbnail: "/thumbnails/api_design_patterns.png",
+          thumbnail: "https://iili.io/CAQrLOb.jpg",
           demoUrl: null,
           fileUrl: "/mock/api-design-patterns-serverless.pdf",
-          price: 59900, // ₹599.00
+          price: 2400, // $24.00
           version: "1.0.0",
           featured: true,
           published: true,
@@ -552,10 +552,10 @@ export async function ensureCategoriesSeeded() {
           category: "ebooks",
           subcategory: "coding-handbooks",
           tags: "ai,automation,scraping,puppeteer,nodejs",
-          thumbnail: "/thumbnails/ai_automation_scraping.png",
+          thumbnail: "https://iili.io/CAQrDWQ.jpg",
           demoUrl: null,
           fileUrl: "/mock/ai-automation-scraping-playbook.pdf",
-          price: 49900, // ₹499.00
+          price: 1900, // $19.00
           version: "1.0.0",
           featured: true,
           published: true,
