@@ -26,7 +26,7 @@ export default function AffiliateOnboardingClient({
 
   // Calculator states
   const [salesVal, setSalesVal] = useState(1500); // USD
-  const [commRate, setCommRate] = useState(15); // Percentage
+  const [commRate, setCommRate] = useState(30); // Percentage
 
   const potentialEarnings = Math.round(salesVal * (commRate / 100));
 

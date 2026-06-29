@@ -317,14 +317,43 @@ export default async function BlogPostPage({ params }: PageProps) {
         <footer className="max-w-3xl mx-auto border-t border-border/60 pt-8 mt-12">
           <div className="p-6 bg-card/45 border-2 border-border rounded-3xl flex flex-col md:flex-row items-center gap-6 shadow-[0_3px_0_var(--border)]">
             <div className="space-y-2 text-center md:text-left flex-1">
-              <p className="text-xs text-primary font-black uppercase tracking-wider">About the Team</p>
-              <h4 className="text-sm font-black text-foreground">{post.author.name}</h4>
-              <p className="text-xs text-muted-foreground font-medium leading-relaxed">
-                The {post.author.name} is a group of passionate software developers, templates designers, and technical writers specializing in modern framework architectures, database scaling, prompt engineering, and SaaS growth frameworks.
+              <p className="text-xs text-primary font-black uppercase tracking-wider">
+                {post.author.bio ? "About the Author" : "About the Team"}
               </p>
+              <h4 className="text-sm font-black text-foreground">
+                {post.author.name} {post.author.role ? `— ${post.author.role}` : ""}
+              </h4>
+              <p className="text-xs text-muted-foreground font-medium leading-relaxed">
+                {post.author.bio || `The ${post.author.name} is a group of passionate software developers, templates designers, and technical writers specializing in modern framework architectures, database scaling, prompt engineering, and SaaS growth frameworks.`}
+              </p>
+              {(post.author.github || post.author.twitter) && (
+                <div className="flex gap-4 pt-2">
+                  {post.author.github && (
+                    <a
+                      href={post.author.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline font-bold"
+                    >
+                      GitHub Profile
+                    </a>
+                  )}
+                  {post.author.twitter && (
+                    <a
+                      href={post.author.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline font-bold"
+                    >
+                      Twitter / X
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </footer>
+
 
       </div>
     </div>

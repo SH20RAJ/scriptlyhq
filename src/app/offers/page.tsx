@@ -59,7 +59,12 @@ export default async function OffersPage() {
               <p className="text-muted-foreground text-sm font-medium leading-relaxed">
                 Add premium boilerplates, kits, or prompts to your cart. Once your subtotal exceeds **$60.00**, a **20% flat discount** will be automatically applied at checkout.
               </p>
+              <div className="mt-2 text-xs font-bold text-amber-500 flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl w-fit">
+                <span className="animate-pulse w-2 h-2 rounded-full bg-amber-500" />
+                <span>Urgent Promo: Only 15 uses remaining today. Expiry in 14 hours!</span>
+              </div>
             </div>
+
           </div>
           <div className="pt-8 border-t border-border/40 mt-8 flex items-center justify-between">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Min. Cart: $60.00</span>

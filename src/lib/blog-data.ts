@@ -1,3 +1,9 @@
+import { post1 } from "./blog-posts/telegram-bot-cloudflare-workers";
+import { post2 } from "./blog-posts/nextjs-saas-templates-2026";
+import { post3 } from "./blog-posts/profitable-micro-saas-ideas";
+import { post4 } from "./blog-posts/automate-seo-content-python-ai";
+import { post5 } from "./blog-posts/monetize-developer-side-projects";
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -6,6 +12,9 @@ export interface BlogPost {
   author: {
     name: string;
     role: string;
+    bio?: string;
+    github?: string;
+    twitter?: string;
   };
   readTime: string;
   category: string;
@@ -14,6 +23,12 @@ export interface BlogPost {
 }
 
 export const BLOG_POSTS: BlogPost[] = [
+  post1,
+  post2,
+  post3,
+  post4,
+  post5,
+
   {
     slug: "announcing-scriptlystore-public-api",
     title: "Announcing ScriptlyStore Public API: Build Your Own Marketplace Frontends",

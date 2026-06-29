@@ -24,6 +24,9 @@ import { CyberBackground } from "@/components/ui/CyberBackground";
 import ProductInteractionAndReviews from "@/components/ProductInteractionAndReviews";
 
 
+import { getProductSeo } from "@/lib/seo-data";
+
+
 interface PageProps {
   params: Promise<{
     slug: string;
@@ -49,6 +52,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Product Not Found | ScriptlyStore" };
   }
 
+  const promo = getProductEffectivePrice(product);
+  const priceText = promo.isFree ? "FREE" : `$${(promo.effectivePrice / 100).toFixed(2)}`;
+  const seo = getProductSeo(product.slug, product.title, product.shortDescription, product.category, priceText);
+
   // Parse screenshots list
   const screenshotsList = product.screenshots ? product.screenshots.split(",").map((s) => s.trim()) : [];
   
@@ -65,15 +72,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     : [product.category, "digital asset", "source code", "boilerplate"];
 
   return {
-    title: `${product.title} - ScriptlyStore`,
-    description: product.shortDescription,
+    title: seo.title,
+    description: seo.description,
     keywords,
     alternates: {
       canonical: `https://scriptly.store/products/${product.slug}`,
     },
     openGraph: {
-      title: `${product.title} - ScriptlyStore`,
-      description: product.shortDescription,
+      title: seo.title,
+      description: seo.description,
       url: `https://scriptly.store/products/${product.slug}`,
       siteName: "ScriptlyStore",
       type: "article",
@@ -82,8 +89,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: "summary_large_image",
-      title: `${product.title} - ScriptlyStore`,
-      description: product.shortDescription,
+      title: seo.title,
+      description: seo.description,
       images: product.thumbnail ? [product.thumbnail] : [],
       creator: "@SH20RAJ",
     },
@@ -132,6 +139,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
   }
 
   const promo = getProductEffectivePrice(product);
+  const priceText = promo.isFree ? "FREE" : `$${(promo.effectivePrice / 100).toFixed(2)}`;
+  const seo = getProductSeo(product.slug, product.title, product.shortDescription, product.category, priceText);
 
   // Fetch related products (same category, not current product, published/approved)
   const relatedProducts = await db.query.products.findMany({
@@ -200,12 +209,66 @@ export default async function ProductDetailPage({ params }: PageProps) {
             },
             "aggregateRating": {
               "@type": "AggregateRating",
-              "ratingValue": product.rating || "5.0",
-              "reviewCount": product.ratingCount || 1
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": product.rating || "5.0",
+                "reviewCount": product.ratingCount || 1
+              }
             }
           })
         }}
       />
+      {/* FAQPage JSON-LD Schema for SEO */}
+      {seo.faqs && seo.faqs.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": seo.faqs.map(faq => ({
+                "@type": "Question",
+                "name": faq.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faq.answer
+                }
+              }))
+            })
+          }}
+        />
+      )}
+      {/* BreadcrumbList JSON-LD Schema for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://scriptly.store/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": product.category,
+                "item": `https://scriptly.store/explore?category=${encodeURIComponent(product.category.toLowerCase())}`
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": product.title,
+                "item": `https://scriptly.store/products/${product.slug}`
+              }
+            ]
+          })
+        }}
+      />
+
       <CyberBackground />
       <div className="container max-w-7xl mx-auto px-4 py-8">
         <Button asChild variant="ghost" size="sm" className="-ml-3 text-muted-foreground hover:text-foreground mb-8">

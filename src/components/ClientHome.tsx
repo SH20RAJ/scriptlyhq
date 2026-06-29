@@ -227,7 +227,7 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter leading-[1.05]"
             >
-              Buy & Sell <span className="bg-gradient-to-r from-primary via-[#1CB0F6] to-[#CE82FF] bg-clip-text text-transparent">Production-Ready</span> Code
+              Deploy <span className="bg-gradient-to-r from-primary via-[#1CB0F6] to-[#CE82FF] bg-clip-text text-transparent">Production-Ready</span> Code Boilerplates Instantly
             </motion.h1>
             
             <motion.p
@@ -236,9 +236,10 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-base sm:text-xl text-muted-foreground font-bold max-w-2xl mx-auto leading-relaxed"
             >
-              Ship your SaaS apps, extensions, and bots in minutes using pre-built templates. Keep 95% of your earnings when you sell, or earn 30% split commission as an affiliate!
+              Launch SaaS products, automation scripts, and browser extensions in minutes with curated developer templates. Sell your code keeping 95% of sales, or earn 30% split commission as an affiliate!
             </motion.p>
           </div>
+
 
           {/* Glowing Hero Search Bar */}
           <motion.form
