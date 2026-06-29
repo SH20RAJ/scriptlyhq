@@ -162,23 +162,40 @@ export function ProductCard({ prod, categoryName }: { prod: any, categoryName: s
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/products/${prod.slug}`} className="block relative overflow-hidden rounded-t-[30px]">
-        <AspectRatio ratio={16 / 10} className="bg-muted overflow-hidden">
+      <Link href={`/products/${prod.slug}`} className="block relative overflow-hidden rounded-t-[30px] bg-muted/40">
+        <AspectRatio ratio={16 / 10} className="overflow-hidden relative flex items-center justify-center">
+          {/* Ambient Glow blurred background */}
+          {prod.thumbnail && (
+            <img
+              src={prod.thumbnail}
+              alt=""
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover blur-[14px] opacity-40 scale-110 saturate-125 select-none pointer-events-none"
+            />
+          )}
           {prod.thumbnail && (
             <img
               src={prod.thumbnail}
               alt={prod.title}
               loading="lazy"
-              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isHovered && prod.previewGif ? 'opacity-0 scale-100' : 'opacity-100'}`}
+              className={`relative z-10 max-w-full max-h-full w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105 ${isHovered && prod.previewGif ? 'opacity-0' : 'opacity-100'}`}
             />
           )}
           {prod.previewGif && (
-             <div className={`absolute inset-0 transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+             <div className={`absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                {/* Blur backdrop for GIF */}
+                <img
+                  src={prod.previewGif}
+                  alt=""
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover blur-[14px] opacity-40 scale-110 saturate-125 select-none pointer-events-none"
+                />
+                {/* Actual GIF */}
                 <img
                   src={prod.previewGif}
                   alt={`${prod.title} preview`}
                   loading="lazy"
-                  className="w-full h-full object-cover"
+                  className="relative z-10 max-w-full max-h-full w-auto h-auto object-contain"
                 />
              </div>
           )}

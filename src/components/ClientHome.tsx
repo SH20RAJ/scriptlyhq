@@ -202,17 +202,21 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
       <section className="relative overflow-hidden pt-16 pb-20 md:pt-24 md:pb-28">
         <div className="container max-w-7xl mx-auto px-4 text-center relative z-10 space-y-8">
           
-          {/* Neon Floating Badge */}
+          {/* Clickable Floating Badge to Affiliate Page */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-card border-2 border-border shadow-[0_3px_0_var(--border)] dark:shadow-[0_3px_0_#2A3842]"
           >
-            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-              DEVELOPER-FIRST MARKETPLACE & PLATFORM
-            </span>
+            <Link 
+              href="/affiliate" 
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500/20 shadow-[0_3px_0_rgba(16,185,129,0.15)] hover:border-emerald-500/40 hover:-translate-y-px transition-all duration-200"
+            >
+              <Sparkles className="w-4 h-4 text-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                Promote & Earn: Get 30% split commission on any script refer <ArrowRight className="w-3 h-3" />
+              </span>
+            </Link>
           </motion.div>
 
           {/* Main Title & Subtitle */}
@@ -232,7 +236,7 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-base sm:text-xl text-muted-foreground font-bold max-w-2xl mx-auto leading-relaxed"
             >
-              Ship your SaaS apps, extensions, and bots in minutes using pre-built templates. Keep 95% of your earnings when you sell.
+              Ship your SaaS apps, extensions, and bots in minutes using pre-built templates. Keep 95% of your earnings when you sell, or earn 30% split commission as an affiliate!
             </motion.p>
           </div>
 

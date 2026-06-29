@@ -286,15 +286,15 @@ export default function AffiliateOnboardingClient({
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
             <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Desired Link Handle (ref)</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+            <div className="flex rounded-xl overflow-hidden border border-border/40 bg-muted/30 focus-within:ring-2 focus-within:ring-primary transition-all duration-200">
+              <span className="bg-muted px-4 flex items-center text-xs font-bold text-muted-foreground border-r border-border/40 select-none">
                 scriptly.store/?ref=
               </span>
               <Input
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
                 placeholder="username"
-                className="rounded-xl h-11 pl-[125px] bg-muted/30 border-border/40 focus-visible:ring-primary font-bold text-xs"
+                className="flex-1 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold text-xs shadow-none h-11 rounded-none px-4"
                 required
               />
             </div>
