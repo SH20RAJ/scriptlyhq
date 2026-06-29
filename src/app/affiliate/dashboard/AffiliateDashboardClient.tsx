@@ -130,7 +130,7 @@ export default function AffiliateDashboardClient({
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="container max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-8 animate-in fade-in duration-300">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
