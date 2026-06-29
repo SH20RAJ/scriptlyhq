@@ -39,7 +39,7 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
       const currentSortBy = params.sortBy || "newest";
       const currentPage = parseInt(params.page || "1");
 
-      const [productsData, featuredData, freeData, categories, subcategories] = await Promise.all([
+      const [productsData, featuredData, freeData, categories, subcategories, landingPagesData] = await Promise.all([
         getProductsAction({
           category: currentCategory,
           subcategory: currentSubcategory,
@@ -50,7 +50,7 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
           limit: 36,
         }),
         getProductsAction({
-          priceType: "paid",
+          featuredOnly: true,
           limit: 6,
           sortBy: "rating",
         }),
@@ -60,7 +60,12 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
           sortBy: "newest",
         }),
         getCategoriesAction(),
-        getSubcategoriesAction()
+        getSubcategoriesAction(),
+        getProductsAction({
+          category: "landing-pages",
+          limit: 6,
+          sortBy: "newest",
+        })
       ]);
 
       setData({
@@ -70,6 +75,7 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
         freeProductsList: freeData.products,
         categoriesList: categories,
         subcategoriesList: subcategories,
+        landingPagesList: landingPagesData.products,
         currentCategory,
         currentSubcategory,
         currentSearch,
@@ -162,7 +168,7 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
 
   const { 
     productsList, featuredPremiumList, freeProductsList, categoriesList, 
-    currentCategory, currentSubcategory, currentSearch
+    currentCategory, currentSubcategory, currentSearch, landingPagesList
   } = data;
 
   const handleHeroSearchSubmit = (e: React.FormEvent) => {
@@ -321,6 +327,39 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
           </div>
         </div>
       </section>
+
+      {/* 2.3. Dedicated Landing Pages Section */}
+      {landingPagesList && landingPagesList.length > 0 && (
+        <section className="py-16 border-t border-border bg-card/[0.01]">
+          <div className="container max-w-7xl mx-auto px-4 space-y-12">
+            
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-border/40 pb-6">
+              <div className="space-y-1.5 text-center md:text-left">
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground flex items-center justify-center md:justify-start gap-2">
+                  <Zap className="w-5 h-5 text-primary animate-pulse" />
+                  Landing Page Templates
+                </h2>
+                <p className="text-xs font-bold text-muted-foreground">
+                  High-converting Next.js, React, and HTML templates designed to showcase your SaaS, portfolio, or agency.
+                </p>
+              </div>
+              <Link href="/explore?category=landing-pages" className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                View All Landing Pages <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {landingPagesList.slice(0, 3).map((prod: any) => (
+                <ProductCard 
+                  key={prod.id} 
+                  prod={prod} 
+                  categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 2.5. Dedicated Featured Products Section */}
       {featuredPremiumList && featuredPremiumList.length > 0 && (
