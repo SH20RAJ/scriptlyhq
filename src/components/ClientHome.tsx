@@ -321,6 +321,39 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
         </div>
       </section>
 
+      {/* 2.5. Dedicated Featured Products Section */}
+      {featuredPremiumList && featuredPremiumList.length > 0 && (
+        <section className="py-16 border-t border-border bg-card/[0.02]">
+          <div className="container max-w-7xl mx-auto px-4 space-y-12">
+            
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-border/40 pb-6">
+              <div className="space-y-1.5 text-center md:text-left">
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground flex items-center justify-center md:justify-start gap-2">
+                  <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                  Featured Releases
+                </h2>
+                <p className="text-xs font-bold text-muted-foreground">
+                  Our handpicked choice of top-performing SaaS boilerplates, ebooks, and developer scripts.
+                </p>
+              </div>
+              <Link href="/explore?sortBy=rating" className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                Explore Best Sellers <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredPremiumList.slice(0, 3).map((prod: any) => (
+                <ProductCard 
+                  key={prod.id} 
+                  prod={prod} 
+                  categoryName={categoriesList.find((c: any) => c.slug === prod.category)?.name || prod.category} 
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* 3. Re-designed Category Cards */}
       <section className="py-20 bg-muted/10">
         <div className="container max-w-7xl mx-auto px-4 space-y-12">
