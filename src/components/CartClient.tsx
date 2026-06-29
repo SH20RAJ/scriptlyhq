@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createRazorpayOrderAction, verifyPaymentAction } from "@/lib/actions/orders";
-import { Trash, CreditCard, ShoppingBag, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { validateReferralCodeAction } from "@/lib/actions/affiliates";
+import { Trash, CreditCard, ShoppingBag, Loader2, CheckCircle2, AlertCircle, Percent } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -18,12 +19,23 @@ export default function CartClient() {
   const { cart, removeFromCart, clearCart, cartSubtotal, cartCount } = useCart();
   const [couponInput, setCouponInput] = useState("");
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const [referralInput, setReferralInput] = useState("");
+  const [appliedReferral, setAppliedReferral] = useState<string | null>(null);
+  const [referralPending, setReferralPending] = useState(false);
+  const [referralMessage, setReferralMessage] = useState<{ success: boolean; text: string } | null>(null);
   const [isPending, startTransition] = useTransition();
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const match = document.cookie.match(/(?:^|; )scriptly_referred_by=([^;]*)/);
+    if (match && match[1]) {
+      const decodedVal = decodeURIComponent(match[1]);
+      setAppliedReferral(decodedVal);
+      setReferralInput(decodedVal);
+      setReferralMessage({ success: true, text: `Referral code "${decodedVal}" active! Extra 5% discount applied.` });
+    }
   }, []);
 
   // Compute Automatic Offer: 20% off > $60.00 (6000 cents)
@@ -61,8 +73,13 @@ export default function CartClient() {
     }
   }
 
-  const finalTotal = Math.max(amountAfterAuto - couponDiscount, 100); // min $1.00 for Razorpay
-  const totalSavings = autoOfferDiscount + couponDiscount;
+  // Calculate Referral Discount (5% on remaining)
+  const referralDiscount = appliedReferral 
+    ? Math.round((amountAfterAuto - couponDiscount) * 0.05) 
+    : 0;
+
+  const finalTotal = Math.max(amountAfterAuto - couponDiscount - referralDiscount, 100); // min $1.00 for Razorpay
+  const totalSavings = autoOfferDiscount + couponDiscount + referralDiscount;
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +96,38 @@ export default function CartClient() {
     setCouponInput("");
   };
 
+  const handleApplyReferral = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCheckoutError(null);
+    setReferralMessage(null);
+    const code = referralInput.trim();
+    if (!code) return;
+
+    setReferralPending(true);
+    try {
+      const res = await validateReferralCodeAction(code);
+      if (res.success && res.referrerSlug) {
+        const slug = res.referrerSlug;
+        setAppliedReferral(slug);
+        document.cookie = `scriptly_referred_by=${encodeURIComponent(slug)}; max-age=${30 * 24 * 60 * 60}; path=/; sameSite=lax`;
+        setReferralMessage({ success: true, text: `Referral code "${slug}" applied! Extra 5% discount applied.` });
+      } else {
+        setReferralMessage({ success: false, text: res.message || "Invalid referral code." });
+      }
+    } catch (err) {
+      setReferralMessage({ success: false, text: "Error validating referral code." });
+    } finally {
+      setReferralPending(false);
+    }
+  };
+
+  const handleRemoveReferral = () => {
+    setAppliedReferral(null);
+    setReferralInput("");
+    setReferralMessage(null);
+    document.cookie = "scriptly_referred_by=; max-age=0; path=/;";
+  };
+
   const handleCheckout = async () => {
     setCheckoutError(null);
     startTransition(async () => {
@@ -87,6 +136,7 @@ export default function CartClient() {
         const orderData = await createRazorpayOrderAction({
           productIds,
           couponCode: couponSuccess ? appliedCode || undefined : undefined,
+          referredByCode: appliedReferral || undefined,
         });
 
         if (!orderData.success) {
@@ -278,6 +328,14 @@ export default function CartClient() {
               </div>
             )}
 
+            {/* Referral Discount Display */}
+            {referralDiscount > 0 && (
+              <div className="flex justify-between items-center text-emerald-500 font-bold">
+                <span>Referral Discount (5% Off)</span>
+                <span className="tabular-nums">- ${(referralDiscount / 100).toFixed(2)}</span>
+              </div>
+            )}
+
             <div className="border-t border-border/40 pt-4 flex justify-between items-baseline">
               <span className="text-base font-black text-foreground">Total</span>
               <div className="text-right">
@@ -347,6 +405,58 @@ export default function CartClient() {
               <div className="flex items-center gap-2 text-xs text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl">
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                 <span>{couponSuccess}</span>
+              </div>
+            )}
+          </form>
+
+          {/* Referral Code Input Form */}
+          <form onSubmit={handleApplyReferral} className="space-y-3 pt-4 border-t border-border/20">
+            <div className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+              <Percent className="w-3.5 h-3.5 text-primary" /> Referral Code (Get Extra 5% Off)
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="e.g. USERNAME"
+                value={referralInput}
+                onChange={(e) => setReferralInput(e.target.value)}
+                disabled={!!appliedReferral || referralPending}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none uppercase tracking-wider font-bold disabled:opacity-50"
+              />
+              {appliedReferral ? (
+                <Button
+                  type="button"
+                  onClick={handleRemoveReferral}
+                  variant="outline"
+                  className="h-10 px-4 rounded-xl border-border/60 font-bold uppercase tracking-wider text-[10px] cursor-pointer"
+                >
+                  Remove
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  disabled={referralPending}
+                  className="h-10 px-5 rounded-xl font-bold uppercase tracking-wider text-[10px] cursor-pointer"
+                >
+                  {referralPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
+                </Button>
+              )}
+            </div>
+
+            {/* Live Referral Message */}
+            {referralMessage && (
+              <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-xl ${
+                referralMessage.success 
+                  ? "text-emerald-500 bg-emerald-500/10 border border-emerald-500/20" 
+                  : "text-destructive bg-destructive/10 border border-destructive/20"
+              }`}>
+                {referralMessage.success ? (
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                )}
+                <span>{referralMessage.text}</span>
               </div>
             )}
           </form>

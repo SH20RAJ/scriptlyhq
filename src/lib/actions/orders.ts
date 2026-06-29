@@ -25,12 +25,14 @@ export async function createRazorpayOrderAction({
   productId,
   productIds,
   couponCode,
+  referredByCode,
   addOnEditCopy = false,
   addOnSetupDeploy = false,
 }: {
   productId?: string;
   productIds?: string[];
   couponCode?: string;
+  referredByCode?: string;
   addOnEditCopy?: boolean;
   addOnSetupDeploy?: boolean;
 }) {
@@ -39,9 +41,9 @@ export async function createRazorpayOrderAction({
     throw new Error("Unauthorized: Please sign in to purchase.");
   }
 
-  // Resolve referring affiliate if present in cookies
+  // Resolve referring affiliate if present in cookies or manual code input
   const cookieStore = await cookies();
-  const referredByVal = cookieStore.get("scriptly_referred_by")?.value;
+  const referredByVal = referredByCode || cookieStore.get("scriptly_referred_by")?.value;
   let resolvedReferrerId: string | null = null;
 
   if (referredByVal && referredByVal !== user.id) {
@@ -54,6 +56,15 @@ export async function createRazorpayOrderAction({
       });
       if (affiliateProfile && affiliateProfile.status === "approved") {
         resolvedReferrerId = referrer.id;
+        // Dynamically save to cookie if it was passed via manual code
+        if (referredByCode) {
+          cookieStore.set("scriptly_referred_by", referrer.affiliateSlug || referrer.id, {
+            maxAge: 30 * 24 * 60 * 60, // 30 days
+            path: "/",
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+          });
+        }
       }
     }
   }
@@ -154,7 +165,13 @@ export async function createRazorpayOrderAction({
     }
   }
 
-  const totalDiscount = autoDiscount + couponDiscount;
+  // 3. Referral 5% Discount
+  let referralDiscount = 0;
+  if (resolvedReferrerId) {
+    referralDiscount = Math.round((subtotal - autoDiscount - couponDiscount) * 0.05);
+  }
+
+  const totalDiscount = autoDiscount + couponDiscount + referralDiscount;
   const finalAmount = Math.max(subtotal - totalDiscount, 0) + totalAddonCost;
 
   // Check if checkout is free

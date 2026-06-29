@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { createRazorpayOrderAction, verifyPaymentAction } from "@/lib/actions/orders";
 import { CreditCard, Download, Loader2, ShoppingCart, Trash, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -47,6 +47,15 @@ export default function ProductCheckout({
   const [isAddonsExpanded, setIsAddonsExpanded] = useState(false);
   const { addToCart, removeFromCart, isInCart } = useCart();
 
+  const [appliedReferral, setAppliedReferral] = useState<string | null>(null);
+
+  useEffect(() => {
+    const match = document.cookie.match(/(?:^|; )scriptly_referred_by=([^;]*)/);
+    if (match && match[1]) {
+      setAppliedReferral(decodeURIComponent(match[1]));
+    }
+  }, []);
+
   const inCart = isInCart(product.id);
 
   const editCopyPrice = Math.round(product.price / 3);
@@ -55,7 +64,12 @@ export default function ProductCheckout({
   const promo = getProductEffectivePrice(product);
   const baseEffectivePrice = isFree ? 0 : promo.effectivePrice;
 
-  let totalDisplayPrice = baseEffectivePrice;
+  let referralDiscount = 0;
+  if (appliedReferral && !isFree) {
+    referralDiscount = Math.round(baseEffectivePrice * 0.05);
+  }
+
+  let totalDisplayPrice = baseEffectivePrice - referralDiscount;
   if (addOnEditCopy) totalDisplayPrice += editCopyPrice;
   if (addOnSetupDeploy) totalDisplayPrice += setupDeployPrice;
 
@@ -83,6 +97,7 @@ export default function ProductCheckout({
           productId: product.id,
           addOnEditCopy,
           addOnSetupDeploy,
+          referredByCode: appliedReferral || undefined,
         });
 
         if (!orderData.success) {
@@ -220,6 +235,13 @@ export default function ProductCheckout({
           </div>
         )}
       </div>
+
+      {appliedReferral && !isFree && (
+        <div className="text-[10px] font-bold text-emerald-500 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl justify-center animate-pulse">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span>Referral Active: Extra 5% Discount Applied!</span>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-3">
         <Button

@@ -54,7 +54,7 @@ export async function registerAffiliateAction({
       .update(affiliateProfiles)
       .set({
         channels,
-        status: "pending", // Reset to pending if updating
+        status: "approved", // Auto-approved
         updatedAt: new Date(),
       })
       .where(eq(affiliateProfiles.id, user.id));
@@ -62,7 +62,7 @@ export async function registerAffiliateAction({
     await db.insert(affiliateProfiles).values({
       id: user.id,
       channels,
-      status: "pending",
+      status: "approved", // Auto-approved
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -251,4 +251,29 @@ export async function payoutAffiliateCommissionAction(commissionId: string) {
 
   revalidatePath("/admin/affiliates");
   return { success: true };
+}
+
+export async function validateReferralCodeAction(code: string) {
+  if (!code) {
+    return { success: false, message: "Please enter a code." };
+  }
+  const cleanCode = code.trim().toLowerCase();
+  const referrer = await db.query.users.findFirst({
+    where: or(eq(users.id, cleanCode), eq(users.affiliateSlug, cleanCode)),
+  });
+  if (!referrer) {
+    return { success: false, message: "Referral code not found." };
+  }
+  const affiliateProfile = await db.query.affiliateProfiles.findFirst({
+    where: eq(affiliateProfiles.id, referrer.id),
+  });
+  if (!affiliateProfile || affiliateProfile.status !== "approved") {
+    return { success: false, message: "Affiliate profile is inactive." };
+  }
+  return { 
+    success: true, 
+    referrerId: referrer.id,
+    referrerSlug: referrer.affiliateSlug || referrer.id,
+    storeName: referrer.storeName || "Partner" 
+  };
 }
