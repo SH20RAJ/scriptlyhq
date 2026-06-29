@@ -46,6 +46,7 @@ interface ProductFormProps {
     downloadsCount?: number;
     saves?: number;
     showStats?: boolean;
+    affiliateCommissionPercent?: number;
   };
 }
 
@@ -77,6 +78,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
   
   const [isFree, setIsFree] = useState(initialData?.isFree || false);
   const [discountPercent, setDiscountPercent] = useState(initialData?.discountPercent?.toString() || "0");
+  const [affiliateCommissionPercent, setAffiliateCommissionPercent] = useState(initialData?.affiliateCommissionPercent?.toString() || "10");
   
   const formatDateForInput = (dateVal: any) => {
     if (!dateVal) return "";
@@ -154,6 +156,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
         if (data.personal !== undefined) setPersonal(data.personal);
         if (data.isFree !== undefined) setIsFree(data.isFree);
         if (data.discountPercent !== undefined) setDiscountPercent(data.discountPercent);
+        if (data.affiliateCommissionPercent !== undefined) setAffiliateCommissionPercent(data.affiliateCommissionPercent);
         if (data.promoStart) setPromoStart(data.promoStart);
         if (data.promoEnd) setPromoEnd(data.promoEnd);
         if (data.redirectDownload !== undefined) setRedirectDownload(data.redirectDownload);
@@ -187,6 +190,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
       personal,
       isFree,
       discountPercent,
+      affiliateCommissionPercent,
       promoStart,
       promoEnd,
       redirectDownload,
@@ -196,7 +200,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
     isEdit, title, slug, category, subcategory, price, shortDescription, 
     description, thumbnailUrl, previewGif, screenshots, videoUrl, 
     fileUrl, demoUrl, tags, version, featured, published, personal, 
-    isFree, discountPercent, promoStart, promoEnd, redirectDownload
+    isFree, discountPercent, affiliateCommissionPercent, promoStart, promoEnd, redirectDownload
   ]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetSetter: (val: string) => void, fieldName: string, forceRelease = false) => {
@@ -278,6 +282,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
     formData.set("views", views);
     formData.set("downloadsCount", downloadsCount);
     formData.set("saves", saves);
+    formData.set("affiliateCommissionPercent", affiliateCommissionPercent);
 
     startTransition(async () => {
       try {
@@ -559,6 +564,29 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
                     onChange={(e) => setPromoEnd(e.target.value)} 
                     className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:border-neutral-700" 
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Affiliate Options */}
+            <div className="border-t border-neutral-800/60 pt-5 space-y-4">
+              <h4 className="text-[10px] font-black uppercase tracking-wider text-emerald-400">Affiliate Referral Configuration</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Affiliate Commission (%)</label>
+                  <input 
+                    type="number" 
+                    min="5" 
+                    max="50" 
+                    value={affiliateCommissionPercent} 
+                    onChange={(e) => setAffiliateCommissionPercent(e.target.value)} 
+                    placeholder="e.g. 10 (Default)" 
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-sm focus:outline-none focus:border-neutral-700" 
+                  />
+                  <p className="text-[8px] text-neutral-500 font-medium">
+                    Specify the percentage rate paid out to referring affiliates (5% to 50%).
+                  </p>
                 </div>
               </div>
             </div>

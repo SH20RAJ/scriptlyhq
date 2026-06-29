@@ -3,10 +3,11 @@
 import Razorpay from "razorpay";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
 import { db } from "@/db";
-import { products, orders, coupons, users, payouts } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { products, orders, coupons, users, payouts, affiliateProfiles, affiliateCommissions } from "@/db/schema";
+import { eq, inArray, or } from "drizzle-orm";
 import crypto from "crypto";
 import { getProductEffectivePrice } from "@/lib/price-utils";
+import { cookies } from "next/headers";
 
 let razorpayInstance: any = null;
 
@@ -36,6 +37,25 @@ export async function createRazorpayOrderAction({
   const user = await getOrCreateDbUser();
   if (!user) {
     throw new Error("Unauthorized: Please sign in to purchase.");
+  }
+
+  // Resolve referring affiliate if present in cookies
+  const cookieStore = await cookies();
+  const referredByVal = cookieStore.get("scriptly_referred_by")?.value;
+  let resolvedReferrerId: string | null = null;
+
+  if (referredByVal && referredByVal !== user.id) {
+    const referrer = await db.query.users.findFirst({
+      where: or(eq(users.id, referredByVal), eq(users.affiliateSlug, referredByVal)),
+    });
+    if (referrer) {
+      const affiliateProfile = await db.query.affiliateProfiles.findFirst({
+        where: eq(affiliateProfiles.id, referrer.id),
+      });
+      if (affiliateProfile && affiliateProfile.status === "approved") {
+        resolvedReferrerId = referrer.id;
+      }
+    }
   }
 
   // Support both single productId and array of productIds
@@ -158,6 +178,7 @@ export async function createRazorpayOrderAction({
         discountApplied: product.originalPrice - product.price + Math.round(totalDiscount / selectedProducts.length),
         addOnEditCopy,
         addOnSetupDeploy,
+        referredById: resolvedReferrerId,
       });
 
       insertedOrders.push({ id: orderId, productTitle: product.title });
@@ -209,6 +230,10 @@ export async function createRazorpayOrderAction({
     ? await db.query.users.findMany({ where: inArray(users.id, creatorIds) })
     : [];
 
+  const affiliate = resolvedReferrerId
+    ? await db.query.users.findFirst({ where: eq(users.id, resolvedReferrerId) })
+    : null;
+
   for (let i = 0; i < selectedProductsWithAddons.length; i++) {
     const product = selectedProductsWithAddons[i];
     const isLast = i === selectedProductsWithAddons.length - 1;
@@ -226,7 +251,17 @@ export async function createRazorpayOrderAction({
     itemAmount += product.addonPrice;
 
     const itemAmountInInrPaise = Math.round(itemAmount * usdToInrRate);
-    const creatorSplitInInrPaise = Math.round(itemAmountInInrPaise * 0.95);
+    
+    // Split Calculations
+    let creatorSplitInInrPaise = Math.round(itemAmountInInrPaise * 0.95);
+    let affiliateSplitInInrPaise = 0;
+    const commissionPercent = product.affiliateCommissionPercent ?? 10;
+
+    if (affiliate) {
+      affiliateSplitInInrPaise = Math.round(itemAmountInInrPaise * (commissionPercent / 100));
+      const creatorPercent = Math.max(0.95 - (commissionPercent / 100), 0);
+      creatorSplitInInrPaise = Math.round(itemAmountInInrPaise * creatorPercent);
+    }
 
     const creator = productCreators.find(c => c.id === product.creatorId);
     if (creator?.razorpayAccountId && creatorSplitInInrPaise > 0) {
@@ -236,6 +271,20 @@ export async function createRazorpayOrderAction({
         currency: "INR",
         notes: {
           info: `Split transfer for product: ${product.title.slice(0, 30)}`,
+        },
+        linked_to: ["payment"],
+        on_hold: false,
+      });
+    }
+
+    // Transfer to referring affiliate if they have a Razorpay Route Account linked
+    if (affiliate?.razorpayAccountId && affiliateSplitInInrPaise > 0) {
+      transfers.push({
+        account: affiliate.razorpayAccountId,
+        amount: affiliateSplitInInrPaise,
+        currency: "INR",
+        notes: {
+          info: `Affiliate transfer for product: ${product.title.slice(0, 30)}`,
         },
         linked_to: ["payment"],
         on_hold: false,
@@ -307,6 +356,7 @@ export async function createRazorpayOrderAction({
       discountApplied: itemDiscount + (product.originalPrice - product.price),
       addOnEditCopy,
       addOnSetupDeploy,
+      referredById: resolvedReferrerId,
     });
 
     insertedOrders.push({ id: orderId, productTitle: product.title });
@@ -373,20 +423,70 @@ export async function verifyPaymentAction({
     // Route split automation auto-logging
     for (const order of orderRecords) {
       const product = await db.query.products.findFirst({ where: eq(products.id, order.productId) });
-      if (product?.creatorId) {
-        const creator = await db.query.users.findFirst({ where: eq(users.id, product.creatorId) });
-        if (creator?.razorpayAccountId && order.amount > 0) {
-          const creatorSplitCents = Math.round(order.amount * 0.95);
+      if (!product) continue;
+
+      let affiliate: any = null;
+      let commissionPercent = 0;
+      let commissionCents = 0;
+
+      if (order.referredById) {
+        affiliate = await db.query.users.findFirst({ where: eq(users.id, order.referredById) });
+        if (affiliate) {
+          commissionPercent = product.affiliateCommissionPercent ?? 10;
+          commissionCents = Math.round(order.amount * (commissionPercent / 100));
+        }
+      }
+
+      // 1. Log Affiliate Commission
+      if (affiliate && commissionCents > 0) {
+        const isAffiliateRouteActive = !!affiliate.razorpayAccountId && affiliate.razorpayAccountId.startsWith("acc_");
+        
+        await db.insert(affiliateCommissions).values({
+          id: crypto.randomUUID(),
+          affiliateId: affiliate.id,
+          orderId: order.id,
+          productId: product.id,
+          amount: commissionCents,
+          percent: commissionPercent,
+          status: isAffiliateRouteActive ? "paid" : "pending",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        // If they received payment via Route, log a completed payout record
+        if (isAffiliateRouteActive) {
           await db.insert(payouts).values({
             id: crypto.randomUUID(),
-            userId: creator.id,
-            amount: creatorSplitCents,
+            userId: affiliate.id,
+            amount: commissionCents,
             status: "processed",
             payoutMethod: "bank",
-            paypalEmail: creator.paypalEmail || null,
-            payoutDetails: `Automated Razorpay Route Split payout for Order ID: ${order.id}`,
+            payoutDetails: `Automated Razorpay Route Split Affiliate commission for Order: ${order.id}`,
             createdAt: new Date(),
           });
+        }
+      }
+
+      // 2. Log Creator Payout
+      if (product.creatorId) {
+        const creator = await db.query.users.findFirst({ where: eq(users.id, product.creatorId) });
+        if (creator?.razorpayAccountId && order.amount > 0) {
+          // Subtract affiliate cut if affiliate exists
+          const creatorPercent = affiliate ? Math.max(0.95 - (commissionPercent / 100), 0) : 0.95;
+          const creatorSplitCents = Math.round(order.amount * creatorPercent);
+
+          if (creatorSplitCents > 0) {
+            await db.insert(payouts).values({
+              id: crypto.randomUUID(),
+              userId: creator.id,
+              amount: creatorSplitCents,
+              status: "processed",
+              payoutMethod: "bank",
+              paypalEmail: creator.paypalEmail || null,
+              payoutDetails: `Automated Razorpay Route Split payout for Order ID: ${order.id}`,
+              createdAt: new Date(),
+            });
+          }
         }
       }
     }

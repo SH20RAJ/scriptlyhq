@@ -71,6 +71,9 @@ export async function createProductAction(formData: FormData) {
   const savesVal = parseInt(formData.get("saves") as string || "0", 10);
   const saves = isNaN(savesVal) ? 0 : savesVal;
 
+  const affiliateCommissionPercentVal = parseInt(formData.get("affiliateCommissionPercent") as string || "10", 10);
+  const affiliateCommissionPercent = isNaN(affiliateCommissionPercentVal) ? 10 : Math.max(5, Math.min(affiliateCommissionPercentVal, 50));
+
   const id = crypto.randomUUID();
 
   await db.insert(products).values({
@@ -104,6 +107,7 @@ export async function createProductAction(formData: FormData) {
     views,
     downloadsCount,
     saves,
+    affiliateCommissionPercent,
   });
 
   revalidatePath("/");
@@ -191,6 +195,9 @@ export async function updateProductAction(id: string, formData: FormData) {
   const savesVal = parseInt(formData.get("saves") as string || "0", 10);
   const saves = isNaN(savesVal) ? 0 : savesVal;
 
+  const affiliateCommissionPercentVal = parseInt(formData.get("affiliateCommissionPercent") as string || "10", 10);
+  const affiliateCommissionPercent = isNaN(affiliateCommissionPercentVal) ? 10 : Math.max(5, Math.min(affiliateCommissionPercentVal, 50));
+
   await db
     .update(products)
     .set({
@@ -222,6 +229,7 @@ export async function updateProductAction(id: string, formData: FormData) {
       views,
       downloadsCount,
       saves,
+      affiliateCommissionPercent,
       updatedAt: new Date(),
     })
     .where(eq(products.id, id));

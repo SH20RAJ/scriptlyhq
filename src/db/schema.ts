@@ -14,6 +14,7 @@ export const users = pgTable("users", {
   bankAccountName: text("bank_account_name"),
   bankAccountNumber: text("bank_account_number"),
   bankIfsc: text("bank_ifsc"),
+  affiliateSlug: text("affiliate_slug").unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -65,6 +66,7 @@ export const products = pgTable("products", {
   saves: integer("saves").default(0).notNull(),
   personal: boolean("personal").default(false).notNull(),
   showStats: boolean("show_stats").default(false).notNull(),
+  affiliateCommissionPercent: integer("affiliate_commission_percent").default(10).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -93,6 +95,7 @@ export const orders = pgTable("orders", {
   discountApplied: integer("discount_applied").default(0).notNull(),
   addOnEditCopy: boolean("add_on_edit_copy").default(false).notNull(),
   addOnSetupDeploy: boolean("add_on_setup_deploy").default(false).notNull(),
+  referredById: text("referred_by_id").references(() => users.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -138,4 +141,34 @@ export const userInteractions = pgTable("user_interactions", {
   productId: text("product_id").references(() => products.id, { onDelete: "cascade" }).notNull(),
   type: text("type").notNull(), // 'save' or 'like'
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const affiliateProfiles = pgTable("affiliate_profiles", {
+  id: text("id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  status: text("status").default("pending").notNull(), // 'pending', 'approved', 'rejected'
+  channels: text("channels"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const affiliateReferrals = pgTable("affiliate_referrals", {
+  id: text("id").primaryKey(),
+  affiliateId: text("affiliate_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  productId: text("product_id").references(() => products.id, { onDelete: "cascade" }),
+  ipHash: text("ip_hash").notNull(),
+  userAgent: text("user_agent"),
+  referrerUrl: text("referrer_url"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const affiliateCommissions = pgTable("affiliate_commissions", {
+  id: text("id").primaryKey(),
+  affiliateId: text("affiliate_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  orderId: text("order_id").references(() => orders.id, { onDelete: "cascade" }).notNull(),
+  productId: text("product_id").references(() => products.id, { onDelete: "cascade" }).notNull(),
+  amount: integer("amount").notNull(), // commission in USD cents
+  percent: integer("percent").notNull(),
+  status: text("status").default("pending").notNull(), // 'pending', 'paid', 'cancelled'
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

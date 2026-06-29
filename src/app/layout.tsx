@@ -80,6 +80,7 @@ import { headers } from "next/headers";
 import { stack } from "@/lib/stack";
 import { CartProvider } from "@/components/CartContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import ReferralTracker from "@/components/ReferralTracker";
 
 export default async function RootLayout({
 	children,
@@ -120,6 +121,7 @@ export default async function RootLayout({
 					<HexclaveProvider app={stack}>
 						<HexclaveTheme>
 							<CartProvider>
+								<ReferralTracker />
 								{isBlog ? <BlogNavbar /> : <Navbar />}
 								<main className="flex-1">
 									{children}
