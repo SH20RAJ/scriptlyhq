@@ -29,20 +29,36 @@ export default async function CreatorLedgerPage() {
 
   const productIds = creatorProducts.map((p) => p.id);
 
-  let salesHistory: { orderId: string; amount: number; date: Date; productTitle: string }[] = [];
+  let salesHistory: { orderId: string; amount: number; date: Date; productTitle: string; creatorShare: number; referredById: string | null }[] = [];
 
   if (productIds.length > 0) {
-    salesHistory = await db
+    const rawSales = await db
       .select({
         orderId: orders.id,
         amount: orders.amount,
         date: orders.createdAt,
         productTitle: products.title,
+        referredById: orders.referredById,
+        affiliateCommissionPercent: products.affiliateCommissionPercent,
       })
       .from(orders)
       .innerJoin(products, eq(orders.productId, products.id))
       .where(and(eq(orders.status, "completed"), inArray(orders.productId, productIds)))
       .orderBy(desc(orders.createdAt));
+
+    salesHistory = rawSales.map((sale) => {
+      const commissionPercent = sale.referredById ? (sale.affiliateCommissionPercent ?? 30) : 0;
+      const creatorPercent = sale.referredById ? Math.max(0.95 - (commissionPercent / 100), 0) : 0.95;
+      const calculatedShare = Math.round(sale.amount * creatorPercent);
+      return {
+        orderId: sale.orderId,
+        amount: sale.amount,
+        date: sale.date,
+        productTitle: sale.productTitle,
+        creatorShare: calculatedShare,
+        referredById: sale.referredById,
+      };
+    });
   }
 
   return (
@@ -89,7 +105,7 @@ export default async function CreatorLedgerPage() {
                     <th className="py-3 px-6">Product Title</th>
                     <th className="py-3 px-6">Transaction ID</th>
                     <th className="py-3 px-6">Total Paid</th>
-                    <th className="py-3 px-6 text-right">Your Share (95%)</th>
+                    <th className="py-3 px-6 text-right">Your Share</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border text-xs font-medium text-muted-foreground">
@@ -108,7 +124,7 @@ export default async function CreatorLedgerPage() {
                         ${(sale.amount / 100).toFixed(2)}
                       </td>
                       <td className="py-4 px-6 text-right font-black text-primary">
-                        +${((sale.amount * 0.95) / 100).toFixed(2)}
+                        +${(sale.creatorShare / 100).toFixed(2)}
                       </td>
                     </tr>
                   ))}

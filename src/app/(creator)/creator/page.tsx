@@ -11,6 +11,7 @@ import { Package, Sparkles, AlertTriangle, Plus, LayoutGrid, Coins, Activity, Ar
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import CreatorEarningsChart from "@/components/CreatorEarningsChart";
 
 export const metadata: Metadata = {
   title: "Creator Console | ScriptlyStore",
@@ -34,26 +35,45 @@ export default async function CreatorConsolePage() {
 
   let totalSold = 0;
   let grossSales = 0;
-  let salesHistory: { orderId: string; amount: number; date: Date; productTitle: string }[] = [];
+  let creatorShare = 0;
+  let salesHistory: { orderId: string; amount: number; date: Date; productTitle: string; creatorShare: number; referredById: string | null }[] = [];
 
   if (productIds.length > 0) {
-    salesHistory = await db
+    const rawSales = await db
       .select({
         orderId: orders.id,
         amount: orders.amount,
         date: orders.createdAt,
         productTitle: products.title,
+        referredById: orders.referredById,
+        affiliateCommissionPercent: products.affiliateCommissionPercent,
       })
       .from(orders)
       .innerJoin(products, eq(orders.productId, products.id))
       .where(and(eq(orders.status, "completed"), inArray(orders.productId, productIds)))
       .orderBy(desc(orders.createdAt));
 
+    salesHistory = rawSales.map((sale) => {
+      // Calculate true uploader split: 5% platform fee.
+      // If referred: 30% default affiliate fee (or whatever custom is configured), leaving 65% for creator.
+      // If direct: 95% for creator.
+      const commissionPercent = sale.referredById ? (sale.affiliateCommissionPercent ?? 30) : 0;
+      const creatorPercent = sale.referredById ? Math.max(0.95 - (commissionPercent / 100), 0) : 0.95;
+      const calculatedShare = Math.round(sale.amount * creatorPercent);
+      return {
+        orderId: sale.orderId,
+        amount: sale.amount,
+        date: sale.date,
+        productTitle: sale.productTitle,
+        creatorShare: calculatedShare,
+        referredById: sale.referredById,
+      };
+    });
+
     totalSold = salesHistory.length;
     grossSales = salesHistory.reduce((sum, item) => sum + item.amount, 0);
+    creatorShare = salesHistory.reduce((sum, item) => sum + item.creatorShare, 0);
   }
-
-  const creatorShare = Math.round(grossSales * 0.95);
 
   // Determine Razorpay Route Connection Status
   const hasBankDetails = !!user.bankAccountNumber && !!user.bankIfsc;
@@ -147,6 +167,9 @@ export default async function CreatorConsolePage() {
         </div>
       )}
 
+      {/* Analytics Chart */}
+      <CreatorEarningsChart sales={salesHistory} />
+
       {/* Analytics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="rounded-2xl border border-border/40 bg-card/45 backdrop-blur-md shadow-sm hover:translate-y-[-4px] hover:shadow-[0_8px_0_var(--border)] transition-all duration-300">
@@ -191,13 +214,13 @@ export default async function CreatorConsolePage() {
         <Card className="rounded-2xl border border-primary/20 bg-primary/5 backdrop-blur-md shadow-sm hover:translate-y-[-4px] hover:shadow-[0_8px_0_rgba(88,204,2,0.15)] transition-all duration-300">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0 p-6">
             <span className="text-[10px] font-black uppercase tracking-widest text-primary">
-              Your Share (95%)
+              Your Share (65%-95%)
             </span>
             <Sparkles className="w-4 h-4 text-primary animate-pulse" />
           </CardHeader>
           <CardContent className="p-6 pt-0">
             <div className="text-2xl font-black text-foreground">${(creatorShare / 100).toFixed(2)}</div>
-            <p className="text-[9px] text-primary/80 font-semibold mt-1">Net pending settlement</p>
+            <p className="text-[9px] text-primary/80 font-semibold mt-1">Uploader share of sales</p>
           </CardContent>
         </Card>
       </div>
@@ -273,7 +296,7 @@ export default async function CreatorConsolePage() {
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-foreground">${(sale.amount / 100).toFixed(2)}</p>
-                        <p className="text-[9px] text-primary font-bold">+${((sale.amount * 0.95) / 100).toFixed(2)}</p>
+                        <p className="text-[9px] text-primary font-bold">+${(sale.creatorShare / 100).toFixed(2)}</p>
                       </div>
                     </div>
                   ))}

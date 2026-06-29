@@ -59,7 +59,7 @@ export default function TermsPage() {
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Store Naming:</strong> Creators may choose a store name to represent their catalog. Store names must not infringe upon trademarks, brands, or third-party intellectual property. Strivio Inc. reserves the right to rename or suspend stores violating this policy.</li>
-            <li><strong>Beta Listings & Payouts:</strong> In the current Beta release, automated payouts are supported via Razorpay Route. For creators who select Direct Bank Transfer and provide valid banking details, payment splits of 95% (creator share) and 5% (platform commission) are executed automatically at checkout. Other payout methods are settled manually on-demand. We are working to transition this framework from 99% to 100% automated soon.</li>
+            <li><strong>Listing Splits & Payouts:</strong> In the current release, automated payouts are supported via Razorpay Route. For creators who configure a Direct Bank Transfer payout method, payments are split dynamically: if an item is purchased via an affiliate referral link, 65% goes directly to the creator, 30% to the referring affiliate, and 5% is retained as a platform commission. For direct purchases without an affiliate, the uploader receives 95% and the platform retains 5%. Other payout types are accrued and settled on-demand.</li>
             <li><strong>Moderation:</strong> All creator uploads are unlisted by default. They are subject to code security reviews and copyright verification by our administration panel before approval.</li>
           </ul>
         </section>
@@ -82,7 +82,7 @@ export default function TermsPage() {
             All prices listed on ScriptlyStore are in Indian Rupees (INR) or United States Dollars (USD), as indicated, and are subject to change without notice.
           </p>
           <p>
-            Payments are securely processed via <strong>Razorpay</strong>. Where split payments are enabled (e.g. through the creator's configured Direct Bank Transfer payout method), 95% of customer payments is split and transferred directly to the creator's bank account via Razorpay Route, while the platform retains a 5% commission. By placing an order, you authorize us and our payment processor to charge the designated payment method for the total order amount. Strivio Inc. does not store or process cardholder credentials on its servers. Free checkouts bypass Razorpay processing entirely.
+            Payments are securely processed via <strong>Razorpay</strong>. Where split payments are enabled, payments are split instantly: the platform retains a 5% commission, the affiliate receives a 30% commission (if referred), and the creator receives the remaining amount (65% for referred sales, or 95% for direct sales). By placing an order, you authorize us and our payment processor to charge the designated payment method for the total order amount. Strivio Inc. does not store or process cardholder credentials on its servers. Free checkouts bypass Razorpay processing entirely.
           </p>
         </section>
 
