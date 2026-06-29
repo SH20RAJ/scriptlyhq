@@ -78,7 +78,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
   
   const [isFree, setIsFree] = useState(initialData?.isFree || false);
   const [discountPercent, setDiscountPercent] = useState(initialData?.discountPercent?.toString() || "0");
-  const [affiliateCommissionPercent, setAffiliateCommissionPercent] = useState(initialData?.affiliateCommissionPercent?.toString() || "10");
+  const [affiliateCommissionPercent, setAffiliateCommissionPercent] = useState(initialData?.affiliateCommissionPercent?.toString() || "30");
   
   const formatDateForInput = (dateVal: any) => {
     if (!dateVal) return "";

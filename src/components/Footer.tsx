@@ -14,6 +14,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-xs font-black uppercase tracking-widest text-foreground">Marketplace</h4>
             <ul className="space-y-2 text-xs font-medium text-muted-foreground">
+              <li><Link href="/affiliate" className="text-primary hover:underline transition-colors font-bold">Affiliate Program (Earn 30%)</Link></li>
               <li><Link href="/" className="hover:text-foreground transition-colors">Explore</Link></li>
               <li><Link href="/search" className="hover:text-foreground transition-colors">Search</Link></li>
               <li><Link href="/offers" className="hover:text-foreground transition-colors">Offers</Link></li>

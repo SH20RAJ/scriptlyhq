@@ -255,7 +255,7 @@ export async function createRazorpayOrderAction({
     // Split Calculations
     let creatorSplitInInrPaise = Math.round(itemAmountInInrPaise * 0.95);
     let affiliateSplitInInrPaise = 0;
-    const commissionPercent = product.affiliateCommissionPercent ?? 10;
+    const commissionPercent = product.affiliateCommissionPercent ?? 30;
 
     if (affiliate) {
       affiliateSplitInInrPaise = Math.round(itemAmountInInrPaise * (commissionPercent / 100));
@@ -432,7 +432,7 @@ export async function verifyPaymentAction({
       if (order.referredById) {
         affiliate = await db.query.users.findFirst({ where: eq(users.id, order.referredById) });
         if (affiliate) {
-          commissionPercent = product.affiliateCommissionPercent ?? 10;
+          commissionPercent = product.affiliateCommissionPercent ?? 30;
           commissionCents = Math.round(order.amount * (commissionPercent / 100));
         }
       }

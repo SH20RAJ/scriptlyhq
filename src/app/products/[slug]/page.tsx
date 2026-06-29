@@ -1,13 +1,14 @@
 export const dynamic = "force-dynamic";
 
 import { db } from "@/db";
-import { products, orders, users } from "@/db/schema";
+import { products, orders, users, affiliateProfiles } from "@/db/schema";
 import { eq, and, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/SearchFilter";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
 import ProductCheckout from "@/components/ProductCheckout";
 import Link from "next/link";
+import ProductAffiliateShare from "@/components/ProductAffiliateShare";
 import { getProductEffectivePrice } from "@/lib/price-utils";
 import { ArrowLeft, ExternalLink, ShieldCheck, Zap, Download, RefreshCw, Headphones, Lock, Sparkles } from "lucide-react";
 import { Metadata } from "next";
@@ -109,6 +110,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!isAccessible && !isUserAdmin && !isUserCreator) {
     notFound();
   }
+
+  // Load affiliate profile of current user to see if they are approved
+  let affiliateProfile = null;
+  if (user) {
+    affiliateProfile = await db.query.affiliateProfiles.findFirst({
+      where: eq(affiliateProfiles.id, user.id),
+    });
+  }
+  const isApprovedAffiliate = affiliateProfile?.status === "approved";
 
   const authorized = isUserAdmin;
 
@@ -343,6 +353,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     hasPurchased={hasPurchased}
                     userLoggedIn={!!user}
                     isFree={promo.isFree}
+                  />
+
+                  <ProductAffiliateShare
+                    productSlug={product.slug}
+                    productTitle={product.title}
+                    affiliateSlug={user?.affiliateSlug || user?.id || null}
+                    isApproved={isApprovedAffiliate}
+                    isLoggedIn={!!user}
+                    commissionPercent={product.affiliateCommissionPercent ?? 30}
                   />
                   
                   {product.demoUrl && (

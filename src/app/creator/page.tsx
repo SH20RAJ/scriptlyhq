@@ -75,12 +75,19 @@ export default async function CreatorConsolePage() {
             Monitor store-level analytics, split payments status, and quick shortcuts.
           </p>
         </div>
-        <Button asChild size="sm" className="rounded-xl h-10 px-5 font-black uppercase tracking-wider text-[10px] bg-[#58CC02] text-white hover:bg-[#58CC02]/90 cursor-pointer shadow-sm">
-          <Link href="/creator/new">
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            List New Script
-          </Link>
-        </Button>
+        <div className="flex gap-2.5">
+          <Button asChild size="sm" variant="outline" className="rounded-xl h-10 px-5 font-black uppercase tracking-wider text-[10px] border border-border bg-card/45 backdrop-blur-md hover:bg-muted/80 text-foreground cursor-pointer shadow-sm">
+            <Link href="/affiliate">
+              Affiliate Console
+            </Link>
+          </Button>
+          <Button asChild size="sm" className="rounded-xl h-10 px-5 font-black uppercase tracking-wider text-[10px] bg-[#58CC02] text-white hover:bg-[#58CC02]/90 cursor-pointer shadow-sm">
+            <Link href="/creator/new">
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              List New Script
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Razorpay Route Split Integration Status Banner */}

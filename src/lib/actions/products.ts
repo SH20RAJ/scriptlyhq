@@ -71,8 +71,8 @@ export async function createProductAction(formData: FormData) {
   const savesVal = parseInt(formData.get("saves") as string || "0", 10);
   const saves = isNaN(savesVal) ? 0 : savesVal;
 
-  const affiliateCommissionPercentVal = parseInt(formData.get("affiliateCommissionPercent") as string || "10", 10);
-  const affiliateCommissionPercent = isNaN(affiliateCommissionPercentVal) ? 10 : Math.max(5, Math.min(affiliateCommissionPercentVal, 50));
+  const affiliateCommissionPercentVal = parseInt(formData.get("affiliateCommissionPercent") as string || "30", 10);
+  const affiliateCommissionPercent = isNaN(affiliateCommissionPercentVal) ? 30 : Math.max(5, Math.min(affiliateCommissionPercentVal, 50));
 
   const id = crypto.randomUUID();
 
@@ -195,8 +195,8 @@ export async function updateProductAction(id: string, formData: FormData) {
   const savesVal = parseInt(formData.get("saves") as string || "0", 10);
   const saves = isNaN(savesVal) ? 0 : savesVal;
 
-  const affiliateCommissionPercentVal = parseInt(formData.get("affiliateCommissionPercent") as string || "10", 10);
-  const affiliateCommissionPercent = isNaN(affiliateCommissionPercentVal) ? 10 : Math.max(5, Math.min(affiliateCommissionPercentVal, 50));
+  const affiliateCommissionPercentVal = parseInt(formData.get("affiliateCommissionPercent") as string || "30", 10);
+  const affiliateCommissionPercent = isNaN(affiliateCommissionPercentVal) ? 30 : Math.max(5, Math.min(affiliateCommissionPercentVal, 50));
 
   await db
     .update(products)

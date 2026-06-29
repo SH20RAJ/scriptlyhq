@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Terminal, Compass, Search, BookOpen, Tag, LayoutGrid, ChevronRight } from "lucide-react";
+import { Menu, Terminal, Compass, Search, BookOpen, Tag, LayoutGrid, ChevronRight, Percent } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/explore", label: "Explore", desc: "Discover premium templates", icon: Compass },
@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { href: "/directories", label: "Directories", desc: "Developer sitemaps list", icon: LayoutGrid },
   { href: "/blog", label: "Blog", desc: "Read developer tutorials", icon: BookOpen },
   { href: "/offers", label: "Offers", desc: "Special pricing campaigns", icon: Tag, badge: "Sale" },
+  { href: "/affiliate", label: "Affiliate", desc: "Earn 30% commission sharing code", icon: Percent, badge: "30%" },
 ];
 
 export default function Navbar() {

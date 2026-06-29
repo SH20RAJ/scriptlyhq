@@ -66,7 +66,7 @@ export const products = pgTable("products", {
   saves: integer("saves").default(0).notNull(),
   personal: boolean("personal").default(false).notNull(),
   showStats: boolean("show_stats").default(false).notNull(),
-  affiliateCommissionPercent: integer("affiliate_commission_percent").default(10).notNull(),
+  affiliateCommissionPercent: integer("affiliate_commission_percent").default(30).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
