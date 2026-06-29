@@ -231,7 +231,7 @@ export default function AffiliateDashboardClient({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products to promote..."
-                  className="pl-9 rounded-xl border-border/40 bg-muted/20"
+                  className="pl-9 h-9 rounded-xl border-border/40 bg-muted/20"
                 />
               </div>
 
@@ -243,13 +243,15 @@ export default function AffiliateDashboardClient({
                     <button
                       key={prod.id}
                       onClick={() => setSelectedProductId(prod.id)}
-                      className={`w-full text-left p-3 text-xs flex justify-between items-center transition-colors hover:bg-muted/30 ${
-                        selectedProductId === prod.id ? "bg-primary/10 text-primary font-black" : "text-muted-foreground"
+                      className={`w-full text-left py-2.5 px-4 text-xs flex justify-between items-center transition-all border-l-2 ${
+                        selectedProductId === prod.id
+                          ? "bg-primary/[0.08] border-primary text-foreground font-black"
+                          : "border-transparent text-muted-foreground hover:bg-muted/30"
                       }`}
                     >
-                      <span className="font-bold truncate">{prod.title}</span>
-                      <span className="shrink-0 text-[10px] ml-2">
-                        (${prod.price / 100}) • <strong className="text-primary">{prod.affiliateCommissionPercent}%</strong> split
+                      <span className="font-bold truncate flex-1 min-w-0 mr-4 text-left">{prod.title}</span>
+                      <span className={`shrink-0 text-[10px] ml-2 ${selectedProductId === prod.id ? "text-foreground/80" : "text-muted-foreground"}`}>
+                        (${prod.price / 100}) • <strong className="text-primary font-black">{prod.affiliateCommissionPercent}%</strong> split
                       </span>
                     </button>
                   ))
@@ -269,12 +271,12 @@ export default function AffiliateDashboardClient({
                     <input
                       readOnly
                       value={generatedLink}
-                      className="flex-1 bg-background text-[10px] font-mono px-3 py-2 border border-border/40 rounded-xl select-all outline-none"
+                      className="flex-1 bg-background text-[10px] font-mono px-3 h-9 border border-border/40 rounded-xl select-all outline-none"
                     />
                     <Button
                       size="sm"
                       onClick={() => handleCopy(generatedLink, selectedProduct.id)}
-                      className="rounded-xl bg-primary text-white hover:bg-primary/90 h-9 font-black uppercase tracking-wider text-[9px] cursor-pointer"
+                      className="w-9 h-9 p-0 rounded-xl bg-primary text-white hover:bg-primary/90 font-black flex items-center justify-center cursor-pointer shrink-0"
                     >
                       {copiedLink === selectedProduct.id ? (
                         <Check className="w-3.5 h-3.5" />
