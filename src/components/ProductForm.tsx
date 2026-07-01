@@ -204,40 +204,48 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
   ]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetSetter: (val: string) => void, fieldName: string, forceRelease = false) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setUploading(fieldName);
     setError(null);
-    const formData = new FormData();
-    formData.append("file", file);
+
+    const isMulti = fieldName === "screenshots";
+    const uploadedUrls: string[] = [];
 
     try {
-      let data;
-      // Auto fallback to Release upload for files > 15MB or if forceRelease is true
-      if (forceRelease || file.size > 15 * 1024 * 1024) {
-        data = await uploadToGithubReleaseAction(formData);
-      } else {
-        data = await uploadImageAction(formData);
-        if (data && 'error' in data) {
-          console.warn("Standard upload failed, falling back to GitHub Release upload:", data.error);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        let data;
+        // Auto fallback to Release upload for files > 15MB or if forceRelease is true
+        if (forceRelease || file.size > 15 * 1024 * 1024) {
           data = await uploadToGithubReleaseAction(formData);
+        } else {
+          data = await uploadImageAction(formData);
+          if (data && 'error' in data) {
+            console.warn("Standard upload failed, falling back to GitHub Release upload:", data.error);
+            data = await uploadToGithubReleaseAction(formData);
+          }
+        }
+
+        if (data && 'url' in data && data.url) {
+          uploadedUrls.push(data.url);
+        } else if (data && 'error' in data) {
+          toast.error(`Upload failed for ${file.name}: ${data.error}`);
         }
       }
 
-      if (data && 'url' in data && data.url) {
-        if (fieldName === "screenshots") {
-          const current = screenshots ? screenshots.split(",").map(s => s.trim()) : [];
-          targetSetter([...current, data.url].join(", "));
+      if (uploadedUrls.length > 0) {
+        if (isMulti) {
+          const current = screenshots ? screenshots.split(",").map(s => s.trim()).filter(Boolean) : [];
+          targetSetter([...current, ...uploadedUrls].join(", "));
         } else {
-          targetSetter(data.url);
+          targetSetter(uploadedUrls[0]);
         }
-        toast.success("File uploaded successfully!");
-      } else if (data && 'error' in data) {
-        setError("Upload failed: " + data.error);
-        toast.error("Upload failed: " + data.error);
-      } else {
-        setError("Upload failed: Unexpected response from server.");
+        toast.success(`Successfully uploaded ${uploadedUrls.length} file(s)!`);
       }
     } catch (err: any) {
       setError("Upload failed: " + (err.message || "Please try again."));
@@ -407,7 +415,22 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
             </h3>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Product Title *</label>
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Product Title *</label>
+                <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
+                  title.length === 0 ? "bg-neutral-800/40 text-neutral-500" :
+                  title.length < 30 ? "bg-amber-500/10 text-amber-500" :
+                  title.length <= 60 ? "bg-emerald-500/10 text-emerald-500" :
+                  "bg-rose-500/10 text-rose-500"
+                }`}>
+                  {title.length} / 60 chars {
+                    title.length === 0 ? "" :
+                    title.length < 30 ? "• Too Short" :
+                    title.length <= 60 ? "• Optimal SEO" :
+                    "• May Truncate"
+                  }
+                </span>
+              </div>
               <input 
                 type="text" 
                 value={title} 
@@ -590,6 +613,58 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
                 </div>
               </div>
             </div>
+
+            {/* Live Pricing & Earnings Calculator */}
+            {(() => {
+              const numPrice = parseFloat(price) || 0;
+              const numDiscount = isFree ? 0 : (parseFloat(discountPercent) || 0);
+              const discountedPrice = numPrice * (1 - numDiscount / 100);
+              const numCommissionPercent = parseFloat(affiliateCommissionPercent) || 30;
+              const affiliatePayout = discountedPrice * (numCommissionPercent / 100);
+              const platformFee = discountedPrice * 0.10; // 10%
+              const creatorNetNormal = discountedPrice - platformFee;
+              const creatorNetReferred = discountedPrice - platformFee - affiliatePayout;
+
+              return (
+                <div className="border-t border-neutral-800/60 pt-5 space-y-3">
+                  <h4 className="text-[10px] font-black uppercase tracking-wider text-cyan-400">Live Earnings Calculator</h4>
+                  <div className="p-4 rounded-xl border border-neutral-800 bg-neutral-950/60 space-y-3 text-xs leading-relaxed font-semibold">
+                    <div className="flex justify-between items-center text-neutral-400">
+                      <span>Customer Checkout Cost:</span>
+                      <span className="font-bold text-white">
+                        {numDiscount > 0 ? (
+                          <>
+                            <span className="line-through text-neutral-600 mr-1.5">${numPrice.toFixed(2)}</span>
+                            <span className="text-emerald-500 font-extrabold">${discountedPrice.toFixed(2)}</span>
+                          </>
+                        ) : (
+                          `$${numPrice.toFixed(2)}`
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-neutral-400">
+                      <span>Platform Fee (10%):</span>
+                      <span className="font-bold text-rose-500">-${platformFee.toFixed(2)}</span>
+                    </div>
+                    {numCommissionPercent > 0 && (
+                      <div className="flex justify-between items-center text-neutral-400 border-b border-neutral-850 pb-2">
+                        <span>Affiliate Commission ({numCommissionPercent}%):</span>
+                        <span className="font-bold text-purple-400">-${affiliatePayout.toFixed(2)}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between items-center pt-1">
+                      <span className="font-bold text-neutral-300">Creator Share (Direct Sale):</span>
+                      <span className="font-black text-emerald-400 text-sm">${creatorNetNormal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-neutral-300">Creator Share (Affiliate Sale):</span>
+                      <span className="font-black text-[#1CB0F6] text-sm">${Math.max(0, creatorNetReferred).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Section C: Markdown & Descriptions */}
@@ -600,7 +675,22 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
             </h3>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Short Catchy Subtitle *</label>
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Short Catchy Subtitle *</label>
+                <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
+                  shortDescription.length === 0 ? "bg-neutral-800/40 text-neutral-500" :
+                  shortDescription.length < 50 ? "bg-amber-500/10 text-amber-500" :
+                  shortDescription.length <= 160 ? "bg-emerald-500/10 text-emerald-500" :
+                  "bg-rose-500/10 text-rose-500"
+                }`}>
+                  {shortDescription.length} / 160 chars {
+                    shortDescription.length === 0 ? "" :
+                    shortDescription.length < 50 ? "• Too Short" :
+                    shortDescription.length <= 160 ? "• Optimal SEO" :
+                    "• May Truncate"
+                  }
+                </span>
+              </div>
               <input 
                 type="text" 
                 value={shortDescription} 
@@ -874,16 +964,103 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
             <div className="space-y-2">
               <label className="text-[10px] font-black text-neutral-400 uppercase flex justify-between">
                 Carousel Screenshots
-                <span className="text-[9px] lowercase font-normal opacity-60">Comma-separated URLs</span>
+                <span className="text-[9px] lowercase font-normal opacity-60">Rearrange and manage screenshots</span>
               </label>
-              <div className="space-y-2">
+              
+              <div className="space-y-4">
+                {/* Visual Screenshot List with Preview & Reorder Actions */}
+                {(() => {
+                  const arr = screenshots.split(",").map(s => s.trim()).filter(Boolean);
+                  if (arr.length === 0) return null;
+                  return (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 rounded-xl border border-neutral-800 bg-neutral-950/30">
+                      {arr.map((url, idx) => {
+                        const handleMoveLeft = () => {
+                          if (idx === 0) return;
+                          const newArr = [...arr];
+                          const temp = newArr[idx];
+                          newArr[idx] = newArr[idx - 1];
+                          newArr[idx - 1] = temp;
+                          setScreenshots(newArr.join(", "));
+                        };
+
+                        const handleMoveRight = () => {
+                          if (idx === arr.length - 1) return;
+                          const newArr = [...arr];
+                          const temp = newArr[idx];
+                          newArr[idx] = newArr[idx + 1];
+                          newArr[idx + 1] = temp;
+                          setScreenshots(newArr.join(", "));
+                        };
+
+                        const handleDelete = () => {
+                          const newArr = arr.filter((_, i) => i !== idx);
+                          setScreenshots(newArr.join(", "));
+                          toast.success("Screenshot removed.");
+                        };
+
+                        return (
+                          <div key={idx} className="relative group rounded-lg overflow-hidden border border-neutral-800 bg-neutral-900 aspect-video flex flex-col justify-between">
+                            {/* Image preview */}
+                            <img src={url} alt={`Screenshot ${idx + 1}`} className="w-full h-full object-cover" />
+                            
+                            {/* Overlay Controls */}
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-1.5">
+                              <div className="flex justify-between items-center">
+                                <span className="text-[8px] bg-neutral-800 text-neutral-300 px-1.5 py-0.5 rounded font-black">
+                                  #{idx + 1}
+                                </span>
+                                <button 
+                                  type="button" 
+                                  onClick={handleDelete}
+                                  className="p-1 bg-red-600/90 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </div>
+                              
+                              <div className="flex justify-center gap-1.5">
+                                <button
+                                  type="button"
+                                  disabled={idx === 0}
+                                  onClick={handleMoveLeft}
+                                  className="p-1 bg-neutral-800 text-white rounded hover:bg-neutral-700 disabled:opacity-40 disabled:hover:bg-neutral-800 transition-colors cursor-pointer"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                                
+                                <button
+                                  type="button"
+                                  disabled={idx === arr.length - 1}
+                                  onClick={handleMoveRight}
+                                  className="p-1 bg-neutral-800 text-white rounded hover:bg-neutral-700 disabled:opacity-40 disabled:hover:bg-neutral-800 transition-colors cursor-pointer"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+
+                {/* Comma separated text box for quick updates */}
                 <textarea 
                   value={screenshots} 
                   onChange={(e) => setScreenshots(e.target.value)} 
-                  placeholder="URL1, URL2, ..." 
-                  rows={3} 
+                  placeholder="Paste direct URLs separated by comma (or use the upload button below)" 
+                  rows={2} 
                   className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none resize-none font-medium leading-relaxed" 
                 />
+                
                 <div className="relative w-full">
                   <input 
                     type="file" 
@@ -893,7 +1070,7 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
                     className="absolute inset-0 opacity-0 cursor-pointer" 
                   />
                   <button type="button" className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer">
-                    {uploading === "screenshots" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Upload className="w-3.5 h-3.5" /> Upload Screenshot</>}
+                    {uploading === "screenshots" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Upload className="w-3.5 h-3.5" /> Upload Screenshots (Multiple Supported)</>}
                   </button>
                 </div>
               </div>
@@ -979,9 +1156,66 @@ export default function ProductForm({ categories, subcategories, isCreatorConsol
             )}
             
             <div className="pt-4 border-t border-neutral-800 space-y-4">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase">Search Tags</label>
-                <input type="text" name="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="nextjs, tailwind, auth" className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" />
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Search Tags</label>
+                
+                {/* Visual tag chips preview */}
+                {tags.split(",").map(t => t.trim()).filter(Boolean).length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 p-2.5 rounded-xl border border-neutral-850 bg-neutral-950/40">
+                    {tags.split(",").map(t => t.trim()).filter(Boolean).map((tag, idx) => {
+                      const handleRemoveTag = () => {
+                        const newTags = tags.split(",").map(t => t.trim()).filter(Boolean).filter((_, i) => i !== idx);
+                        setTags(newTags.join(", "));
+                      };
+                      return (
+                        <span key={idx} className="inline-flex items-center gap-1 bg-neutral-800 text-neutral-200 text-[9px] font-black uppercase tracking-wider py-1 px-2.5 rounded-lg border border-neutral-700/50">
+                          {tag}
+                          <button 
+                            type="button" 
+                            onClick={handleRemoveTag}
+                            className="text-neutral-500 hover:text-rose-400 transition-colors font-bold text-[10px] pl-0.5 cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                
+                <input 
+                  type="text" 
+                  name="tags" 
+                  value={tags} 
+                  onChange={(e) => setTags(e.target.value)} 
+                  placeholder="nextjs, tailwind, auth" 
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-white text-xs focus:border-neutral-500 outline-none font-medium" 
+                />
+
+                {/* Popular suggested tags list */}
+                <div className="space-y-1">
+                  <p className="text-[8px] text-neutral-500 font-bold uppercase tracking-wider">Suggested tags (click to add):</p>
+                  <div className="flex flex-wrap gap-1">
+                    {["nextjs", "tailwindcss", "typescript", "react", "saas", "boilerplate", "api", "cloudflare-worker", "ebook"].map((suggested) => {
+                      const handleAddTag = () => {
+                        const current = tags.split(",").map(t => t.trim()).filter(Boolean);
+                        if (!current.includes(suggested)) {
+                          setTags([...current, suggested].join(", "));
+                        }
+                      };
+                      return (
+                        <button
+                          key={suggested}
+                          type="button"
+                          onClick={handleAddTag}
+                          className="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white text-[8px] py-1 px-2 rounded-md transition-all font-mono font-bold cursor-pointer"
+                        >
+                          +{suggested}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-neutral-400 uppercase">Build Version</label>
