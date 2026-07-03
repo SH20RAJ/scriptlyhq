@@ -261,6 +261,70 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* BlogPosting JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": post.title,
+            "description": post.excerpt,
+            "image": [post.thumbnail],
+            "datePublished": post.createdAt,
+            "dateModified": post.createdAt,
+            "author": {
+              "@type": "Person",
+              "name": post.author.name,
+              "jobTitle": post.author.role,
+              "description": post.author.bio,
+              "url": post.author.github || post.author.twitter || "https://scriptly.store/about"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "ScriptlyStore",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://scriptly.store/logo.png"
+              }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://scriptly.store/blog/${post.slug}`
+            }
+          })
+        }}
+      />
+      {/* BreadcrumbList JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://scriptly.store/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://scriptly.store/blog"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": post.title,
+                "item": `https://scriptly.store/blog/${post.slug}`
+              }
+            ]
+          })
+        }}
+      />
       <CyberBackground />
 
       <div className="container max-w-4xl mx-auto px-4 py-12 md:py-16 space-y-10">

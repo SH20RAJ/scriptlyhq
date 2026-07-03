@@ -21,5 +21,61 @@ interface PageProps {
 }
 
 export default function Page({ searchParams }: PageProps) {
-  return <ClientHome searchParams={searchParams} />;
+  return (
+    <>
+      {/* WebSite JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "ScriptlyStore",
+            "url": "https://scriptly.store",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://scriptly.store/search?search={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          })
+        }}
+      />
+      {/* Organization JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "ScriptlyStore",
+            "url": "https://scriptly.store",
+            "logo": "https://scriptly.store/logo.png",
+            "sameAs": [
+              "https://github.com/SH20RAJ",
+              "https://x.com/sh20raj"
+            ]
+          })
+        }}
+      />
+      {/* BreadcrumbList JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://scriptly.store/"
+              }
+            ]
+          })
+        }}
+      />
+      <ClientHome searchParams={searchParams} />
+    </>
+  );
 }

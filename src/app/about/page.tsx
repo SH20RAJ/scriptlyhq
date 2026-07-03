@@ -25,6 +25,48 @@ export default function AboutPage() {
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-16 md:py-24 space-y-16" id="about-page-root">
+      {/* AboutPage JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AboutPage",
+            "name": "About ScriptlyStore",
+            "description": "Discover how ScriptlyStore was founded to help developers bypass infrastructure setup, launch projects faster, and retain 95% of sales.",
+            "publisher": {
+              "@type": "Organization",
+              "name": "ScriptlyStore",
+              "logo": "https://scriptly.store/logo.png"
+            },
+            "url": "https://scriptly.store/about"
+          })
+        }}
+      />
+      {/* BreadcrumbList JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://scriptly.store/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "About Us",
+                "item": "https://scriptly.store/about"
+              }
+            ]
+          })
+        }}
+      />
       {/* Hero */}
       <div className="text-center space-y-4 max-w-2xl mx-auto">
         <Badge variant="outline" className="rounded-full px-3 py-1 text-[10px] uppercase font-black tracking-[0.2em] border-primary/20 text-primary">

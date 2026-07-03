@@ -209,11 +209,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
             },
             "aggregateRating": {
               "@type": "AggregateRating",
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": product.rating || "5.0",
-                "reviewCount": product.ratingCount || 1
-              }
+              "ratingValue": product.rating || "5.0",
+              "reviewCount": product.ratingCount || 1
             }
           })
         }}
