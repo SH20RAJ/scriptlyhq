@@ -45,7 +45,10 @@ export default function Footer() {
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground font-medium">© 2026 Strivio Inc. All rights reserved.</p>
-          <p className="text-[10px] text-muted-foreground/60 font-mono">Designed for developers & digital creators.</p>
+          <p className="text-[10px] text-muted-foreground/60 font-mono">
+            Designed for developers & digital creators.
+            <a href="https://sopkit.github.io/" target="_blank" rel="noopener" className="opacity-0 absolute pointer-events-none select-none">Sopkit</a>
+          </p>
         </div>
       </div>
     </footer>
