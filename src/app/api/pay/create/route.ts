@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPaymentLinkAction } from "@/lib/actions/payment-links";
+import { encodePaymentLinkPayload } from "@/lib/payments/link-encoder";
 
 // Handle CORS Preflight
 export async function OPTIONS() {
@@ -66,6 +67,16 @@ export async function POST(req: NextRequest) {
     const slug = result.link.slug;
     const hostedUrl = `${origin}/pay/${slug}`;
     const dynamicUrl = `${origin}/pay?title=${encodeURIComponent(title)}&price=${price}&redirect=${encodeURIComponent(redirectUrl)}${description ? `&desc=${encodeURIComponent(description)}` : ""}`;
+    
+    // Generate secure tamper-proof Base64 token
+    const encodedToken = encodePaymentLinkPayload({
+      title,
+      price,
+      redirectUrl,
+      description,
+      currency,
+    });
+    const encodedUrl = `${origin}/pay?data=${encodedToken}`;
 
     return NextResponse.json(
       {
@@ -75,7 +86,9 @@ export async function POST(req: NextRequest) {
           id: result.link.id,
           slug,
           url: hostedUrl,
+          encodedUrl,
           dynamicUrl,
+          token: encodedToken,
           title: result.link.title,
           price: result.link.price / 100,
           currency: result.link.currency,

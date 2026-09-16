@@ -92,7 +92,17 @@ export default function PaymentLinksDocPage() {
           </div>
 
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-2">
-            <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">URL Pattern</p>
+            <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">URL Pattern (Base64 Encoded & Tamper-Proof - Recommended)</p>
+            <pre className="p-3 rounded-xl bg-background/90 border border-emerald-500/30 font-mono text-xs text-foreground overflow-x-auto">
+              https://scriptly.store/pay?data=BASE64_ENCODED_PAYLOAD
+            </pre>
+            <p className="text-[11px] text-muted-foreground pt-1">
+              Hides the price and destination parameters from plain view and cryptographically verifies integrity via HMAC-SHA256 so users cannot modify the price in their browser.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-muted/20 border border-border/50 space-y-2">
+            <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">URL Pattern (Plain Query String)</p>
             <pre className="p-3 rounded-xl bg-background/90 border border-border/60 font-mono text-xs text-foreground overflow-x-auto">
               https://scriptly.store/pay?title=YOUR_TITLE&price=PRICE_IN_INR&redirect=REDIRECT_URL
             </pre>

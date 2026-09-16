@@ -24,6 +24,13 @@ import {
   Clock,
   Sparkles,
   Sliders,
+  BarChart3,
+  Lock,
+  CreditCard,
+  X,
+  AlertTriangle,
+  FileCode,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +39,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
+import { encodePaymentLinkPayload } from "@/lib/payments/link-encoder";
 
 interface PaymentLinkItem {
   id: string;
@@ -53,6 +61,8 @@ interface ActivityItem {
   id: string;
   linkId: string | null;
   type: string;
+  orderId?: string | null;
+  paymentId?: string | null;
   amount: number | null;
   payerEmail: string | null;
   payerName: string | null;
@@ -61,19 +71,61 @@ interface ActivityItem {
   createdAt: Date;
 }
 
+interface SeparateAnalytics {
+  overall: {
+    totalRevenue: number;
+    totalPaidOrders: number;
+    totalViews: number;
+    totalCheckouts: number;
+  };
+  stored: {
+    totalLinks: number;
+    activeLinks: number;
+    totalRevenue: number;
+    totalConversions: number;
+    totalViews: number;
+    conversionRate: string;
+  };
+  dynamicPay: {
+    totalRevenue: number;
+    totalConversions: number;
+    totalCheckoutStarts: number;
+    totalViews: number;
+    conversionRate: string;
+    recentTransactions: Array<{
+      id: string;
+      orderId: string | null;
+      paymentId: string | null;
+      amount: number;
+      payerEmail: string | null;
+      payerName: string | null;
+      payerPhone: string | null;
+      redirectUrl: string | null;
+      title: string | null;
+      createdAt: Date;
+    }>;
+  };
+}
+
 export default function AdminPaymentLinksManager({
   initialLinks,
   initialActivities,
+  initialAnalytics,
   origin,
 }: {
   initialLinks: PaymentLinkItem[];
   initialActivities: ActivityItem[];
+  initialAnalytics: SeparateAnalytics;
   origin: string;
 }) {
   const [links, setLinks] = useState<PaymentLinkItem[]>(initialLinks);
   const [activities, setActivities] = useState<ActivityItem[]>(initialActivities);
+  const [analytics, setAnalytics] = useState<SeparateAnalytics>(initialAnalytics);
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+
+  // Per-Link Analytics Modal
+  const [selectedLinkForAnalytics, setSelectedLinkForAnalytics] = useState<PaymentLinkItem | null>(null);
 
   // New Link Form State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -84,21 +136,33 @@ export default function AdminPaymentLinksManager({
   const [customSlug, setCustomSlug] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Dynamic Generator State
-  const [genTitle, setGenTitle] = useState("Consulting Call");
-  const [genPrice, setGenPrice] = useState("1500");
-  const [genRedirect, setGenRedirect] = useState("https://meet.google.com/abc-def-ghi");
-  const [genDesc, setGenDesc] = useState("1-on-1 Architecture Review Session");
-  const [copiedGen, setCopiedGen] = useState(false);
+  // Encoded Link Generator State
+  const [encTitle, setEncTitle] = useState("Architecture Review");
+  const [encPrice, setEncPrice] = useState("1499");
+  const [encRedirect, setEncRedirect] = useState("https://scriptly.store/explore");
+  const [encDesc, setEncDesc] = useState("1-on-1 private architecture walkthrough session");
+  const [encSign, setEncSign] = useState(true);
+  const [copiedEnc, setCopiedEnc] = useState(false);
 
-  const dynamicUrlPreview = `${origin}/pay?title=${encodeURIComponent(genTitle)}&price=${genPrice}&redirect=${encodeURIComponent(genRedirect)}${genDesc ? `&desc=${encodeURIComponent(genDesc)}` : ""}`;
+  // Calculate live Base64 token
+  const generatedToken = encodePaymentLinkPayload(
+    {
+      title: encTitle || "Product",
+      price: parseFloat(encPrice) || 100,
+      redirectUrl: encRedirect || "https://scriptly.store",
+      description: encDesc || undefined,
+    },
+    encSign
+  );
 
-  // Metrics
-  const totalLinks = links.length;
-  const totalViews = links.reduce((sum, l) => sum + (l.views || 0), 0);
-  const totalConversions = links.reduce((sum, l) => sum + (l.conversions || 0), 0);
-  const totalRevenue = links.reduce((sum, l) => sum + (l.totalEarned || 0), 0) / 100;
-  const conversionRate = totalViews > 0 ? ((totalConversions / totalViews) * 100).toFixed(1) : "0.0";
+  const encodedUrlPreview = `${origin}/pay?data=${generatedToken}`;
+
+  const formatINR = (val: number) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(val);
 
   const filteredLinks = links.filter((l) =>
     l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -169,6 +233,11 @@ export default function AdminPaymentLinksManager({
     setTimeout(() => setCopiedSlug(null), 2000);
   };
 
+  // Activity list for the currently selected link modal
+  const linkSpecificActivities = selectedLinkForAnalytics
+    ? activities.filter((a) => a.linkId === selectedLinkForAnalytics.id)
+    : [];
+
   return (
     <div className="space-y-8">
       {/* Top Header */}
@@ -181,21 +250,21 @@ export default function AdminPaymentLinksManager({
             Payment Links & Instant Checkouts
           </h1>
           <p className="text-xs md:text-sm text-muted-foreground mt-1">
-            Create payment links with instant post-payment redirection. Or generate links on-the-fly via encoded URLs and open REST API.
+            Create permanent stored links, or generate tamper-proof Base64 encoded links for instant payment collection.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Button asChild variant="outline" size="sm" className="rounded-xl text-xs font-bold gap-1.5 border-border/60">
             <a href="/docs/api/payment-links" target="_blank">
-              <Code className="w-3.5 h-3.5" /> API & URL Docs
+              <Code className="w-3.5 h-3.5" /> API & Encoder Docs
             </a>
           </Button>
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-[#58CC02] hover:bg-[#58CC02]/90 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_3px_0_#46A302] active:translate-y-px active:shadow-none transition-all gap-1.5">
-                <Plus className="w-4 h-4" /> Create Payment Link
+                <Plus className="w-4 h-4" /> Create Permanent Link
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg rounded-2xl bg-card/95 backdrop-blur-2xl border-border/60 p-6">
@@ -300,62 +369,60 @@ export default function AdminPaymentLinksManager({
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* Global KPI Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-5 rounded-2xl bg-card/40 border border-border/50 backdrop-blur-md space-y-1 shadow-sm">
           <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Link2 className="w-3.5 h-3.5 text-primary" /> Active Links
+            <TrendingUp className="w-3.5 h-3.5 text-[#58CC02]" /> Overall Volume
           </span>
-          <p className="text-2xl font-black text-foreground">{totalLinks}</p>
-          <p className="text-[10px] text-muted-foreground">Managed payment links</p>
+          <p className="text-2xl font-black text-foreground">{formatINR(analytics.overall.totalRevenue)}</p>
+          <p className="text-[10px] text-muted-foreground">{analytics.overall.totalPaidOrders} total paid checkouts</p>
         </div>
 
         <div className="p-5 rounded-2xl bg-card/40 border border-border/50 backdrop-blur-md space-y-1 shadow-sm">
           <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Eye className="w-3.5 h-3.5 text-[#1CB0F6]" /> Total Views
+            <Link2 className="w-3.5 h-3.5 text-primary" /> Stored Links Volume
           </span>
-          <p className="text-2xl font-black text-foreground">{totalViews}</p>
-          <p className="text-[10px] text-muted-foreground">Checkout page impressions</p>
+          <p className="text-2xl font-black text-foreground">{formatINR(analytics.stored.totalRevenue)}</p>
+          <p className="text-[10px] text-muted-foreground">{analytics.stored.totalConversions} paid orders ({analytics.stored.conversionRate}%)</p>
         </div>
 
         <div className="p-5 rounded-2xl bg-card/40 border border-border/50 backdrop-blur-md space-y-1 shadow-sm">
           <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Conversions
+            <CreditCard className="w-3.5 h-3.5 text-[#1CB0F6]" /> Dynamic /pay Volume
           </span>
-          <div className="flex items-baseline gap-2">
-            <p className="text-2xl font-black text-foreground">{totalConversions}</p>
-            <span className="text-xs font-bold text-emerald-500">{conversionRate}%</span>
-          </div>
-          <p className="text-[10px] text-muted-foreground">Paid orders fulfilled</p>
+          <p className="text-2xl font-black text-foreground">{formatINR(analytics.dynamicPay.totalRevenue)}</p>
+          <p className="text-[10px] text-muted-foreground">{analytics.dynamicPay.totalConversions} paid orders ({analytics.dynamicPay.conversionRate}%)</p>
         </div>
 
         <div className="p-5 rounded-2xl bg-card/40 border border-border/50 backdrop-blur-md space-y-1 shadow-sm">
           <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-[#58CC02]" /> Revenue Collected
+            <Eye className="w-3.5 h-3.5 text-purple-400" /> Total Impressions
           </span>
-          <p className="text-2xl font-black text-foreground">
-            {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(totalRevenue)}
-          </p>
-          <p className="text-[10px] text-muted-foreground">Lifetime volume through links</p>
+          <p className="text-2xl font-black text-foreground">{analytics.overall.totalViews}</p>
+          <p className="text-[10px] text-muted-foreground">{analytics.overall.totalCheckouts} checkouts launched</p>
         </div>
       </div>
 
       {/* Main Workspace Tabs */}
       <Tabs defaultValue="links" className="w-full">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <TabsList className="bg-muted/40 p-1 rounded-xl border border-border/50">
-            <TabsTrigger value="links" className="rounded-lg text-xs font-bold gap-1.5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+          <TabsList className="bg-muted/40 p-1 rounded-xl border border-border/50 flex-wrap h-auto">
+            <TabsTrigger value="links" className="rounded-lg text-xs font-bold gap-1.5 py-2">
               <Link2 className="w-3.5 h-3.5" /> All Payment Links ({links.length})
             </TabsTrigger>
-            <TabsTrigger value="activities" className="rounded-lg text-xs font-bold gap-1.5">
-              <Activity className="w-3.5 h-3.5" /> Live Activity Log ({activities.length})
+            <TabsTrigger value="dynamic_analytics" className="rounded-lg text-xs font-bold gap-1.5 py-2">
+              <CreditCard className="w-3.5 h-3.5 text-[#58CC02]" /> /pay Dynamic Analytics ({analytics.dynamicPay.totalConversions})
             </TabsTrigger>
-            <TabsTrigger value="generator" className="rounded-lg text-xs font-bold gap-1.5">
-              <Sliders className="w-3.5 h-3.5" /> Dynamic URL Generator
+            <TabsTrigger value="encoder" className="rounded-lg text-xs font-bold gap-1.5 py-2">
+              <Lock className="w-3.5 h-3.5 text-amber-500" /> Encoded Link Creator
+            </TabsTrigger>
+            <TabsTrigger value="activities" className="rounded-lg text-xs font-bold gap-1.5 py-2">
+              <Activity className="w-3.5 h-3.5" /> Activity Stream ({activities.length})
             </TabsTrigger>
           </TabsList>
 
-          <div className="relative w-full sm:w-64">
+          <div className="relative w-full lg:w-64">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchQuery}
@@ -366,7 +433,7 @@ export default function AdminPaymentLinksManager({
           </div>
         </div>
 
-        {/* Tab 1: Payment Links Table */}
+        {/* Tab 1: Payment Links Table with Analytics Button */}
         <TabsContent value="links" className="mt-0">
           <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
@@ -389,17 +456,13 @@ export default function AdminPaymentLinksManager({
                           <Link2 className="w-5 h-5" />
                         </div>
                         <p className="font-bold">No payment links found</p>
-                        <p className="text-[11px]">Click "Create Payment Link" above to get started.</p>
+                        <p className="text-[11px]">Click "Create Permanent Link" above to get started.</p>
                       </td>
                     </tr>
                   ) : (
                     filteredLinks.map((link) => {
                       const hostedUrl = `${origin}/pay/${link.slug}`;
-                      const priceFormatted = new Intl.NumberFormat("en-IN", {
-                        style: "currency",
-                        currency: link.currency || "INR",
-                        maximumFractionDigits: 0,
-                      }).format(link.price / 100);
+                      const priceFormatted = formatINR(link.price / 100);
 
                       return (
                         <tr key={link.id} className="hover:bg-muted/10 transition-colors">
@@ -463,6 +526,17 @@ export default function AdminPaymentLinksManager({
 
                           <td className="py-3.5 px-4 text-right">
                             <div className="flex items-center justify-end gap-1.5">
+                              {/* View Link Analytics Button */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedLinkForAnalytics(link)}
+                                className="h-8 px-2.5 rounded-lg text-[11px] font-bold gap-1 border-primary/30 text-primary hover:bg-primary/10"
+                                title="View analytics for this link"
+                              >
+                                <BarChart3 className="w-3 h-3" /> Analytics
+                              </Button>
+
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -475,7 +549,7 @@ export default function AdminPaymentLinksManager({
                                   </>
                                 ) : (
                                   <>
-                                    <Copy className="w-3 h-3" /> Copy Link
+                                    <Copy className="w-3 h-3" /> Copy
                                   </>
                                 )}
                               </Button>
@@ -512,16 +586,266 @@ export default function AdminPaymentLinksManager({
           </div>
         </TabsContent>
 
-        {/* Tab 2: Activity Feed */}
+        {/* Tab 2: Separate Analytics for https://scriptly.store/pay */}
+        <TabsContent value="dynamic_analytics" className="mt-0 space-y-6">
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#58CC02] flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5" /> Dynamic Checkouts Telemetry
+                </span>
+                <h3 className="text-lg font-black text-foreground">
+                  Payments Processed via https://scriptly.store/pay
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Real-time analytics for all transactions completed using on-the-fly Base64 encoded links and dynamic URL parameters.
+                </p>
+              </div>
+
+              <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-bold gap-1.5 border-border/60">
+                <a href={encodedUrlPreview} target="_blank" rel="noreferrer">
+                  Test /pay Live <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </Button>
+            </div>
+
+            {/* Dynamic /pay KPI Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-background/60 border border-border/40 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                  Dynamic Revenue
+                </span>
+                <p className="text-2xl font-black text-foreground">{formatINR(analytics.dynamicPay.totalRevenue)}</p>
+                <p className="text-[10px] text-emerald-500 font-bold">100% via /pay</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-background/60 border border-border/40 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                  Paid Orders
+                </span>
+                <p className="text-2xl font-black text-foreground">{analytics.dynamicPay.totalConversions}</p>
+                <p className="text-[10px] text-muted-foreground">Successful fulfillments</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-background/60 border border-border/40 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                  Checkout Launches
+                </span>
+                <p className="text-2xl font-black text-foreground">{analytics.dynamicPay.totalCheckoutStarts}</p>
+                <p className="text-[10px] text-muted-foreground">{analytics.dynamicPay.totalViews} page impressions</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-background/60 border border-border/40 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                  Conversion Rate
+                </span>
+                <p className="text-2xl font-black text-emerald-500">{analytics.dynamicPay.conversionRate}%</p>
+                <p className="text-[10px] text-muted-foreground">Paid vs checkouts started</p>
+              </div>
+            </div>
+
+            {/* Transactions Table for /pay */}
+            <div className="space-y-3 pt-2">
+              <h4 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+                Recent /pay Completed Transactions
+              </h4>
+
+              {analytics.dynamicPay.recentTransactions.length === 0 ? (
+                <div className="py-10 text-center text-muted-foreground rounded-xl border border-border/40 bg-background/40">
+                  <CreditCard className="w-6 h-6 mx-auto mb-2 opacity-40" />
+                  <p className="font-bold text-xs">No dynamic payments recorded yet</p>
+                  <p className="text-[11px] mt-0.5">When customers complete checkout at /pay?data=..., their orders will display here.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-xl border border-border/40">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-muted/30 border-b border-border/40 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                      <tr>
+                        <th className="py-2.5 px-3">Title & Payer</th>
+                        <th className="py-2.5 px-3">Amount</th>
+                        <th className="py-2.5 px-3">Redirect Target</th>
+                        <th className="py-2.5 px-3">Order & Payment ID</th>
+                        <th className="py-2.5 px-3 text-right">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/30 bg-background/40">
+                      {analytics.dynamicPay.recentTransactions.map((tx) => (
+                        <tr key={tx.id} className="hover:bg-muted/10">
+                          <td className="py-3 px-3">
+                            <p className="font-bold text-foreground">{tx.title || "Dynamic Checkout"}</p>
+                            <p className="text-[11px] text-muted-foreground">
+                              {tx.payerEmail || "No email"} {tx.payerName ? `(${tx.payerName})` : ""}
+                            </p>
+                          </td>
+                          <td className="py-3 px-3 font-black text-emerald-500 text-sm">
+                            {formatINR(tx.amount)}
+                          </td>
+                          <td className="py-3 px-3 max-w-[180px] truncate">
+                            {tx.redirectUrl ? (
+                              <a
+                                href={tx.redirectUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-primary hover:underline truncate"
+                              >
+                                <span className="truncate">{tx.redirectUrl}</span>
+                                <ExternalLink className="w-3 h-3 shrink-0" />
+                              </a>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 font-mono text-[10px] text-muted-foreground">
+                            <div>{tx.orderId || "—"}</div>
+                            <div className="text-foreground/70">{tx.paymentId || "—"}</div>
+                          </td>
+                          <td className="py-3 px-3 text-right text-[11px] text-muted-foreground">
+                            <div>{formatDistanceToNow(new Date(tx.createdAt), { addSuffix: true })}</div>
+                            <div className="text-[9px] opacity-70">{format(new Date(tx.createdAt), "MMM d, yyyy HH:mm")}</div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Tab 3: Encoded Link Creator Tool */}
+        <TabsContent value="encoder" className="mt-0">
+          <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl p-6 shadow-sm space-y-6">
+            <div className="space-y-1">
+              <span className="text-[11px] font-black uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5" /> Tamper-Proof Link Engine
+              </span>
+              <h3 className="text-lg font-black text-foreground">Base64 Encoded Payment Link Tool</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
+                Generate an encoded link that conceals price and destination parameters behind a cryptographic signature. Buyers cannot alter the price in the URL without invalidating checkout.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                  Product / Service Title
+                </label>
+                <Input
+                  value={encTitle}
+                  onChange={(e) => setEncTitle(e.target.value)}
+                  placeholder="e.g. Code Review & Architecture Audit"
+                  className="rounded-xl h-10 text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                  Price (INR ₹)
+                </label>
+                <Input
+                  type="number"
+                  value={encPrice}
+                  onChange={(e) => setEncPrice(e.target.value)}
+                  placeholder="e.g. 1499"
+                  className="rounded-xl h-10 text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                  Redirect Destination URL (Post-Payment)
+                </label>
+                <Input
+                  value={encRedirect}
+                  onChange={(e) => setEncRedirect(e.target.value)}
+                  placeholder="https://cal.com/booking or https://drive.google.com/..."
+                  className="rounded-xl h-10 text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                  Description (Optional)
+                </label>
+                <Input
+                  value={encDesc}
+                  onChange={(e) => setEncDesc(e.target.value)}
+                  placeholder="Short explanation displayed on the checkout card"
+                  className="rounded-xl h-10 text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Cryptographic Protection Toggle */}
+            <div className="p-4 rounded-xl bg-muted/20 border border-border/40 flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="text-xs font-black text-foreground flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" /> HMAC-SHA256 Cryptographic Signature
+                </span>
+                <p className="text-[11px] text-muted-foreground">
+                  Signs the title, price, and redirect URL so any client-side tampering causes the checkout to fail.
+                </p>
+              </div>
+              <Switch checked={encSign} onCheckedChange={setEncSign} />
+            </div>
+
+            {/* Live Generated Base64 URL Output */}
+            <div className="p-5 rounded-2xl bg-muted/40 border border-border/50 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-emerald-500" /> Tamper-Proof URL Output
+                </span>
+                <span className="text-[10px] text-emerald-500 font-bold">
+                  Zero Parameters Exposed
+                </span>
+              </div>
+
+              <div className="p-3 bg-background/90 rounded-xl border border-border/60 font-mono text-xs text-foreground break-all select-all">
+                {encodedUrlPreview}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(encodedUrlPreview);
+                    setCopiedEnc(true);
+                    toast.success("Encoded payment URL copied to clipboard!");
+                    setTimeout(() => setCopiedEnc(false), 2000);
+                  }}
+                  className="bg-[#58CC02] hover:bg-[#58CC02]/90 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_3px_0_#46A302] active:translate-y-px active:shadow-none"
+                >
+                  {copiedEnc ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 mr-1.5" /> Copied Link
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy Encoded Link
+                    </>
+                  )}
+                </Button>
+
+                <Button asChild variant="outline" className="rounded-xl text-xs font-bold border-border/60">
+                  <a href={encodedUrlPreview} target="_blank" rel="noreferrer">
+                    Test Checkout Card <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Tab 4: Raw Activity Stream */}
         <TabsContent value="activities" className="mt-0">
           <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-black text-sm text-foreground">Recent Customer Activities</h3>
-                <p className="text-[11px] text-muted-foreground">Real-time log of views, checkout initiations, and completed transactions.</p>
+                <h3 className="font-black text-sm text-foreground">Global Activity Stream</h3>
+                <p className="text-[11px] text-muted-foreground">Telemetry stream across stored and dynamic payment links.</p>
               </div>
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-                Live Telemetry
+                Live Feed
               </span>
             </div>
 
@@ -529,7 +853,7 @@ export default function AdminPaymentLinksManager({
               <div className="py-12 text-center text-muted-foreground">
                 <Activity className="w-6 h-6 mx-auto mb-2 opacity-50" />
                 <p className="font-bold text-xs">No activities recorded yet</p>
-                <p className="text-[11px]">When customers visit or pay via links, events will appear here.</p>
+                <p className="text-[11px]">Events will appear here as visitors interact with links.</p>
               </div>
             ) : (
               <div className="divide-y divide-border/30">
@@ -543,19 +867,19 @@ export default function AdminPaymentLinksManager({
                   if (act.type === "payment_success") {
                     badge = (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Payment Success
+                        <CheckCircle2 className="w-3 h-3" /> Paid
                       </span>
                     );
                   } else if (act.type === "checkout_initiated") {
                     badge = (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-sky-500/10 text-sky-500 border border-sky-500/20">
-                        Checkout Started
+                        Checkout
                       </span>
                     );
                   } else if (act.type === "view") {
                     badge = (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-muted text-muted-foreground">
-                        Page View
+                        View
                       </span>
                     );
                   } else if (act.type === "payment_failed") {
@@ -566,9 +890,7 @@ export default function AdminPaymentLinksManager({
                     );
                   }
 
-                  const formattedAmount = act.amount
-                    ? new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(act.amount / 100)
-                    : null;
+                  const formattedAmount = act.amount ? formatINR(act.amount / 100) : null;
 
                   return (
                     <div key={act.id} className="py-3 flex items-center justify-between gap-4 text-xs">
@@ -576,7 +898,7 @@ export default function AdminPaymentLinksManager({
                         {badge}
                         <div>
                           <p className="font-bold text-foreground">
-                            {act.payerEmail || (act.linkId ? `Link ID: ${act.linkId}` : "Dynamic Checkout")}
+                            {act.payerEmail || (act.linkId ? `Link ID: ${act.linkId}` : "Dynamic /pay Checkout")}
                             {act.payerName && <span className="font-normal text-muted-foreground ml-1.5">({act.payerName})</span>}
                           </p>
                           {act.metadata && (
@@ -604,109 +926,140 @@ export default function AdminPaymentLinksManager({
             )}
           </div>
         </TabsContent>
-
-        {/* Tab 3: Dynamic Encoded URL Generator */}
-        <TabsContent value="generator" className="mt-0">
-          <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl p-6 shadow-sm space-y-6">
-            <div className="space-y-1">
-              <span className="text-[11px] font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> Zero-Setup Instant Checkout
-              </span>
-              <h3 className="text-lg font-black text-foreground">Dynamic URL Encoder</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-                Encode your product title, price, and redirect destination directly into the URL. Anyone can create this link on the fly without database pre-registration.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">Title / Purpose</label>
-                <Input
-                  value={genTitle}
-                  onChange={(e) => setGenTitle(e.target.value)}
-                  placeholder="e.g. VIP Consultation"
-                  className="rounded-xl h-10 text-sm"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">Price (INR ₹)</label>
-                <Input
-                  type="number"
-                  value={genPrice}
-                  onChange={(e) => setGenPrice(e.target.value)}
-                  placeholder="e.g. 1500"
-                  className="rounded-xl h-10 text-sm"
-                />
-              </div>
-
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">Redirect Destination URL</label>
-                <Input
-                  value={genRedirect}
-                  onChange={(e) => setGenRedirect(e.target.value)}
-                  placeholder="https://your-app.com/success or calendar booking link"
-                  className="rounded-xl h-10 text-sm"
-                />
-              </div>
-
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">Description (Optional)</label>
-                <Input
-                  value={genDesc}
-                  onChange={(e) => setGenDesc(e.target.value)}
-                  placeholder="Short line shown to the buyer on the checkout card"
-                  className="rounded-xl h-10 text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Live Generated URL Output */}
-            <div className="p-4 rounded-xl bg-muted/40 border border-border/50 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
-                  Ready-to-Share Dynamic URL
-                </span>
-                <span className="text-[10px] text-emerald-500 font-bold flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" /> No Login Required
-                </span>
-              </div>
-
-              <div className="p-3 bg-background/80 rounded-lg border border-border/60 font-mono text-xs text-foreground break-all select-all">
-                {dynamicUrlPreview}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Button
-                  onClick={() => {
-                    navigator.clipboard.writeText(dynamicUrlPreview);
-                    setCopiedGen(true);
-                    toast.success("Dynamic checkout URL copied!");
-                    setTimeout(() => setCopiedGen(false), 2000);
-                  }}
-                  className="bg-[#58CC02] hover:bg-[#58CC02]/90 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_3px_0_#46A302] active:translate-y-px active:shadow-none"
-                >
-                  {copiedGen ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 mr-1.5" /> Copied Link
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy Dynamic Link
-                    </>
-                  )}
-                </Button>
-
-                <Button asChild variant="outline" className="rounded-xl text-xs font-bold">
-                  <a href={dynamicUrlPreview} target="_blank" rel="noreferrer">
-                    Test Pay Page Now <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
-                  </a>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
       </Tabs>
+
+      {/* Per-Link Analytics Modal */}
+      {selectedLinkForAnalytics && (
+        <Dialog open={Boolean(selectedLinkForAnalytics)} onOpenChange={(open) => !open && setSelectedLinkForAnalytics(null)}>
+          <DialogContent className="max-w-2xl rounded-2xl bg-card/95 backdrop-blur-2xl border-border/60 p-6 space-y-6">
+            <DialogHeader className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
+                  <BarChart3 className="w-3.5 h-3.5" /> Link Analytics & Telemetry
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-muted text-[10px] font-mono text-muted-foreground">
+                  ID: {selectedLinkForAnalytics.id}
+                </span>
+              </div>
+              <DialogTitle className="text-xl font-black tracking-tight">
+                {selectedLinkForAnalytics.title}
+              </DialogTitle>
+              <p className="text-xs text-muted-foreground font-mono truncate">
+                {origin}/pay/{selectedLinkForAnalytics.slug}
+              </p>
+            </DialogHeader>
+
+            {/* Metrics Breakdown */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-xl bg-background/80 border border-border/40 space-y-0.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Price</span>
+                <p className="text-lg font-black text-foreground">{formatINR(selectedLinkForAnalytics.price / 100)}</p>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-background/80 border border-border/40 space-y-0.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Total Views</span>
+                <p className="text-lg font-black text-foreground">{selectedLinkForAnalytics.views}</p>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-background/80 border border-border/40 space-y-0.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Conversions</span>
+                <p className="text-lg font-black text-emerald-500">{selectedLinkForAnalytics.conversions}</p>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-background/80 border border-border/40 space-y-0.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Revenue</span>
+                <p className="text-lg font-black text-foreground">{formatINR(selectedLinkForAnalytics.totalEarned / 100)}</p>
+              </div>
+            </div>
+
+            {/* Funnel Progress */}
+            <div className="p-4 rounded-xl bg-muted/20 border border-border/40 space-y-2">
+              <div className="flex justify-between text-xs font-black">
+                <span>Conversion Rate</span>
+                <span className="text-emerald-500">
+                  {selectedLinkForAnalytics.views > 0
+                    ? ((selectedLinkForAnalytics.conversions / selectedLinkForAnalytics.views) * 100).toFixed(1)
+                    : "0.0"}%
+                </span>
+              </div>
+              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 transition-all duration-300"
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      selectedLinkForAnalytics.views > 0
+                        ? (selectedLinkForAnalytics.conversions / selectedLinkForAnalytics.views) * 100
+                        : 0
+                    )}%`,
+                  }}
+                />
+              </div>
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>{selectedLinkForAnalytics.views} impressions</span>
+                <span>{selectedLinkForAnalytics.conversions} paid buyers</span>
+              </div>
+            </div>
+
+            {/* Destination URL */}
+            <div className="p-3 rounded-xl bg-muted/30 border border-border/40 text-xs flex items-center justify-between">
+              <div className="truncate pr-2">
+                <span className="text-muted-foreground">Redirects to: </span>
+                <span className="font-bold text-foreground truncate">{selectedLinkForAnalytics.redirectUrl}</span>
+              </div>
+              <a href={selectedLinkForAnalytics.redirectUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline shrink-0">
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            {/* Link-specific recent activity */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+                Link Activity History ({linkSpecificActivities.length})
+              </h4>
+              {linkSpecificActivities.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-4 text-center">No specific activity recorded yet.</p>
+              ) : (
+                <div className="max-h-48 overflow-y-auto divide-y divide-border/30 rounded-xl border border-border/40 bg-background/50 p-2">
+                  {linkSpecificActivities.map((act) => (
+                    <div key={act.id} className="py-2 px-2 flex items-center justify-between text-xs">
+                      <span className="font-bold text-foreground uppercase text-[10px] px-2 py-0.5 rounded bg-muted">
+                        {act.type}
+                      </span>
+                      <span className="text-muted-foreground truncate max-w-xs text-[11px]">
+                        {act.payerEmail || act.orderId || "Anonymous view"}
+                      </span>
+                      <span className="text-muted-foreground text-[10px]">
+                        {formatDistanceToNow(new Date(act.createdAt), { addSuffix: true })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedLinkForAnalytics(null)}
+                className="rounded-xl text-xs font-bold"
+              >
+                Close
+              </Button>
+              <Button
+                asChild
+                size="sm"
+                className="bg-[#58CC02] hover:bg-[#58CC02]/90 text-white font-black text-xs uppercase tracking-wider rounded-xl"
+              >
+                <a href={`${origin}/pay/${selectedLinkForAnalytics.slug}`} target="_blank" rel="noreferrer">
+                  Open Checkout Page <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                </a>
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

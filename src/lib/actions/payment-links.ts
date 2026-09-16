@@ -7,6 +7,7 @@ import { eq, desc, sql } from "drizzle-orm";
 import crypto from "crypto";
 import { getOrCreateDbUser, isAdmin } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
+import { encodePaymentLinkPayload } from "@/lib/payments/link-encoder";
 
 let razorpayInstance: any = null;
 
@@ -382,5 +383,163 @@ export async function verifyLinkPaymentAction({
     redirectUrl,
     orderId,
     paymentId,
+  };
+}
+
+/**
+ * Generates a signed, URL-safe Base64 payment link token.
+ */
+export async function generateEncodedPaymentLinkAction(payload: {
+  title: string;
+  price: number;
+  redirectUrl: string;
+  description?: string | null;
+  currency?: string;
+  sign?: boolean;
+}) {
+  const token = encodePaymentLinkPayload(payload, payload.sign !== false);
+  return {
+    success: true,
+    token,
+    encodedUrl: `/pay?data=${token}`,
+  };
+}
+
+/**
+ * Returns detailed analytics separated for:
+ * 1) Stored Database Links (/pay/[slug])
+ * 2) Dynamic On-The-Fly / Base64 Encoded Checkouts (/pay)
+ */
+export async function getSeparatePaymentAnalyticsAction() {
+  const authorized = await isAdmin();
+  if (!authorized) {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+
+  const [allLinks, allActivities] = await Promise.all([
+    db.query.paymentLinks.findMany({
+      orderBy: [desc(paymentLinks.createdAt)],
+    }),
+    db.query.paymentLinkActivities.findMany({
+      orderBy: [desc(paymentLinkActivities.createdAt)],
+      limit: 500,
+    }),
+  ]);
+
+  // Separate activities into Stored Links vs Dynamic /pay checkouts
+  const storedActivities = allActivities.filter(a => a.linkId && a.linkId !== "dynamic");
+  const dynamicActivities = allActivities.filter(a => !a.linkId || a.linkId === "dynamic");
+
+  // Dynamic /pay stats
+  const dynamicViews = dynamicActivities.filter(a => a.type === "view").length;
+  const dynamicCheckouts = dynamicActivities.filter(a => a.type === "checkout_initiated").length;
+  const dynamicPaid = dynamicActivities.filter(a => a.type === "payment_success");
+  const dynamicRevenuePaise = dynamicPaid.reduce((sum, a) => sum + (a.amount || 0), 0);
+  const dynamicRevenueINR = dynamicRevenuePaise / 100;
+  const dynamicConversionRate = dynamicViews > 0
+    ? ((dynamicPaid.length / dynamicViews) * 100).toFixed(1)
+    : dynamicCheckouts > 0
+      ? ((dynamicPaid.length / dynamicCheckouts) * 100).toFixed(1)
+      : "0.0";
+
+  // Stored links stats
+  const storedTotalViews = allLinks.reduce((sum, l) => sum + (l.views || 0), 0);
+  const storedTotalConversions = allLinks.reduce((sum, l) => sum + (l.conversions || 0), 0);
+  const storedTotalRevenueINR = allLinks.reduce((sum, l) => sum + (l.totalEarned || 0), 0) / 100;
+  const storedActiveLinks = allLinks.filter(l => l.active).length;
+  const storedConversionRate = storedTotalViews > 0
+    ? ((storedTotalConversions / storedTotalViews) * 100).toFixed(1)
+    : "0.0";
+
+  // Recent dynamic transactions
+  const recentDynamicTransactions = dynamicPaid.map(p => {
+    let redirectUrl = null;
+    let title = null;
+    try {
+      if (p.metadata) {
+        const meta = JSON.parse(p.metadata);
+        redirectUrl = meta.redirectUrl || null;
+        title = meta.title || null;
+      }
+    } catch {}
+    return {
+      id: p.id,
+      orderId: p.orderId,
+      paymentId: p.paymentId,
+      amount: (p.amount || 0) / 100,
+      payerEmail: p.payerEmail,
+      payerName: p.payerName,
+      payerPhone: p.payerPhone,
+      redirectUrl,
+      title,
+      createdAt: p.createdAt,
+    };
+  });
+
+  return {
+    overall: {
+      totalRevenue: storedTotalRevenueINR + dynamicRevenueINR,
+      totalPaidOrders: storedTotalConversions + dynamicPaid.length,
+      totalViews: storedTotalViews + dynamicViews,
+      totalCheckouts: allActivities.filter(a => a.type === "checkout_initiated").length,
+    },
+    stored: {
+      totalLinks: allLinks.length,
+      activeLinks: storedActiveLinks,
+      totalRevenue: storedTotalRevenueINR,
+      totalConversions: storedTotalConversions,
+      totalViews: storedTotalViews,
+      conversionRate: storedConversionRate,
+    },
+    dynamicPay: {
+      totalRevenue: dynamicRevenueINR,
+      totalConversions: dynamicPaid.length,
+      totalCheckoutStarts: dynamicCheckouts,
+      totalViews: dynamicViews,
+      conversionRate: dynamicConversionRate,
+      recentTransactions: recentDynamicTransactions,
+    },
+  };
+}
+
+/**
+ * Retrieves full telemetry analytics for a single specific link.
+ */
+export async function getSingleLinkAnalyticsAction(linkId: string) {
+  const authorized = await isAdmin();
+  if (!authorized) {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+
+  const link = await db.query.paymentLinks.findFirst({
+    where: eq(paymentLinks.id, linkId),
+  });
+
+  if (!link) {
+    throw new Error("Payment link not found.");
+  }
+
+  const activities = await db.query.paymentLinkActivities.findMany({
+    where: eq(paymentLinkActivities.linkId, linkId),
+    orderBy: [desc(paymentLinkActivities.createdAt)],
+    limit: 100,
+  });
+
+  const views = activities.filter(a => a.type === "view").length;
+  const checkouts = activities.filter(a => a.type === "checkout_initiated").length;
+  const successes = activities.filter(a => a.type === "payment_success").length;
+  const failures = activities.filter(a => a.type === "payment_failed").length;
+
+  return {
+    link,
+    metrics: {
+      views: Math.max(views, link.views),
+      checkouts,
+      successes: Math.max(successes, link.conversions),
+      failures,
+      revenueINR: link.totalEarned / 100,
+      conversionRate: link.views > 0 ? ((link.conversions / link.views) * 100).toFixed(1) : "0.0",
+    },
+    activities,
   };
 }

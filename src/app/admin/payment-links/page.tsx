@@ -1,7 +1,11 @@
 import { Metadata } from "next";
 import { isAdmin } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
-import { getAdminPaymentLinksAction, getPaymentLinkActivitiesAction } from "@/lib/actions/payment-links";
+import {
+  getAdminPaymentLinksAction,
+  getPaymentLinkActivitiesAction,
+  getSeparatePaymentAnalyticsAction,
+} from "@/lib/actions/payment-links";
 import AdminPaymentLinksManager from "@/components/admin/AdminPaymentLinksManager";
 import { headers } from "next/headers";
 
@@ -16,9 +20,10 @@ export default async function AdminPaymentLinksPage() {
     redirect("/");
   }
 
-  const [links, activities] = await Promise.all([
+  const [links, activities, analytics] = await Promise.all([
     getAdminPaymentLinksAction(),
-    getPaymentLinkActivitiesAction(50),
+    getPaymentLinkActivitiesAction(100),
+    getSeparatePaymentAnalyticsAction(),
   ]);
 
   const headersList = await headers();
@@ -31,6 +36,7 @@ export default async function AdminPaymentLinksPage() {
       <AdminPaymentLinksManager
         initialLinks={links}
         initialActivities={activities}
+        initialAnalytics={analytics}
         origin={origin}
       />
     </div>
