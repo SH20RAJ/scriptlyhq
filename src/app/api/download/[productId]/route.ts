@@ -8,14 +8,13 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ productId: string }> }
 ) {
-  let product: any = null;
   try {
     const { productId } = await params;
 
     // Authenticate user with Hexclave
     const hexclaveUser = await hexclave.getUser();
     if (!hexclaveUser) {
-      return new Response("Unauthorized: Please sign in.", { status: 401 });
+      return new Response("Unauthorized: Please sign in to download.", { status: 401 });
     }
 
     // Fetch user from DB to check role
@@ -25,9 +24,18 @@ export async function GET(
 
     const isAdmin = dbUser?.role === "admin";
 
-    // If not admin, check if user has purchased this product
+    // Fetch product details
+    const product = await db.query.products.findFirst({
+      where: eq(products.id, productId),
+    });
+
+    if (!product || !product.fileUrl) {
+      return new Response("Product or file not found.", { status: 404 });
+    }
+
+    // If not admin and not free, verify completed purchase entitlement
     let orderRecord = null;
-    if (!isAdmin) {
+    if (!isAdmin && !product.isFree) {
       orderRecord = await db.query.orders.findFirst({
         where: and(
           eq(orders.userId, hexclaveUser.id),
@@ -41,25 +49,16 @@ export async function GET(
       }
     }
 
-    // Fetch product details
-    product = await db.query.products.findFirst({
-      where: eq(products.id, productId),
-    });
-
-    if (!product || !product.fileUrl) {
-      return new Response("Product file not found.", { status: 404 });
-    }
-
-    // Log the download event
+    // Log the download audit event
     try {
       await db.insert(downloads).values({
         id: crypto.randomUUID(),
         userId: hexclaveUser.id,
         productId: productId,
-        orderId: orderRecord ? orderRecord.id : "admin_download",
+        orderId: orderRecord ? orderRecord.id : (isAdmin ? "admin_download" : "free_download"),
       });
 
-      // Increment product downloads count
+      // Increment product downloads count atomically
       await db
         .update(products)
         .set({
@@ -67,14 +66,15 @@ export async function GET(
         })
         .where(eq(products.id, productId));
     } catch (dbErr) {
-      console.error("Failed to log download event:", dbErr);
+      console.error("Failed to log download audit event:", dbErr);
     }
 
-    // Handle remote storage download stream with redirect fallback
+    // Handle remote storage downloads
     if (product.fileUrl.startsWith("http://") || product.fileUrl.startsWith("https://")) {
       if (product.redirectDownload) {
         return NextResponse.redirect(new URL(product.fileUrl));
       }
+
       try {
         const response = await fetch(product.fileUrl);
         if (response.ok) {
@@ -86,32 +86,24 @@ export async function GET(
           return new Response(fileBuffer as any, {
             headers: {
               "Content-Type": baseName.endsWith(".zip") ? "application/zip" : "application/octet-stream",
-              "Content-Disposition": `attachment; filename="${baseName}"`,
+              "Content-Disposition": `attachment; filename="${encodeURIComponent(baseName)}"`,
+              "X-Content-Type-Options": "nosniff",
+              "Cache-Control": "private, no-cache, no-store, must-revalidate",
             },
           });
         }
       } catch (err) {
-        console.error("Edge fetch download failed, falling back to direct redirect:", err);
+        console.error("Fetch download failed, falling back to direct URL redirect:", err);
       }
       
-      // Fallback: Redirect directly to the remote URL
       return NextResponse.redirect(new URL(product.fileUrl));
     }
 
-    // Fallback for local paths: redirect relative to host
-    return NextResponse.redirect(new URL(product.fileUrl, req.url));
+    // Local path handling: strictly prevent directory traversal
+    const safePath = product.fileUrl.replace(/\.\./g, "");
+    return NextResponse.redirect(new URL(safePath, req.url));
   } catch (error) {
-    console.error("Secure download error:", error);
-    if (product && product.fileUrl) {
-      try {
-        const redirectUrl = product.fileUrl.startsWith("http://") || product.fileUrl.startsWith("https://")
-          ? product.fileUrl
-          : new URL(product.fileUrl, req.url).toString();
-        return NextResponse.redirect(new URL(redirectUrl));
-      } catch (redirectError) {
-        console.error("Failed to redirect to fileUrl in catch block:", redirectError);
-      }
-    }
-    return new Response("Internal Server Error", { status: 500 });
+    console.error("Secure download authorization error:", error);
+    return new Response("Internal Server Error: Unable to process secure download.", { status: 500 });
   }
 }

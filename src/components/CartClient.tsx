@@ -4,11 +4,13 @@ import { useCart } from "@/components/CartContext";
 import { useState, useTransition, useEffect } from "react";
 import useSWR from "swr";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createRazorpayOrderAction, verifyPaymentAction } from "@/lib/actions/orders";
+import { loadRazorpayScript } from "@/lib/payments/razorpay-loader";
 import { validateReferralCodeAction } from "@/lib/actions/affiliates";
 import { Trash, CreditCard, ShoppingBag, Loader2, CheckCircle2, AlertCircle, Percent } from "lucide-react";
 
@@ -98,24 +100,24 @@ export default function CartClient() {
 
   const handleApplyReferral = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCheckoutError(null);
-    setReferralMessage(null);
-    const code = referralInput.trim();
-    if (!code) return;
+    if (!referralInput.trim()) return;
 
     setReferralPending(true);
+    setReferralMessage(null);
+    setCheckoutError(null);
+
     try {
-      const res = await validateReferralCodeAction(code);
+      const res = await validateReferralCodeAction(referralInput.trim());
       if (res.success && res.referrerSlug) {
-        const slug = res.referrerSlug;
-        setAppliedReferral(slug);
-        document.cookie = `scriptly_referred_by=${encodeURIComponent(slug)}; max-age=${30 * 24 * 60 * 60}; path=/; sameSite=lax`;
-        setReferralMessage({ success: true, text: `Referral code "${slug}" applied! Extra 5% discount applied.` });
+        const code = res.referrerSlug;
+        setAppliedReferral(code);
+        setReferralMessage({ success: true, text: `Referral code "${code}" applied! 5% discount added.` });
+        document.cookie = `scriptly_referred_by=${encodeURIComponent(code)}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Lax`;
       } else {
         setReferralMessage({ success: false, text: res.message || "Invalid referral code." });
       }
-    } catch (err) {
-      setReferralMessage({ success: false, text: "Error validating referral code." });
+    } catch {
+      setReferralMessage({ success: false, text: "Failed to validate referral code." });
     } finally {
       setReferralPending(false);
     }
@@ -141,6 +143,13 @@ export default function CartClient() {
 
         if (!orderData.success) {
           setCheckoutError("Failed to initialize order. Please try again.");
+          return;
+        }
+
+        // Dynamically load Razorpay SDK
+        const scriptLoaded = await loadRazorpayScript();
+        if (!scriptLoaded || typeof window.Razorpay === "undefined") {
+          setCheckoutError("Payment SDK failed to load. Please check your network connection.");
           return;
         }
 
@@ -175,18 +184,13 @@ export default function CartClient() {
             email: orderData.userEmail,
           },
           theme: {
-            color: "#000000",
+            color: "#0F172A",
           },
         };
 
-        if (typeof window.Razorpay === "undefined") {
-          setCheckoutError("Razorpay SDK failed to load. Please refresh the page.");
-          return;
-        }
-
         const rzp = new window.Razorpay(options);
         rzp.on("payment.failed", function (response: any) {
-          setCheckoutError(response.error.description || "Payment failed.");
+          setCheckoutError(response.error.description || "Payment was cancelled or failed.");
         });
         rzp.open();
       } catch (err: any) {
@@ -199,99 +203,88 @@ export default function CartClient() {
   if (!mounted) {
     return (
       <div className="flex items-center justify-center min-h-[40vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (cartCount === 0) {
     return (
-      <div className="text-center py-20 space-y-6 max-w-md mx-auto">
-        <div className="w-16 h-16 bg-muted/40 rounded-full flex items-center justify-center mx-auto">
-          <ShoppingBag className="w-8 h-8 text-muted-foreground" />
+      <div className="text-center py-20 space-y-5 max-w-md mx-auto">
+        <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto text-muted-foreground">
+          <ShoppingBag className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-black tracking-tight text-foreground">Your Cart is Empty</h2>
-        <p className="text-muted-foreground text-sm font-medium leading-relaxed">
-          Explore our premium marketplace collection of SaaS boilerplates, ebooks, prompts, scripts, and UI kits to add them to your cart.
+        <h2 className="text-xl font-semibold tracking-tight text-foreground">Your cart is empty</h2>
+        <p className="text-muted-foreground text-xs leading-relaxed">
+          Explore our marketplace collection of developer templates, automation scripts, and digital tools.
         </p>
-        <Button asChild className="h-11 px-8 rounded-full font-bold uppercase tracking-widest text-[10px]">
-          <Link href="/">Browse Catalog</Link>
+        <Button asChild size="default">
+          <Link href="/explore">Browse Products</Link>
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
       {/* Cart Items List */}
-      <div className="lg:col-span-7 space-y-6">
+      <div className="lg:col-span-7 space-y-4">
         {cart.map((item) => (
-          <Card key={item.id} className="border-border/50 bg-card/40 rounded-2xl overflow-hidden group">
-            <CardContent className="p-4 sm:p-6 flex gap-6 items-center">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-xl overflow-hidden flex-shrink-0 relative border border-border/40">
+          <div key={item.id} className="rounded-lg border border-border/80 bg-card p-4 sm:p-5 flex gap-4 items-center justify-between">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-16 h-16 bg-secondary rounded-md overflow-hidden flex-shrink-0 relative border border-border/60">
                 {item.thumbnail ? (
                   <img src={item.thumbnail} alt={item.title} loading="lazy" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[8px] font-black uppercase text-muted-foreground tracking-widest bg-muted/50">
+                  <div className="w-full h-full flex items-center justify-center text-[9px] font-mono text-muted-foreground">
                     {item.category}
                   </div>
                 )}
               </div>
 
-              <div className="flex-1 min-w-0 space-y-1">
-                <Badge variant="outline" className="text-[9px] uppercase font-black tracking-widest px-2 py-0 h-4 border-muted">
+              <div className="min-w-0 space-y-1">
+                <span className="text-[10px] font-mono uppercase text-muted-foreground">
                   {item.category}
-                </Badge>
-                <h3 className="font-bold text-base sm:text-lg text-foreground line-clamp-1 leading-snug">
+                </span>
+                <h3 className="font-medium text-sm text-foreground truncate">
                   <Link href={`/products/${item.slug}`} className="hover:underline">
                     {item.title}
                   </Link>
                 </h3>
-                <div className="text-sm font-black text-foreground sm:hidden leading-none pt-1 flex items-baseline gap-2">
+                <div className="text-xs font-semibold text-foreground font-mono flex items-baseline gap-2">
                   <span>${(item.price / 100).toFixed(2)}</span>
                   {item.originalPrice && item.originalPrice > item.price && (
-                    <span className="text-[10px] text-muted-foreground line-through decoration-destructive/60 tabular-nums font-bold">
+                    <span className="text-[11px] text-muted-foreground line-through">
                       ${(item.originalPrice / 100).toFixed(2)}
                     </span>
                   )}
                 </div>
               </div>
+            </div>
 
-              <div className="hidden sm:block text-right">
-                <div className="text-base font-black text-foreground tabular-nums">
-                  ${(item.price / 100).toFixed(2)}
-                </div>
-                {item.originalPrice && item.originalPrice > item.price && (
-                  <div className="text-xs text-muted-foreground line-through decoration-destructive/60 tabular-nums">
-                    ${(item.originalPrice / 100).toFixed(2)}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-shrink-0">
-                <Button
-                  onClick={() => removeFromCart(item.id)}
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full cursor-pointer"
-                >
-                  <Trash className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            <Button
+              onClick={() => removeFromCart(item.id)}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+              aria-label="Remove item"
+            >
+              <Trash className="w-4 h-4" />
+            </Button>
+          </div>
         ))}
 
-        <div className="flex items-center justify-between pt-4">
-          <Button asChild variant="link" className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest font-black p-0">
-            <Link href="/">
-              Browse more products
+        <div className="flex items-center justify-between pt-2">
+          <Button asChild variant="link" className="text-muted-foreground hover:text-foreground text-xs p-0">
+            <Link href="/explore">
+              ← Continue browsing
             </Link>
           </Button>
           <Button
             onClick={clearCart}
-            variant="outline"
-            className="rounded-xl h-9 px-4 text-xs font-bold uppercase tracking-wider border-border/60 hover:bg-destructive/10 hover:text-destructive hover:border-transparent transition-colors cursor-pointer"
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-destructive"
           >
             Clear Cart
           </Button>
@@ -300,184 +293,136 @@ export default function CartClient() {
 
       {/* Pricing Summary Sidebar */}
       <div className="lg:col-span-5">
-        <div className="bg-card/40 border border-border/50 rounded-3xl p-6 sm:p-8 space-y-6 sticky top-28 backdrop-blur-md">
-          <h3 className="text-base font-black uppercase tracking-[0.2em] text-muted-foreground border-b border-border/40 pb-4">
+        <div className="bg-card border border-border/80 rounded-lg p-6 space-y-5 sticky top-20">
+          <h3 className="text-sm font-semibold text-foreground border-b border-border/60 pb-3">
             Order Summary
           </h3>
 
-          {/* Calculations List */}
-          <div className="space-y-4 text-sm font-medium">
+          <div className="space-y-3 text-xs">
             <div className="flex justify-between items-center text-muted-foreground">
-              <span>Cart Subtotal</span>
-              <span className="text-foreground font-black tabular-nums">${(cartSubtotal / 100).toFixed(2)}</span>
+              <span>Subtotal</span>
+              <span className="text-foreground font-mono font-medium">${(cartSubtotal / 100).toFixed(2)}</span>
             </div>
 
-            {/* Automatic Discount Display */}
             {autoOfferDiscount > 0 && (
-              <div className="flex justify-between items-center text-emerald-500 font-bold">
-                <span>Auto Offer (20% Off)</span>
-                <span className="tabular-nums">- ${(autoOfferDiscount / 100).toFixed(2)}</span>
+              <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+                <span>Bulk Savings (20% Off)</span>
+                <span className="font-mono">- ${(autoOfferDiscount / 100).toFixed(2)}</span>
               </div>
             )}
 
-            {/* Coupon Discount Display */}
             {couponDiscount > 0 && (
-              <div className="flex justify-between items-center text-emerald-500 font-bold">
-                <span>Coupon Discount</span>
-                <span className="tabular-nums">- ${(couponDiscount / 100).toFixed(2)}</span>
+              <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+                <span>Coupon Applied</span>
+                <span className="font-mono">- ${(couponDiscount / 100).toFixed(2)}</span>
               </div>
             )}
 
-            {/* Referral Discount Display */}
             {referralDiscount > 0 && (
-              <div className="flex justify-between items-center text-emerald-500 font-bold">
-                <span>Referral Discount (5% Off)</span>
-                <span className="tabular-nums">- ${(referralDiscount / 100).toFixed(2)}</span>
+              <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+                <span>Referral Discount (5%)</span>
+                <span className="font-mono">- ${(referralDiscount / 100).toFixed(2)}</span>
               </div>
             )}
 
-            <div className="border-t border-border/40 pt-4 flex justify-between items-baseline">
-              <span className="text-base font-black text-foreground">Total</span>
+            <div className="border-t border-border/60 pt-3 flex justify-between items-baseline">
+              <span className="text-sm font-semibold text-foreground">Total</span>
               <div className="text-right">
-                <span className="text-3xl font-black text-foreground tracking-tighter tabular-nums">
+                <span className="text-2xl font-semibold text-foreground font-mono">
                   ${(finalTotal / 100).toFixed(2)}
                 </span>
-                <span className="text-[10px] font-bold text-muted-foreground block uppercase tracking-widest mt-0.5">USD</span>
+                <span className="text-[10px] text-muted-foreground block font-mono">USD</span>
               </div>
             </div>
 
             {totalSavings > 0 && (
-              <div className="text-xs font-black text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl text-center">
-                You are saving ${(totalSavings / 100).toFixed(2)} on this order!
+              <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-md text-center">
+                Total savings: ${(totalSavings / 100).toFixed(2)}
               </div>
             )}
           </div>
 
-          {/* Coupon Code Input Form */}
-          <form onSubmit={handleApplyCoupon} className="space-y-3">
-            <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">Promo / Coupon Code</div>
+          {/* Coupon Code Form */}
+          <form onSubmit={handleApplyCoupon} className="space-y-2 pt-2 border-t border-border/50 text-xs">
+            <label className="font-medium text-foreground block">Coupon Code</label>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="e.g. GROW20"
+                placeholder="PROMO CODE"
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value)}
                 disabled={!!appliedCode}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none uppercase tracking-wider font-bold disabled:opacity-50"
+                className="flex-1 px-3 py-1.5 rounded-md border border-border bg-background text-xs uppercase font-mono disabled:opacity-50"
               />
               {appliedCode ? (
-                <Button
-                  type="button"
-                  onClick={handleRemoveCoupon}
-                  variant="outline"
-                  className="h-10 px-4 rounded-xl border-border/60 font-bold uppercase tracking-wider text-[10px] cursor-pointer"
-                >
+                <Button type="button" onClick={handleRemoveCoupon} variant="outline" size="sm">
                   Remove
                 </Button>
               ) : (
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  className="h-10 px-5 rounded-xl font-bold uppercase tracking-wider text-[10px] cursor-pointer"
-                >
+                <Button type="submit" variant="secondary" size="sm">
                   Apply
                 </Button>
               )}
             </div>
 
-            {/* SWR Loading Indicator */}
-            {couponLoading && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Validating coupon code...</span>
-              </div>
-            )}
-
-            {/* Live Coupon Message */}
             {couponError && (
-              <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-xl">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{couponError}</span>
-              </div>
+              <p className="text-[11px] text-destructive">{couponError}</p>
             )}
-
             {couponSuccess && (
-              <div className="flex items-center gap-2 text-xs text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                <span>{couponSuccess}</span>
-              </div>
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400">{couponSuccess}</p>
             )}
           </form>
 
-          {/* Referral Code Input Form */}
-          <form onSubmit={handleApplyReferral} className="space-y-3 pt-4 border-t border-border/20">
-            <div className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-              <Percent className="w-3.5 h-3.5 text-primary" /> Referral Code (Get Extra 5% Off)
-            </div>
+          {/* Referral Code Form */}
+          <form onSubmit={handleApplyReferral} className="space-y-2 pt-2 border-t border-border/50 text-xs">
+            <label className="font-medium text-foreground flex items-center gap-1">
+              <Percent className="h-3 w-3 text-primary" />
+              <span>Referral Code (5% Off)</span>
+            </label>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="e.g. USERNAME"
+                placeholder="AFFILIATE CODE"
                 value={referralInput}
                 onChange={(e) => setReferralInput(e.target.value)}
                 disabled={!!appliedReferral || referralPending}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-800 bg-black text-white text-sm focus:border-neutral-600 outline-none uppercase tracking-wider font-bold disabled:opacity-50"
+                className="flex-1 px-3 py-1.5 rounded-md border border-border bg-background text-xs uppercase font-mono disabled:opacity-50"
               />
               {appliedReferral ? (
-                <Button
-                  type="button"
-                  onClick={handleRemoveReferral}
-                  variant="outline"
-                  className="h-10 px-4 rounded-xl border-border/60 font-bold uppercase tracking-wider text-[10px] cursor-pointer"
-                >
+                <Button type="button" onClick={handleRemoveReferral} variant="outline" size="sm">
                   Remove
                 </Button>
               ) : (
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  disabled={referralPending}
-                  className="h-10 px-5 rounded-xl font-bold uppercase tracking-wider text-[10px] cursor-pointer"
-                >
-                  {referralPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
+                <Button type="submit" variant="secondary" size="sm" disabled={referralPending}>
+                  {referralPending ? <Loader2 className="h-3 w-3 animate-spin" /> : "Apply"}
                 </Button>
               )}
             </div>
 
-            {/* Live Referral Message */}
             {referralMessage && (
-              <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-xl ${
-                referralMessage.success 
-                  ? "text-emerald-500 bg-emerald-500/10 border border-emerald-500/20" 
-                  : "text-destructive bg-destructive/10 border border-destructive/20"
-              }`}>
-                {referralMessage.success ? (
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                ) : (
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                )}
-                <span>{referralMessage.text}</span>
-              </div>
+              <p className={`text-[11px] ${referralMessage.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+                {referralMessage.text}
+              </p>
             )}
           </form>
 
-          {/* Checkout Button */}
-          <div className="space-y-3 pt-2">
+          {/* Checkout CTA */}
+          <div className="pt-2">
             <Button
               onClick={handleCheckout}
               disabled={isPending}
-              className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer shadow-lg shadow-primary/10"
+              className="w-full h-11 text-xs font-semibold"
             >
               {isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <CreditCard className="w-4 h-4 mr-2" />
               )}
-              <span>Pay ${(finalTotal / 100).toFixed(2)}</span>
+              <span>Pay ${(finalTotal / 100).toFixed(2)} USD</span>
             </Button>
 
             {checkoutError && (
-              <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-xl text-center">
+              <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-md text-center mt-3">
                 {checkoutError}
               </p>
             )}

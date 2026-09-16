@@ -9,165 +9,116 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Terminal, Compass, Search, BookOpen, Tag, LayoutGrid, ChevronRight, Percent } from "lucide-react";
-
-const NAV_LINKS = [
-  { href: "/explore", label: "Explore", desc: "Discover premium templates", icon: Compass },
-  { href: "/search", label: "Search", desc: "Find specific code solutions", icon: Search },
-  { href: "/affiliate", label: "Affiliate", desc: "Earn 30% commission sharing code", icon: Percent, badge: "30%" },
-];
-
+import { Menu, Terminal, Search, ShoppingBag } from "lucide-react";
+import { MAIN_NAVIGATION } from "@/config/navigation";
 
 export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full select-none">
-      {/* Dynamic Glow Line */}
-      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
-      
-      <div className="bg-background/70 backdrop-blur-xl border-b border-white/5 saturate-150">
-        <div className="container flex h-16 max-w-7xl mx-auto items-center justify-between px-4">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="group flex items-center space-x-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-[#1CB0F6] text-white shadow-[0_0_15px_rgba(88,204,2,0.3)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
-                <Terminal className="w-5 h-5" />
-              </div>
-              <span className="font-sans font-black text-xl tracking-tight text-foreground transition-all duration-300">
-                scriptly<span className="text-primary">store</span>
-              </span>
-            </Link>
-            
-            <nav className="hidden md:flex items-center gap-1">
-              {NAV_LINKS.map((link) => {
-                const isActive = pathname === link.href;
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      "relative px-4 py-2 text-[11px] font-black uppercase tracking-wider transition-all duration-200 rounded-xl flex items-center gap-1.5 border border-transparent",
-                      isActive 
-                        ? "text-primary bg-primary/10 border-primary/10" 
-                        : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/40"
-                    )}
-                  >
-                    <Icon className={cn("w-3.5 h-3.5", isActive ? "text-primary" : "text-muted-foreground")} />
-                    {link.label}
-                    {link.badge && (
-                      <span className="absolute -top-1 -right-1.5 flex h-3.5 px-1 items-center justify-center bg-amber-500 text-[8px] text-white font-extrabold uppercase rounded-full animate-pulse border border-background">
-                        {link.badge}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
+    <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/85 backdrop-blur-md transition-colors">
+      <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
+        {/* Brand & Left Navigation */}
+        <div className="flex items-center gap-6 md:gap-8">
+          <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-foreground transition-opacity hover:opacity-90">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-background">
+              <Terminal className="h-4 w-4" />
+            </div>
+            <span className="text-base font-semibold">
+              scriptly<span className="text-primary font-mono text-sm">.store</span>
+            </span>
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-1">
+            {MAIN_NAVIGATION.map((item) => {
+              const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                    isActive
+                      ? "bg-secondary text-foreground font-semibold"
+                      : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Right Utilities & Actions */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/search"
+            aria-label="Search products"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            <Search className="h-4 w-4" />
+          </Link>
+
+          <div className="h-4 w-px bg-border/80" />
+
+          <ThemeToggle />
+
+          <CartIcon />
+
+          <div className="hidden sm:block">
+            <Suspense fallback={<div className="h-8 w-16 animate-pulse rounded-md bg-muted" />}>
+              <AuthButtons />
+            </Suspense>
           </div>
 
-          <div className="flex items-center justify-end space-x-2">
-            <div className="flex items-center p-1.5 bg-muted/40 border border-white/5 rounded-2xl">
-              <ThemeToggle />
-              <div className="w-px h-4 bg-border/40 mx-2" />
-              <CartIcon />
-            </div>
-            
-            <div className="hidden sm:block">
-              <Suspense fallback={
-                <div className="flex items-center space-x-2 animate-pulse">
-                  <div className="w-16 h-8 bg-muted rounded-2xl" />
-                  <div className="w-24 h-8 bg-muted rounded-2xl" />
+          {/* Mobile Navigation Drawer */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                  <Menu className="h-4 w-4" />
+                  <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-72 p-6 flex flex-col justify-between">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-2 border-b border-border pb-4">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-background">
+                      <Terminal className="h-4 w-4" />
+                    </div>
+                    <span className="font-semibold text-sm">ScriptlyStore</span>
+                  </div>
+
+                  <nav className="flex flex-col space-y-1">
+                    {MAIN_NAVIGATION.map((item) => {
+                      const isActive = pathname === item.href;
+                      return (
+                        <SheetClose asChild key={item.href}>
+                          <Link
+                            href={item.href}
+                            className={cn(
+                              "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                              isActive
+                                ? "bg-secondary text-foreground font-semibold"
+                                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                            )}
+                          >
+                            {item.label}
+                          </Link>
+                        </SheetClose>
+                      );
+                    })}
+                  </nav>
                 </div>
-              }>
-                <AuthButtons />
-              </Suspense>
-            </div>
 
-            {/* Mobile Sheet Trigger */}
-            <div className="md:hidden">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-9 w-9 rounded-xl border border-white/5 bg-muted/30">
-                    <Menu className="w-5 h-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-full sm:max-w-sm bg-background/95 backdrop-blur-2xl border-l border-white/5 p-6 flex flex-col justify-between">
-                  <div className="space-y-8">
-                    {/* Header */}
-                    <div className="flex items-center justify-between border-b border-border/40 pb-4">
-                      <div className="flex items-center space-x-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-primary to-[#1CB0F6] text-white">
-                          <Terminal className="w-4.5 h-4.5" />
-                        </div>
-                        <span className="font-sans font-black text-lg tracking-tight text-foreground">
-                          scriptly<span className="text-primary">store</span>
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Links */}
-                    <nav className="flex flex-col gap-3">
-                      {NAV_LINKS.map((link) => {
-                        const isActive = pathname === link.href;
-                        const Icon = link.icon;
-                        return (
-                          <SheetClose asChild key={link.href}>
-                            <Link
-                              href={link.href}
-                              className={cn(
-                                "flex items-center justify-between p-4.5 rounded-2xl transition-all duration-200 border",
-                                isActive
-                                  ? "bg-primary/10 border-primary/20 text-primary"
-                                  : "bg-muted/30 hover:bg-muted/50 border-white/5 text-muted-foreground hover:text-foreground"
-                              )}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={cn(
-                                  "p-2 rounded-xl border",
-                                  isActive ? "bg-primary/20 border-primary/20" : "bg-card border-white/5"
-                                )}>
-                                  <Icon className="w-4 h-4" />
-                                </div>
-                                <div className="text-left">
-                                  <div className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                                    {link.label}
-                                    {link.badge && (
-                                      <span className="px-1.5 py-0.5 bg-amber-500 text-[8px] text-white font-extrabold uppercase rounded-full">
-                                        {link.badge}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="text-[10px] text-muted-foreground mt-0.5">{link.desc}</div>
-                                </div>
-                              </div>
-                              <ChevronRight className="w-4 h-4 opacity-60" />
-                            </Link>
-                          </SheetClose>
-                        );
-                      })}
-                    </nav>
-                  </div>
-
-                  {/* Footer (Auth and Actions) */}
-                  <div className="space-y-4 border-t border-border/40 pt-6">
-                    <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/40 border border-white/5">
-                      <span className="text-xs font-bold text-muted-foreground">App Preferences</span>
-                      <div className="flex items-center gap-2">
-                        <ThemeToggle />
-                      </div>
-                    </div>
-                    <div className="w-full">
-                      <Suspense fallback={<div className="h-10 bg-muted rounded-2xl animate-pulse" />}>
-                        <div className="flex flex-col gap-2 w-full [&>*]:w-full">
-                          <AuthButtons />
-                        </div>
-                      </Suspense>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
+                <div className="border-t border-border pt-4">
+                  <Suspense fallback={null}>
+                    <AuthButtons />
+                  </Suspense>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>

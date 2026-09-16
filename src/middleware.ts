@@ -1,16 +1,9 @@
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const ref = request.nextUrl.searchParams.get("ref");
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-pathname", request.nextUrl.pathname);
-
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  const response = NextResponse.next();
 
   if (ref) {
     response.cookies.set("scriptly_referred_by", ref, {
@@ -26,7 +19,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all pathways except static assets
+    // Match all pathways except static assets and internal next endpoints
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

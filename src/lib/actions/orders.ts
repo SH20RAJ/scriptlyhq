@@ -8,6 +8,7 @@ import { eq, inArray, or } from "drizzle-orm";
 import crypto from "crypto";
 import { getProductEffectivePrice } from "@/lib/price-utils";
 import { cookies } from "next/headers";
+import { COMMISSION_RATES, PRICING_RULES } from "@/config/pricing";
 
 let razorpayInstance: any = null;
 
@@ -408,16 +409,25 @@ export async function verifyPaymentAction({
   const isMockKeys = (process.env.RAZORPAY_KEY_ID || "").startsWith("rzp_test_mock");
   let isValid = false;
 
-  if (isMockKeys || !razorpaySignature) {
+  if (isMockKeys) {
     isValid = true;
   } else {
+    if (!razorpaySignature) {
+      throw new Error("Missing razorpay payment signature");
+    }
     const text = `${razorpayOrderId}|${razorpayPaymentId}`;
     const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || "")
       .update(text)
       .digest("hex");
 
-    isValid = generatedSignature === razorpaySignature;
+    try {
+      const generatedBuf = Buffer.from(generatedSignature, "utf8");
+      const signatureBuf = Buffer.from(razorpaySignature, "utf8");
+      isValid = generatedBuf.length === signatureBuf.length && crypto.timingSafeEqual(generatedBuf, signatureBuf);
+    } catch {
+      isValid = false;
+    }
   }
 
   const orderRecords = await db.query.orders.findMany({

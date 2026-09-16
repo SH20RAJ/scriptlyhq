@@ -1,7 +1,7 @@
 export function getProductEffectivePrice(product: {
   price: number;
   isFree?: boolean;
-  discountPercent?: number;
+  discountPercent?: number | null;
   promoStart?: Date | string | null;
   promoEnd?: Date | string | null;
 }) {

@@ -2,18 +2,12 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { createRazorpayOrderAction, verifyPaymentAction } from "@/lib/actions/orders";
+import { loadRazorpayScript } from "@/lib/payments/razorpay-loader";
 import { CreditCard, Download, Loader2, ShoppingCart, Trash, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/CartContext";
-
 import { getProductEffectivePrice } from "@/lib/price-utils";
-
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
 
 interface ProductCheckoutProps {
   product: {
@@ -24,7 +18,7 @@ interface ProductCheckoutProps {
     category: string;
     thumbnail: string | null;
     isFree?: boolean;
-    discountPercent?: number;
+    discountPercent?: number | null;
     promoStart?: Date | string | null;
     promoEnd?: Date | string | null;
   };
@@ -75,10 +69,10 @@ export default function ProductCheckout({
 
   if (hasPurchased) {
     return (
-      <Button asChild className="w-full min-h-[48px] py-3 rounded-xl font-bold uppercase tracking-widest text-[11px]">
+      <Button asChild className="w-full h-11 text-xs font-semibold">
         <a href={`/api/download/${product.id}`}>
           <Download className="w-4 h-4 mr-2" />
-          <span>Download Files</span>
+          <span>Download Purchased Files</span>
         </a>
       </Button>
     );
@@ -101,12 +95,19 @@ export default function ProductCheckout({
         });
 
         if (!orderData.success) {
-          setError("Failed to initialize order. Please try again.");
+          setError("Failed to initialize checkout. Please try again.");
           return;
         }
 
         if (orderData.isFreeCheckout && orderData.redirectUrl) {
           router.push(orderData.redirectUrl);
+          return;
+        }
+
+        // Lazy load Razorpay SDK dynamically
+        const scriptLoaded = await loadRazorpayScript();
+        if (!scriptLoaded || typeof window.Razorpay === "undefined") {
+          setError("Payment SDK failed to load. Please check your network connection.");
           return;
         }
 
@@ -140,23 +141,18 @@ export default function ProductCheckout({
             email: orderData.userEmail,
           },
           theme: {
-            color: "#000000",
+            color: "#0F172A",
           },
         };
 
-        if (typeof window.Razorpay === "undefined") {
-          setError("Razorpay SDK failed to load. Please refresh the page.");
-          return;
-        }
-
         const rzp = new window.Razorpay(options);
         rzp.on("payment.failed", function (response: any) {
-          setError(response.error.description || "Payment failed.");
+          setError(response.error.description || "Payment was cancelled or failed.");
         });
         rzp.open();
       } catch (err: any) {
         console.error("Checkout initialization error:", err);
-        setError(err.message || "An unexpected error occurred.");
+        setError(err.message || "An unexpected error occurred during checkout.");
       }
     });
   };
@@ -179,57 +175,55 @@ export default function ProductCheckout({
 
   return (
     <div className="w-full space-y-4">
-      {/* Accordion: Customize & Support Add-ons */}
-      <div className="bg-card/60 border-2 border-border/80 rounded-2xl shadow-[0_4px_0_var(--border)] dark:shadow-[0_4px_0_#2A3842] overflow-hidden">
+      {/* Optional Setup/Customization Add-ons */}
+      <div className="rounded-lg border border-border/70 bg-card overflow-hidden text-xs">
         <button
           type="button"
           onClick={() => setIsAddonsExpanded(!isAddonsExpanded)}
-          className="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-muted/10 transition-colors text-left"
+          className="w-full flex items-center justify-between p-3.5 hover:bg-secondary/40 transition-colors text-left"
         >
           <div className="space-y-0.5">
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground">
-              Customize & Support Add-ons
+            <span className="font-medium text-foreground">
+              Optional Add-on Services
             </span>
-            <p className="text-[9px] font-bold text-primary uppercase tracking-wider">
-              {addOnEditCopy || addOnSetupDeploy ? "✓ Add-ons Selected" : "+ Click to view options"}
+            <p className="text-[11px] text-muted-foreground">
+              {addOnEditCopy || addOnSetupDeploy ? "Services selected" : "Setup & customization available"}
             </p>
           </div>
-          <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${isAddonsExpanded ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isAddonsExpanded ? "rotate-180" : ""}`} />
         </button>
 
         {isAddonsExpanded && (
-          <div className="p-4 pt-0 border-t border-border/40 space-y-3 animate-in slide-in-from-top-2 duration-300">
-            {/* Add-on 1: Copy Edit */}
-            <label className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${addOnEditCopy ? 'border-primary bg-primary/5 shadow-[0_3px_0_rgba(88,204,2,0.2)]' : 'border-border/60 hover:border-border hover:bg-muted/10'}`}>
+          <div className="p-3.5 pt-0 border-t border-border/50 space-y-2">
+            <label className={`flex items-start gap-2.5 p-2.5 rounded-md border cursor-pointer transition-colors ${addOnEditCopy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
               <input 
                 type="checkbox" 
                 checked={addOnEditCopy} 
                 onChange={(e) => setAddOnEditCopy(e.target.checked)} 
-                className="mt-1 w-4 h-4 accent-primary rounded cursor-pointer shrink-0"
+                className="mt-0.5 h-3.5 w-3.5 accent-primary rounded"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline gap-2">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-foreground">Edit Copy & Content</span>
-                  <span className="text-[11px] font-black text-primary font-mono shrink-0">+${(editCopyPrice / 100).toFixed(2)}</span>
+                  <span className="font-medium text-foreground">Custom Copy & Branding</span>
+                  <span className="font-mono text-primary">+${(editCopyPrice / 100).toFixed(2)}</span>
                 </div>
-                <p className="text-[9px] font-bold text-muted-foreground mt-1 leading-normal">Customize placeholder texts, branding copy, colors, and design components.</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Customize default text, colors, and components for your brand.</p>
               </div>
             </label>
 
-            {/* Add-on 2: Setup/Deployment */}
-            <label className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${addOnSetupDeploy ? 'border-primary bg-primary/5 shadow-[0_3px_0_rgba(88,204,2,0.2)]' : 'border-border/60 hover:border-border hover:bg-muted/10'}`}>
+            <label className={`flex items-start gap-2.5 p-2.5 rounded-md border cursor-pointer transition-colors ${addOnSetupDeploy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
               <input 
                 type="checkbox" 
                 checked={addOnSetupDeploy} 
                 onChange={(e) => setAddOnSetupDeploy(e.target.checked)} 
-                className="mt-1 w-4 h-4 accent-primary rounded cursor-pointer shrink-0"
+                className="mt-0.5 h-3.5 w-3.5 accent-primary rounded"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline gap-2">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-foreground">Setup & Deployment</span>
-                  <span className="text-[11px] font-black text-primary font-mono shrink-0">+${(setupDeployPrice / 100).toFixed(2)}</span>
+                  <span className="font-medium text-foreground">Cloud Deployment & Setup</span>
+                  <span className="font-mono text-primary">+${(setupDeployPrice / 100).toFixed(2)}</span>
                 </div>
-                <p className="text-[9px] font-bold text-muted-foreground mt-1 leading-normal">Complete setup. We will deploy the codebase live on Cloudflare/Vercel for you.</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Full environment deployment on Vercel or Cloudflare.</p>
               </div>
             </label>
           </div>
@@ -237,17 +231,18 @@ export default function ProductCheckout({
       </div>
 
       {appliedReferral && !isFree && (
-        <div className="text-[10px] font-bold text-emerald-500 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl justify-center animate-pulse">
+        <div className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-md">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <span>Referral Active: Extra 5% Discount Applied!</span>
+          <span>Referral active: 5% discount applied at checkout.</span>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      {/* Primary Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-2.5">
         <Button
           onClick={handleCheckout}
           disabled={isPending}
-          className="flex-1 min-h-[48px] px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer bg-primary hover:bg-primary/95 text-white"
+          className="flex-1 h-11 text-xs font-semibold"
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -256,8 +251,8 @@ export default function ProductCheckout({
           )}
           <span>
             {userLoggedIn 
-              ? (totalDisplayPrice === 0 ? "Claim Free" : `Pay $${(totalDisplayPrice / 100).toFixed(2)}`) 
-              : "Sign in to Buy"
+              ? (totalDisplayPrice === 0 ? "Download Free" : `Buy Now — $${(totalDisplayPrice / 100).toFixed(2)}`) 
+              : "Sign In to Buy"
             }
           </span>
         </Button>
@@ -265,17 +260,17 @@ export default function ProductCheckout({
         <Button
           type="button"
           onClick={handleCartToggle}
-          variant={inCart ? "destructive" : "secondary"}
-          className="min-h-[48px] px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[11px] cursor-pointer"
+          variant={inCart ? "secondary" : "outline"}
+          className="h-11 px-4 text-xs font-medium"
         >
           {inCart ? (
             <>
-              <Trash className="w-4 h-4 mr-2" />
-              <span>Remove</span>
+              <Trash className="w-3.5 h-3.5 mr-1.5 text-destructive" />
+              <span>In Cart</span>
             </>
           ) : (
             <>
-              <ShoppingCart className="w-4 h-4 mr-2" />
+              <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
               <span>Add to Cart</span>
             </>
           )}
@@ -283,7 +278,7 @@ export default function ProductCheckout({
       </div>
 
       {error && (
-        <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-lg text-center">
+        <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-md">
           {error}
         </p>
       )}
