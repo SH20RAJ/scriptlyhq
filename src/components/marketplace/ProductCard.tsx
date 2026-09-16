@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,12 +53,12 @@ export default function ProductCard(props: ProductCardProps) {
         {/* Visual Preview Container */}
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-secondary/50 border-b border-border/60">
           {product.thumbnail ? (
-            <Image
+            <img
               src={product.thumbnail}
               alt={product.title}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className={`object-cover transition-transform duration-300 group-hover:scale-[1.02] ${
+              loading="lazy"
+              decoding="async"
+              className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] ${
                 isHovered && product.previewGif ? "opacity-0" : "opacity-100"
               }`}
             />
