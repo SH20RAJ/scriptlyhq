@@ -172,3 +172,37 @@ export const affiliateCommissions = pgTable("affiliate_commissions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const paymentLinks = pgTable("payment_links", {
+  id: text("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description"),
+  price: integer("price").notNull(), // Price in paise (INR)
+  currency: text("currency").default("INR").notNull(),
+  redirectUrl: text("redirect_url").notNull(), // Destination after successful payment
+  creatorId: text("creator_id").references(() => users.id, { onDelete: "set null" }),
+  active: boolean("active").default(true).notNull(),
+  views: integer("views").default(0).notNull(),
+  conversions: integer("conversions").default(0).notNull(),
+  totalEarned: integer("total_earned").default(0).notNull(), // in paise
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const paymentLinkActivities = pgTable("payment_link_activities", {
+  id: text("id").primaryKey(),
+  linkId: text("link_id"), // references paymentLinks.id or null if dynamic link
+  type: text("type").notNull(), // 'view' | 'checkout_initiated' | 'payment_success' | 'payment_failed'
+  orderId: text("order_id"),
+  paymentId: text("payment_id"),
+  amount: integer("amount"), // in paise
+  payerEmail: text("payer_email"),
+  payerName: text("payer_name"),
+  payerPhone: text("payer_phone"),
+  ip: text("ip"),
+  userAgent: text("user_agent"),
+  referrer: text("referrer"),
+  metadata: text("metadata"), // extra JSON details
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

@@ -59,7 +59,7 @@ export default function AuthButtons() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="rounded-xl px-3 py-2 text-xs font-bold hover:bg-muted hover:text-foreground text-foreground cursor-pointer flex items-center gap-2">
-            <Link href="/creator">
+            <Link href="/creator/dashboard">
               <Store className="w-4 h-4 text-purple-400" />
               Creator Console
             </Link>

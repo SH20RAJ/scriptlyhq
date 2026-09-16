@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   {
     name: "Overview",
-    href: "/creator",
+    href: "/creator/dashboard",
     icon: LayoutGrid,
   },
   {

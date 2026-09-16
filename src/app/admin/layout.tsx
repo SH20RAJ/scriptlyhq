@@ -1,7 +1,7 @@
 import { isAdmin } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, ShoppingCart, Package, Home, ShieldAlert, FolderKanban, Gift, CheckSquare, Store, Coins, Users } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, Home, ShieldAlert, FolderKanban, Gift, CheckSquare, Store, Coins, Users, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { db } from "@/db";
@@ -106,6 +106,12 @@ export default async function AdminLayout({
               <Link href="/admin/orders">
                 <ShoppingCart className="w-4 h-4 mr-3" />
                 Orders
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="w-full justify-start font-normal text-muted-foreground hover:text-foreground">
+              <Link href="/admin/payment-links">
+                <Link2 className="w-4 h-4 mr-3" />
+                Payment Links
               </Link>
             </Button>
           </nav>
