@@ -6,38 +6,39 @@ export interface NavItem {
 }
 
 export const MAIN_NAVIGATION: NavItem[] = [
-  { href: "/explore", label: "Shop", description: "Browse developer tools, scripts and templates" },
-  { href: "/free", label: "Free Tools", description: "Open source boilerplates and scripts" },
-  { href: "/directories", label: "Directories", description: "Curated launch and developer tool indexes" },
-  { href: "/blog", label: "Resources", description: "Engineering guides, changelogs and tutorials" },
-  { href: "/creator", label: "For Creators", description: "Sell your code and keep 95% of sales" },
+  { href: "/explore", label: "Explore", description: "Browse developer tools, scripts and templates" },
+  { href: "/explore?category=all", label: "Categories", description: "Explore categories" },
+  { href: "/free", label: "Free", description: "Open source boilerplates, scripts and tools" },
+  { href: "/blog", label: "Learn", description: "Engineering guides, tutorials and monetization" },
+  { href: "/creator", label: "Sell on Scriptly", description: "Sell your code and keep 95% of sales" },
 ];
 
 export const FOOTER_NAVIGATION = {
-  products: [
-    { href: "/explore", label: "Browse Catalog" },
-    { href: "/explore?category=saas-templates", label: "SaaS Templates" },
-    { href: "/explore?category=scripts", label: "Developer Scripts" },
-    { href: "/explore?category=ai-prompts", label: "AI & Automation" },
-    { href: "/free", label: "Free Resources" },
+  marketplace: [
+    { href: "/explore", label: "Explore" },
+    { href: "/explore?category=all", label: "Categories" },
+    { href: "/free", label: "Free Products" },
+    { href: "/offers", label: "Offers" },
+    { href: "/featured", label: "Featured" },
   ],
   creators: [
-    { href: "/creator", label: "Sell on ScriptlyStore" },
+    { href: "/creator", label: "Sell on Scriptly" },
+    { href: "/creator/new", label: "Submit Product" },
     { href: "/affiliate", label: "Affiliate Program" },
-    { href: "/trust", label: "Creator Security & Split" },
+    { href: "/trust", label: "Creator Economics & Split" },
   ],
-  resources: [
-    { href: "/blog", label: "Engineering Blog" },
-    { href: "/directories", label: "Tool Directories" },
-    { href: "/docs/api", label: "API Reference" },
+  learn: [
+    { href: "/blog", label: "Blog" },
+    { href: "/blog", label: "Developer Guides" },
+    { href: "/licenses", label: "License Guide" },
+    { href: "/docs/api", label: "API Docs" },
   ],
   company: [
     { href: "/about", label: "About" },
     { href: "/trust", label: "Trust Center" },
-    { href: "/contact", label: "Contact & Support" },
+    { href: "/contact", label: "Support & Contact" },
   ],
   legal: [
-    { href: "/licenses", label: "Licensing Terms" },
     { href: "/terms", label: "Terms of Service" },
     { href: "/privacy", label: "Privacy Policy" },
     { href: "/refund", label: "Refund Policy" },
