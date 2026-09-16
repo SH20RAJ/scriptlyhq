@@ -51,7 +51,7 @@ export default async function Page({ searchParams }: PageProps) {
     getCategoriesAction(),
     getProductsAction({
       featuredOnly: true,
-      limit: 3,
+      limit: 4,
       sortBy: "rating",
     }),
   ]);
@@ -81,15 +81,15 @@ export default async function Page({ searchParams }: PageProps) {
       />
 
       {/* Hero Section */}
-      <section className="border-b border-border/60 bg-gradient-to-b from-secondary/40 to-background py-14 sm:py-20">
+      <section className="border-b border-border/50 bg-gradient-to-b from-secondary/30 via-background to-background py-14 sm:py-20">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6">
           <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-mono text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/80 px-3 py-1 text-xs font-mono text-muted-foreground shadow-xs">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span>Developer Marketplace</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-foreground leading-[1.15]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.15]">
               Production-ready templates & developer scripts.
             </h1>
 
@@ -99,19 +99,61 @@ export default async function Page({ searchParams }: PageProps) {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Button asChild size="default">
+              <Button asChild size="default" className="rounded-xl font-bold">
                 <Link href="/explore">
                   <span>Browse Products</span>
                   <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="default">
+              <Button asChild variant="outline" size="default" className="rounded-xl font-bold">
                 <Link href="/creator">
                   <span>Sell Your Code</span>
                 </Link>
               </Button>
             </div>
           </div>
+
+          {/* Featured Products Showcase inside Hero */}
+          {featuredData.products.length > 0 && (
+            <div className="pt-12 sm:pt-16 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-border/40 pt-8">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-500">
+                      Handpicked by Editors
+                    </span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                    Featured Marketplace Products
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    Top-rated templates, verified architecture, and instant production boilerplates.
+                  </p>
+                </div>
+
+                <Button asChild variant="outline" size="sm" className="rounded-xl font-bold text-xs self-start sm:self-auto">
+                  <Link href="/featured" className="flex items-center gap-1.5">
+                    <span>View More Featured Products</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {featuredData.products.map((product) => {
+                  const catObj = categories.find((c) => c.slug === product.category);
+                  return (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      categoryName={catObj?.name}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

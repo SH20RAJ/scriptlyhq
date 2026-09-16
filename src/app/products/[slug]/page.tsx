@@ -227,9 +227,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Main Visual & Content Column */}
-          <div className="lg:col-span-7 space-y-8">
+          <div className="lg:col-span-7 space-y-10">
             {/* Visual Media Showcase */}
-            <div className="rounded-lg border border-border/70 bg-card overflow-hidden">
+            <div className="rounded-3xl border border-border/50 bg-card/30 overflow-hidden shadow-sm">
               <ProductMediaSwitcher
                 videoUrl={product.videoUrl}
                 previewGif={product.previewGif}
@@ -240,8 +240,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             {/* Screenshots Gallery */}
             {screenshotsList.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Interface Screenshots ({screenshotsList.length})
                 </h3>
                 <ProductScreenshots screenshots={screenshotsList} productTitle={product.title} />
@@ -249,28 +249,28 @@ export default async function ProductDetailPage({ params }: PageProps) {
             )}
 
             {/* Product Overview & Markdown Documentation */}
-            <div className="rounded-lg border border-border/70 bg-card p-6 sm:p-8 space-y-6">
-              <div className="border-b border-border/60 pb-4">
-                <h2 className="text-base font-semibold text-foreground tracking-tight">Overview & Specifications</h2>
-              </div>
+            <div className="space-y-4 pt-4 border-t border-border/40">
+              <h2 className="text-lg font-bold text-foreground tracking-tight">
+                Overview & Specifications
+              </h2>
               <div 
                 dangerouslySetInnerHTML={{ __html: htmlDescription }}
-                className="markdown-content text-sm leading-relaxed"
+                className="markdown-content text-sm leading-relaxed text-muted-foreground/90"
               />
             </div>
 
             {/* Tech Stack / Tags */}
             {tagsList.length > 0 && (
-              <div className="rounded-lg border border-border/70 bg-card p-5 space-y-3">
-                <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-                  <Layers className="h-4 w-4 text-muted-foreground" />
+              <div className="space-y-3 pt-6 border-t border-border/40">
+                <div className="flex items-center gap-2 text-xs font-bold text-foreground">
+                  <Layers className="h-4 w-4 text-primary" />
                   <span>Technologies & Frameworks</span>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {tagsList.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded px-2.5 py-1 text-xs font-mono bg-secondary text-foreground border border-border/60"
+                      className="rounded-full px-3 py-1 text-xs font-mono font-medium bg-secondary/70 text-foreground border border-border/40"
                     >
                       {tag}
                     </span>
@@ -280,7 +280,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             )}
 
             {/* Reviews & Social Proof */}
-            <div className="rounded-lg border border-border/70 bg-card p-6 sm:p-8">
+            <div className="pt-8 border-t border-border/40">
               <ProductInteractionAndReviews 
                 productId={product.id}
                 initialViews={product.views || 0}
@@ -298,19 +298,19 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <div className="lg:col-span-5">
             <div className="sticky top-20 space-y-6">
               {/* Product Header & Pricing Box */}
-              <div className="rounded-lg border border-border/80 bg-card p-6 space-y-5">
-                <div className="space-y-2">
+              <div className="rounded-3xl border border-border/50 bg-card/60 backdrop-blur-md p-6 sm:p-7 space-y-6 shadow-sm">
+                <div className="space-y-2.5">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-[11px] capitalize">
+                    <Badge variant="outline" className="rounded-full text-[11px] capitalize px-3">
                       {product.category.replace(/-/g, " ")}
                     </Badge>
                     {storeName && (
-                      <Link href={`/stores/${product.creatorId}`} className="text-xs text-muted-foreground hover:text-foreground">
+                      <Link href={`/stores/${product.creatorId}`} className="text-xs text-muted-foreground hover:text-foreground transition-colors font-medium">
                         By {storeName}
                       </Link>
                     )}
                   </div>
-                  <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-snug">
+                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground leading-snug">
                     {product.title}
                   </h1>
                   <p className="text-xs text-muted-foreground leading-relaxed">
@@ -324,10 +324,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 )}
 
                 {/* Price Display */}
-                <div className="border-t border-border/60 pt-4">
+                <div className="border-t border-border/40 pt-4">
                   {promo.isFree ? (
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
+                      <span className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
                         FREE
                       </span>
                       {promo.price > 0 && (
@@ -338,22 +338,22 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     </div>
                   ) : promo.hasDiscount ? (
                     <div className="flex items-baseline gap-2.5">
-                      <span className="text-3xl font-semibold text-foreground font-mono">
+                      <span className="text-3xl font-extrabold text-foreground font-mono">
                         ${(promo.effectivePrice / 100).toFixed(2)}
                       </span>
                       <span className="text-sm text-muted-foreground line-through font-mono">
                         ${(promo.price / 100).toFixed(2)}
                       </span>
-                      <Badge variant="destructive" className="text-[10px]">
+                      <Badge variant="destructive" className="rounded-full text-[10px] font-bold">
                         Save {promo.discountPercent}%
                       </Badge>
                     </div>
                   ) : (
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl font-semibold text-foreground font-mono">
+                      <span className="text-3xl font-extrabold text-foreground font-mono">
                         ${(product.price / 100).toFixed(2)}
                       </span>
-                      <span className="text-xs text-muted-foreground font-mono">USD</span>
+                      <span className="text-xs text-muted-foreground font-mono font-medium">USD</span>
                     </div>
                   )}
                 </div>
@@ -369,10 +369,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 {/* Live Preview & Secondary Links */}
                 <div className="flex items-center gap-2 pt-1">
                   {product.demoUrl && (
-                    <Button asChild variant="outline" size="sm" className="flex-1 text-xs">
+                    <Button asChild variant="outline" size="sm" className="flex-1 text-xs font-bold">
                       <a href={product.demoUrl} target="_blank" rel="noopener noreferrer">
                         <span>Live Preview</span>
-                        <ExternalLink className="h-3 w-3 ml-1.5" />
+                        <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
                       </a>
                     </Button>
                   )}
@@ -388,51 +388,47 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   isLoggedIn={!!user}
                   commissionPercent={product.affiliateCommissionPercent ?? 30}
                 />
-              </div>
 
-              {/* Honest Purchase Inclusions Box */}
-              <div className="rounded-lg border border-border/70 bg-secondary/30 p-5 space-y-3.5 text-xs">
-                <p className="font-semibold text-foreground flex items-center gap-1.5">
-                  <ShieldCheck className="h-4 w-4 text-primary" />
-                  <span>What's Included With This Purchase</span>
-                </p>
+                {/* Honest Purchase Inclusions */}
+                <div className="pt-4 border-t border-border/40 space-y-3 text-xs">
+                  <p className="font-bold text-foreground flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-primary" />
+                    <span>What's Included</span>
+                  </p>
 
-                <ul className="space-y-2.5 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span><strong className="text-foreground font-medium">Instant Source Code Archive</strong> — Complete uncompiled source repository ZIP delivered upon payment.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span><strong className="text-foreground font-medium">Commercial License</strong> — Permitted for use in commercial client work and proprietary SaaS products.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span><strong className="text-foreground font-medium">Lifetime Access & Updates</strong> — Re-download future patches and releases anytime from your dashboard.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span><strong className="text-foreground font-medium">Direct Author Support</strong> — Inquire directly with the creator for setup guidance and issue triage.</span>
-                  </li>
-                </ul>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                      <span><strong className="text-foreground font-semibold">Instant Source Archive</strong> — Full source repository ZIP delivered upon payment.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                      <span><strong className="text-foreground font-semibold">Commercial License</strong> — Clean license for commercial client & SaaS projects.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                      <span><strong className="text-foreground font-semibold">Lifetime Access</strong> — Re-download future patches directly from your dashboard.</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
 
               {/* Related Products */}
               {relatedProducts.length > 0 && (
                 <div className="space-y-3 pt-2">
-                  <p className="text-xs font-semibold text-foreground">Related in {product.category}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Related in {product.category}</p>
                   <div className="space-y-2.5">
                     {relatedProducts.map((rel) => (
                       <Link
                         key={rel.id}
                         href={`/products/${rel.slug}`}
-                        className="flex items-center justify-between p-3 rounded-md border border-border/70 bg-card hover:bg-secondary/40 transition-colors text-xs"
+                        className="flex items-center justify-between p-3.5 rounded-2xl border border-border/40 bg-card/40 hover:bg-secondary/40 hover:border-border/70 transition-all text-xs group"
                       >
                         <div className="truncate pr-3">
-                          <p className="font-medium text-foreground truncate">{rel.title}</p>
-                          <p className="text-muted-foreground text-[11px] truncate">{rel.shortDescription}</p>
+                          <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">{rel.title}</p>
+                          <p className="text-muted-foreground text-[11px] truncate mt-0.5">{rel.shortDescription}</p>
                         </div>
-                        <span className="font-mono font-semibold text-foreground shrink-0">
+                        <span className="font-mono font-bold text-foreground shrink-0">
                           ${(rel.price / 100).toFixed(2)}
                         </span>
                       </Link>

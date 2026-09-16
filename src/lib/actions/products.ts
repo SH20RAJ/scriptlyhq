@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { products } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 import { isAdmin, getOrCreateDbUser } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
 
@@ -296,6 +296,41 @@ export async function toggleProductPublishAction(id: string) {
   revalidatePath(`/products/${existing.slug}`);
   revalidatePath("/admin/products");
   return { success: true };
+}
+
+export async function bulkDeleteProductsAction(ids: string[]) {
+  const isUserAdmin = await isAdmin();
+  if (!isUserAdmin) {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+  if (!ids || ids.length === 0) return { success: true, count: 0 };
+
+  await db.delete(products).where(inArray(products.id, ids));
+
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+  return { success: true, count: ids.length };
+}
+
+export async function bulkSetProductsPublishAction(ids: string[], published: boolean) {
+  const isUserAdmin = await isAdmin();
+  if (!isUserAdmin) {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+  if (!ids || ids.length === 0) return { success: true, count: 0 };
+
+  await db
+    .update(products)
+    .set({
+      published,
+      status: published ? "approved" : "pending",
+      updatedAt: new Date(),
+    })
+    .where(inArray(products.id, ids));
+
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+  return { success: true, count: ids.length };
 }
 
 import { categories as categoriesTable, subcategories } from "@/db/schema";
