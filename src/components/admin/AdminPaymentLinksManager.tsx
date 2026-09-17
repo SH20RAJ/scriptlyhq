@@ -31,6 +31,7 @@ import {
   AlertTriangle,
   FileCode,
   Zap,
+  KeyRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -142,9 +143,12 @@ export default function AdminPaymentLinksManager({
   const [encRedirect, setEncRedirect] = useState("https://scriptly.store/explore");
   const [encDesc, setEncDesc] = useState("1-on-1 private architecture walkthrough session");
   const [encSign, setEncSign] = useState(true);
+  const [encKey, setEncKey] = useState("");
+  const [encMode, setEncMode] = useState<"signed" | "keyed" | "plain">("signed");
   const [copiedEnc, setCopiedEnc] = useState(false);
+  const [copiedUnlocked, setCopiedUnlocked] = useState(false);
 
-  // Calculate live Base64 token
+  // Calculate live Base64 or Key-Encrypted token
   const generatedToken = encodePaymentLinkPayload(
     {
       title: encTitle || "Product",
@@ -152,10 +156,29 @@ export default function AdminPaymentLinksManager({
       redirectUrl: encRedirect || "https://scriptly.store",
       description: encDesc || undefined,
     },
-    encSign
+    {
+      sign: encMode === "signed",
+      encryptionKey: encMode === "keyed" && encKey.trim() ? encKey.trim() : undefined,
+    }
   );
 
   const encodedUrlPreview = `${origin}/pay?data=${generatedToken}`;
+  const unlockedUrlPreview =
+    encMode === "keyed" && encKey.trim()
+      ? `${origin}/pay?data=${generatedToken}&key=${encodeURIComponent(encKey.trim())}`
+      : encodedUrlPreview;
+
+  const sampleSchemaJson = JSON.stringify(
+    {
+      title: encTitle || "Architecture Review",
+      price: parseFloat(encPrice) || 1499,
+      redirectUrl: encRedirect || "https://scriptly.store/explore",
+      description: encDesc || "1-on-1 private architecture walkthrough session",
+      currency: "INR",
+    },
+    null,
+    2
+  );
 
   const formatINR = (val: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -777,27 +800,95 @@ export default function AdminPaymentLinksManager({
               </div>
             </div>
 
-            {/* Cryptographic Protection Toggle */}
-            <div className="p-4 rounded-xl bg-muted/20 border border-border/40 flex items-center justify-between">
-              <div className="space-y-0.5">
-                <span className="text-xs font-black text-foreground flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500" /> HMAC-SHA256 Cryptographic Signature
-                </span>
-                <p className="text-[11px] text-muted-foreground">
-                  Signs the title, price, and redirect URL so any client-side tampering causes the checkout to fail.
-                </p>
+            {/* Protection Mode Selection */}
+            <div className="space-y-3">
+              <label className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                Payload Encoding & Security Mode
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEncMode("signed")}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    encMode === "signed"
+                      ? "border-[#58CC02] bg-[#58CC02]/10 text-foreground"
+                      : "border-border/50 bg-card/40 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 font-black text-xs">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#58CC02]" /> HMAC Signed
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Tamper-proof Base64. Price cannot be altered.
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setEncMode("keyed")}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    encMode === "keyed"
+                      ? "border-amber-500 bg-amber-500/10 text-foreground"
+                      : "border-border/50 bg-card/40 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 font-black text-xs">
+                    <Lock className="w-3.5 h-3.5 text-amber-500" /> Key-Encrypted
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    AES-256-GCM. Unlocks only with your secret key.
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setEncMode("plain")}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    encMode === "plain"
+                      ? "border-sky-500 bg-sky-500/10 text-foreground"
+                      : "border-border/50 bg-card/40 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 font-black text-xs">
+                    <Code className="w-3.5 h-3.5 text-sky-500" /> Plain Base64
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Standard Base64 JSON schema. No signature required.
+                  </p>
+                </button>
               </div>
-              <Switch checked={encSign} onCheckedChange={setEncSign} />
             </div>
 
-            {/* Live Generated Base64 URL Output */}
+            {/* Custom Encryption Key Input (if Keyed Mode) */}
+            {encMode === "keyed" && (
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2 animate-in fade-in">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-black text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5" /> Custom Passphrase / Decryption Key
+                  </label>
+                  <span className="text-[10px] font-mono text-muted-foreground">AES-256-GCM</span>
+                </div>
+                <Input
+                  type="text"
+                  value={encKey}
+                  onChange={(e) => setEncKey(e.target.value)}
+                  placeholder="Enter secret key (e.g. secret_pass_2026 or customer PIN)..."
+                  className="rounded-xl h-10 text-sm bg-background/90 border-amber-500/40"
+                />
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Only buyers who possess this key can unlock the payment checkout. You can also append <code className="font-mono text-foreground font-bold">&key={encKey || "YOUR_KEY"}</code> to bypass the key prompt automatically.
+                </p>
+              </div>
+            )}
+
+            {/* Live Generated URL Output */}
             <div className="p-5 rounded-2xl bg-muted/40 border border-border/50 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                  <Lock className="w-3 h-3 text-emerald-500" /> Tamper-Proof URL Output
+                  <Lock className="w-3 h-3 text-emerald-500" /> Encoded Checkout URL
                 </span>
                 <span className="text-[10px] text-emerald-500 font-bold">
-                  Zero Parameters Exposed
+                  {encMode === "keyed" ? "AES-256-GCM Protected" : "Zero Parameters Exposed"}
                 </span>
               </div>
 
@@ -810,14 +901,14 @@ export default function AdminPaymentLinksManager({
                   onClick={() => {
                     navigator.clipboard.writeText(encodedUrlPreview);
                     setCopiedEnc(true);
-                    toast.success("Encoded payment URL copied to clipboard!");
+                    toast.success("Payment URL copied!");
                     setTimeout(() => setCopiedEnc(false), 2000);
                   }}
                   className="bg-[#58CC02] hover:bg-[#58CC02]/90 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_3px_0_#46A302] active:translate-y-px active:shadow-none"
                 >
                   {copiedEnc ? (
                     <>
-                      <Check className="w-3.5 h-3.5 mr-1.5" /> Copied Link
+                      <Check className="w-3.5 h-3.5 mr-1.5" /> Copied
                     </>
                   ) : (
                     <>
@@ -831,7 +922,43 @@ export default function AdminPaymentLinksManager({
                     Test Checkout Card <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
                   </a>
                 </Button>
+
+                {encMode === "keyed" && encKey.trim() && (
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(unlockedUrlPreview);
+                      setCopiedUnlocked(true);
+                      toast.success("Pre-unlocked URL copied to clipboard!");
+                      setTimeout(() => setCopiedUnlocked(false), 2000);
+                    }}
+                    variant="secondary"
+                    className="rounded-xl text-xs font-bold"
+                  >
+                    {copiedUnlocked ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 mr-1.5" /> Copied Unlocked Link
+                      </>
+                    ) : (
+                      <>
+                        <KeyRound className="w-3.5 h-3.5 mr-1.5" /> Copy Pre-Unlocked Link (&key=...)
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
+            </div>
+
+            {/* Underlying JSON Schema Preview */}
+            <div className="p-4 rounded-xl bg-card/40 border border-border/40 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Code className="w-3.5 h-3.5 text-primary" /> Underlying Payload Schema (Raw JSON)
+                </span>
+                <span className="text-[10px] text-muted-foreground font-mono">base64 encoded into ?data=</span>
+              </div>
+              <pre className="p-3 rounded-lg bg-background/80 border border-border/50 font-mono text-[11px] text-muted-foreground overflow-x-auto">
+                {sampleSchemaJson}
+              </pre>
             </div>
           </div>
         </TabsContent>

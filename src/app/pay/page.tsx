@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import PaymentCard from "@/components/pay/PaymentCard";
+import KeyUnlockCard from "@/components/pay/KeyUnlockCard";
 import { CyberBackground } from "@/components/ui/CyberBackground";
 import Link from "next/link";
 import { ArrowLeft, Sparkles, AlertCircle, ShieldAlert, Lock } from "lucide-react";
@@ -26,12 +27,18 @@ interface SearchParamsProps {
     desc?: string;
     description?: string;
     currency?: string;
+    key?: string;
+    k?: string;
+    secret?: string;
+    pass?: string;
+    password?: string;
   }>;
 }
 
 export default async function DynamicPaymentPage({ searchParams }: SearchParamsProps) {
   const resolvedParams = await searchParams;
   const encodedToken = resolvedParams.data || resolvedParams.d || resolvedParams.token;
+  const userKey = resolvedParams.key || resolvedParams.k || resolvedParams.secret || resolvedParams.pass || resolvedParams.password;
 
   let title: string | undefined = resolvedParams.title || resolvedParams.name;
   let rawPrice: string | undefined = resolvedParams.price || resolvedParams.prize;
@@ -40,19 +47,25 @@ export default async function DynamicPaymentPage({ searchParams }: SearchParamsP
   let currency = resolvedParams.currency || "INR";
   let tamperError: string | null = null;
   let isVerifiedSigned = false;
+  let requiresKey = false;
 
-  // Process Encoded Base64 Payload
+  // Process Encoded Base64 / AES Key Payload
   if (encodedToken) {
-    const decoded = decodePaymentLinkPayload(encodedToken);
+    const decoded = decodePaymentLinkPayload(encodedToken, userKey);
     if (!decoded.success || !decoded.data) {
-      tamperError = decoded.error || "The payment link signature is invalid or has been modified.";
+      if (decoded.requiresKey) {
+        requiresKey = true;
+        tamperError = decoded.error || "A decryption key is required to view this payment.";
+      } else {
+        tamperError = decoded.error || "The payment link signature is invalid or has been modified.";
+      }
     } else {
       title = decoded.data.title;
       rawPrice = String(decoded.data.price);
       redirectUrl = decoded.data.redirectUrl;
       description = decoded.data.description || null;
       currency = decoded.data.currency || "INR";
-      isVerifiedSigned = Boolean(decoded.data.sig);
+      isVerifiedSigned = Boolean(decoded.data.sig || decoded.isEncrypted);
     }
   }
 
@@ -104,7 +117,9 @@ export default async function DynamicPaymentPage({ searchParams }: SearchParamsP
 
       {/* Main Checkout Area */}
       <main className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
-        {tamperError ? (
+        {requiresKey && encodedToken ? (
+          <KeyUnlockCard token={encodedToken} initialError={userKey ? tamperError : null} />
+        ) : tamperError ? (
           <div className="w-full max-w-md mx-auto p-8 rounded-3xl bg-card/90 border border-rose-500/40 backdrop-blur-xl shadow-2xl text-center space-y-5 animate-in fade-in zoom-in-95">
             <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-500 flex items-center justify-center mx-auto">
               <ShieldAlert className="w-7 h-7" />

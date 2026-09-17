@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
     const description = body.description || body.desc || "";
     const currency = body.currency || "INR";
     const customSlug = body.customSlug || body.slug;
+    const encryptionKey = body.key || body.encryptionKey || body.secretKey;
 
     if (!title || !title.trim()) {
       return NextResponse.json(
@@ -68,15 +69,24 @@ export async function POST(req: NextRequest) {
     const hostedUrl = `${origin}/pay/${slug}`;
     const dynamicUrl = `${origin}/pay?title=${encodeURIComponent(title)}&price=${price}&redirect=${encodeURIComponent(redirectUrl)}${description ? `&desc=${encodeURIComponent(description)}` : ""}`;
     
-    // Generate secure tamper-proof Base64 token
-    const encodedToken = encodePaymentLinkPayload({
-      title,
-      price,
-      redirectUrl,
-      description,
-      currency,
-    });
+    // Generate secure Base64 or Key-Encrypted token
+    const encodedToken = encodePaymentLinkPayload(
+      {
+        title,
+        price,
+        redirectUrl,
+        description,
+        currency,
+      },
+      {
+        sign: true,
+        encryptionKey: encryptionKey ? String(encryptionKey).trim() : undefined,
+      }
+    );
     const encodedUrl = `${origin}/pay?data=${encodedToken}`;
+    const unlockedUrl = encryptionKey
+      ? `${origin}/pay?data=${encodedToken}&key=${encodeURIComponent(String(encryptionKey).trim())}`
+      : encodedUrl;
 
     return NextResponse.json(
       {
@@ -87,8 +97,10 @@ export async function POST(req: NextRequest) {
           slug,
           url: hostedUrl,
           encodedUrl,
+          unlockedUrl,
           dynamicUrl,
           token: encodedToken,
+          isEncryptedWithKey: Boolean(encryptionKey),
           title: result.link.title,
           price: result.link.price / 100,
           currency: result.link.currency,
@@ -138,7 +150,18 @@ export async function GET(req: NextRequest) {
   const protocol = host.includes("localhost") ? "http" : "https";
   const origin = `${protocol}://${host}`;
 
+  const encryptionKey = searchParams.get("key") || searchParams.get("encryptionKey") || searchParams.get("secretKey");
+
   const dynamicTargetUrl = `${origin}/pay?title=${encodeURIComponent(title)}&price=${price}&redirect=${encodeURIComponent(redirectUrl)}${description ? `&desc=${encodeURIComponent(description)}` : ""}`;
+
+  const encodedToken = encodePaymentLinkPayload(
+    { title, price, redirectUrl, description },
+    { sign: true, encryptionKey: encryptionKey || undefined }
+  );
+  const encodedUrl = `${origin}/pay?data=${encodedToken}`;
+  const unlockedUrl = encryptionKey
+    ? `${origin}/pay?data=${encodedToken}&key=${encodeURIComponent(encryptionKey)}`
+    : encodedUrl;
 
   if (autoSave) {
     try {
@@ -155,8 +178,12 @@ export async function GET(req: NextRequest) {
           {
             success: true,
             url: hostedUrl,
+            encodedUrl,
+            unlockedUrl,
             dynamicUrl: dynamicTargetUrl,
             slug: result.link.slug,
+            token: encodedToken,
+            isEncryptedWithKey: Boolean(encryptionKey),
             data: result.link,
           },
           { headers: { "Access-Control-Allow-Origin": "*" } }
@@ -165,7 +192,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(hostedUrl);
     } catch (err: any) {
       // Fallback to dynamic URL if saving fails
-      return NextResponse.redirect(dynamicTargetUrl);
+      return NextResponse.redirect(unlockedUrl);
     }
   }
 
@@ -174,6 +201,10 @@ export async function GET(req: NextRequest) {
       {
         success: true,
         dynamicUrl: dynamicTargetUrl,
+        encodedUrl,
+        unlockedUrl,
+        token: encodedToken,
+        isEncryptedWithKey: Boolean(encryptionKey),
         title,
         price,
         redirectUrl,
@@ -184,5 +215,5 @@ export async function GET(req: NextRequest) {
   }
 
   // Direct redirection to the checkout page
-  return NextResponse.redirect(dynamicTargetUrl);
+  return NextResponse.redirect(unlockedUrl);
 }

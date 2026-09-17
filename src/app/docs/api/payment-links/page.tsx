@@ -92,19 +92,49 @@ export default function PaymentLinksDocPage() {
           </div>
 
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-2">
-            <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">URL Pattern (Base64 Encoded & Tamper-Proof - Recommended)</p>
+            <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">URL Pattern 1: Base64 Encoded (Signed or Plain Schema)</p>
             <pre className="p-3 rounded-xl bg-background/90 border border-emerald-500/30 font-mono text-xs text-foreground overflow-x-auto">
               https://scriptly.store/pay?data=BASE64_ENCODED_PAYLOAD
             </pre>
             <p className="text-[11px] text-muted-foreground pt-1">
-              Hides the price and destination parameters from plain view and cryptographically verifies integrity via HMAC-SHA256 so users cannot modify the price in their browser.
+              Conceals price and destination parameters in a URL-safe Base64 token conforming to the JSON schema below. Supports optional HMAC-SHA256 signature verification.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2">
+            <p className="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">URL Pattern 2: Key-Protected (AES-256-GCM Encrypted)</p>
+            <pre className="p-3 rounded-xl bg-background/90 border border-amber-500/40 font-mono text-xs text-foreground overflow-x-auto">
+              https://scriptly.store/pay?data=k1.IV.TAG.CIPHERTEXT
+            </pre>
+            <p className="text-[11px] text-muted-foreground pt-1">
+              Encrypted using a secret key. Buyers are prompted for the key on checkout, or pass <code className="font-mono text-foreground font-bold">&key=YOUR_SECRET_KEY</code> to unlock automatically.
             </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-muted/20 border border-border/50 space-y-2">
-            <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">URL Pattern (Plain Query String)</p>
+            <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">URL Pattern 3: Plain Query String</p>
             <pre className="p-3 rounded-xl bg-background/90 border border-border/60 font-mono text-xs text-foreground overflow-x-auto">
               https://scriptly.store/pay?title=YOUR_TITLE&price=PRICE_IN_INR&redirect=REDIRECT_URL
+            </pre>
+          </div>
+
+          {/* Schema Spec */}
+          <div className="p-4 rounded-2xl bg-card/50 border border-border/50 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <Code className="w-3.5 h-3.5 text-primary" /> Base64 Payload Schema (Raw JSON)
+              </span>
+              <span className="text-[10px] text-muted-foreground font-mono">UTF-8 JSON string Base64 encoded</span>
+            </div>
+            <pre className="p-3 rounded-xl bg-background/90 border border-border/60 font-mono text-xs text-foreground overflow-x-auto">
+{`{
+  "title": "Architecture Review",        // [Required] string: Product or service name
+  "price": 1499,                         // [Required] number: Amount in INR (₹)
+  "redirectUrl": "https://example.com",  // [Required] string: Target URL after payment
+  "description": "Optional notes",       // [Optional] string: Subtitle displayed on card
+  "currency": "INR",                     // [Optional] string: Defaults to "INR"
+  "sig": "a1b2c3d4e5f67890"              // [Optional] string: HMAC-SHA256 signature
+}`}
             </pre>
           </div>
 
@@ -138,6 +168,18 @@ export default function PaymentLinksDocPage() {
                     <td className="p-3 text-muted-foreground">string (URL)</td>
                     <td className="p-3 text-emerald-500 font-bold">Yes</td>
                     <td className="p-3 text-muted-foreground">Destination URL to redirect buyer after verified payment. (Alias: <code>redirectUrl</code>)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-mono font-bold text-foreground">data</td>
+                    <td className="p-3 text-muted-foreground">string</td>
+                    <td className="p-3 text-muted-foreground font-bold">No*</td>
+                    <td className="p-3 text-muted-foreground">Base64 encoded payload or AES encrypted token (<code>k1....</code>). Replaces title, price, and redirect parameters.</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-mono font-bold text-foreground">key</td>
+                    <td className="p-3 text-muted-foreground">string</td>
+                    <td className="p-3 text-muted-foreground font-bold">No</td>
+                    <td className="p-3 text-muted-foreground">Decryption key/passphrase for AES-encrypted tokens. Automatically unlocks the checkout without user input. (Alias: <code>secret</code>)</td>
                   </tr>
                   <tr>
                     <td className="p-3 font-mono font-bold text-foreground">desc</td>

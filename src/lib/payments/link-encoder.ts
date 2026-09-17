@@ -10,23 +10,91 @@ export interface EncodedPaymentPayload {
   sig?: string;
 }
 
-const SECRET_KEY = process.env.RAZORPAY_KEY_SECRET || process.env.NEXTAUTH_SECRET || "scriptly_secure_pay_secret_key_2026";
+export interface DecodeResult {
+  success: boolean;
+  data?: EncodedPaymentPayload;
+  error?: string;
+  requiresKey?: boolean;
+  isEncrypted?: boolean;
+}
+
+const DEFAULT_SECRET_KEY =
+  process.env.RAZORPAY_KEY_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  "scriptly_secure_pay_secret_key_2026";
+
+/**
+ * Derives a 32-byte AES key from any string key using SHA-256
+ */
+function deriveKey(secret: string): Buffer {
+  return crypto.createHash("sha256").update(secret).digest();
+}
 
 /**
  * Computes an HMAC SHA-256 signature for a payment payload.
  */
-export function generatePayloadSignature(title: string, price: number, redirectUrl: string): string {
+export function generatePayloadSignature(
+  title: string,
+  price: number,
+  redirectUrl: string,
+  customKey?: string
+): string {
+  const secret = customKey?.trim() || DEFAULT_SECRET_KEY;
   const message = `${title.trim()}|${Number(price)}|${redirectUrl.trim()}`;
   return crypto
-    .createHmac("sha256", SECRET_KEY)
+    .createHmac("sha256", secret)
     .update(message)
     .digest("hex")
     .slice(0, 16); // 16-char hex signature keeps URL compact
 }
 
 /**
- * Encodes payment parameters into a tamper-proof, URL-safe Base64 token.
- * Prevents users from manually altering price, redirect destination, or product title.
+ * Encrypts arbitrary text using AES-256-GCM with a custom key.
+ * Format: k1.<iv_hex>.<tag_hex>.<ciphertext_hex>
+ */
+export function encryptPayloadWithKey(plaintext: string, key: string): string {
+  const derivedKey = deriveKey(key.trim());
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", derivedKey, iv);
+  
+  let ciphertext = cipher.update(plaintext, "utf8", "hex");
+  ciphertext += cipher.final("hex");
+  const authTag = cipher.getAuthTag().toString("hex");
+
+  return `k1.${iv.toString("hex")}.${authTag}.${ciphertext}`;
+}
+
+/**
+ * Decrypts an AES-256-GCM encrypted payload using the provided key.
+ */
+export function decryptPayloadWithKey(token: string, key: string): string | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 4 || parts[0] !== "k1") {
+      return null;
+    }
+
+    const iv = Buffer.from(parts[1], "hex");
+    const authTag = Buffer.from(parts[2], "hex");
+    const ciphertext = parts[3];
+
+    const derivedKey = deriveKey(key.trim());
+    const decipher = crypto.createDecipheriv("aes-256-gcm", derivedKey, iv);
+    decipher.setAuthTag(authTag);
+
+    let decrypted = decipher.update(ciphertext, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+    return decrypted;
+  } catch (err) {
+    return null;
+  }
+}
+
+/**
+ * Encodes payment parameters.
+ * Supports:
+ * 1. Plain or Signed Base64 JSON schema (when no encryptionKey is provided)
+ * 2. Key-based AES-256-GCM encryption (when encryptionKey is provided)
  */
 export function encodePaymentLinkPayload(
   payload: {
@@ -36,8 +104,14 @@ export function encodePaymentLinkPayload(
     description?: string | null;
     currency?: string;
   },
-  sign: boolean = true
+  options: {
+    sign?: boolean;
+    encryptionKey?: string;
+  } | boolean = true
 ): string {
+  const sign = typeof options === "boolean" ? options : options.sign ?? true;
+  const encryptionKey = typeof options === "object" ? options.encryptionKey?.trim() : undefined;
+
   let redirect = payload.redirectUrl.trim();
   if (!/^https?:\/\//i.test(redirect)) {
     redirect = "https://" + redirect;
@@ -56,11 +130,17 @@ export function encodePaymentLinkPayload(
   };
 
   if (sign) {
-    data.sig = generatePayloadSignature(cleanTitle, cleanPrice, redirect);
+    data.sig = generatePayloadSignature(cleanTitle, cleanPrice, redirect, encryptionKey);
   }
 
   const jsonString = JSON.stringify(data);
-  // URL-safe Base64
+
+  // If encryption key is specified, encrypt with AES-256-GCM
+  if (encryptionKey) {
+    return encryptPayloadWithKey(jsonString, encryptionKey);
+  }
+
+  // Otherwise, encode with URL-safe Base64
   return Buffer.from(jsonString, "utf8")
     .toString("base64")
     .replace(/\+/g, "-")
@@ -69,17 +149,57 @@ export function encodePaymentLinkPayload(
 }
 
 /**
- * Decodes and verifies a Base64 payment token.
- * Returns null or throws an error if tampered.
+ * Decodes and verifies a payment token.
+ * Automatically handles:
+ * - AES-256-GCM key-encrypted tokens (k1. prefix)
+ * - Standard URL-safe Base64 JSON schema tokens
  */
-export function decodePaymentLinkPayload(token: string): {
-  success: boolean;
-  data?: EncodedPaymentPayload;
-  error?: string;
-} {
+export function decodePaymentLinkPayload(
+  token: string,
+  key?: string
+): DecodeResult {
+  if (!token || typeof token !== "string") {
+    return { success: false, error: "Missing or invalid payment token." };
+  }
+
+  const cleanToken = token.trim();
+
+  // 1. Check if token is Key-Encrypted (AES-256-GCM)
+  if (cleanToken.startsWith("k1.")) {
+    if (!key || !key.trim()) {
+      return {
+        success: false,
+        requiresKey: true,
+        isEncrypted: true,
+        error: "This checkout is protected with an encryption key. Please provide the key to proceed.",
+      };
+    }
+
+    const decryptedJson = decryptPayloadWithKey(cleanToken, key.trim());
+    if (!decryptedJson) {
+      return {
+        success: false,
+        requiresKey: true,
+        isEncrypted: true,
+        error: "Invalid decryption key or corrupted token.",
+      };
+    }
+
+    try {
+      const parsed: EncodedPaymentPayload = JSON.parse(decryptedJson);
+      if (!parsed.title || !parsed.price || !parsed.redirectUrl) {
+        return { success: false, error: "Decrypted payload has invalid schema." };
+      }
+
+      return { success: true, data: parsed, isEncrypted: true };
+    } catch {
+      return { success: false, error: "Failed to parse decrypted payment payload." };
+    }
+  }
+
+  // 2. Standard or Signed Base64 JSON Schema
   try {
-    // Restore standard Base64 padding
-    let base64 = token.replace(/-/g, "+").replace(/_/g, "/");
+    let base64 = cleanToken.replace(/-/g, "+").replace(/_/g, "/");
     while (base64.length % 4) {
       base64 += "=";
     }
@@ -88,12 +208,17 @@ export function decodePaymentLinkPayload(token: string): {
     const parsed: EncodedPaymentPayload = JSON.parse(decodedJson);
 
     if (!parsed.title || !parsed.price || !parsed.redirectUrl) {
-      return { success: false, error: "Missing essential payload parameters." };
+      return { success: false, error: "Missing essential payload parameters (title, price, redirectUrl)." };
     }
 
     // Verify signature if present
     if (parsed.sig) {
-      const expectedSig = generatePayloadSignature(parsed.title, parsed.price, parsed.redirectUrl);
+      const expectedSig = generatePayloadSignature(
+        parsed.title,
+        parsed.price,
+        parsed.redirectUrl,
+        key
+      );
       if (parsed.sig !== expectedSig) {
         return {
           success: false,
