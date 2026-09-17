@@ -28,11 +28,11 @@
   "@type": "Product",
   "name": "Product Title",
   "description": "Short product description",
-  "image": ["https://scriptly.store/thumbnail.png"],
+  "image": ["https://scriptly.store/thumbnails/product.png"],
   "offers": {
     "@type": "Offer",
-    "priceCurrency": "USD",
-    "price": "29.00",
+    "priceCurrency": "INR",
+    "price": "1499",
     "availability": "https://schema.org/InStock",
     "url": "https://scriptly.store/products/slug"
   }
@@ -40,14 +40,23 @@
 ```
 *Note: `aggregateRating` is ONLY emitted if verified `ratingCount > 0` in the database.*
 
-### Breadcrumbs
-All catalog and product pages include standard `BreadcrumbList` schemas reflecting the true navigation hierarchy (`Home` > `Category` > `Product`).
+### Nested Category & Subcategory Directory SEO
+All directory hubs emit deterministic titles, descriptions, and OpenGraph cards:
+- `/explore`: "Explore Digital Scripts & SaaS Templates | ScriptlyStore"
+- `/explore/[category]`: "{Category Name} — Templates & Boilerplates | ScriptlyStore"
+- `/explore/[category]/[subcategory]`: "{Subcategory Name} {Category Name} — Production Scripts | ScriptlyStore"
+
+Breadcrumbs reflect the nested structure:
+`Home` > `Explore` > `[Category]` > `[Subcategory]` > `[Product]`.
 
 ---
 
 ## 3. Metadata Generation
 
 Deterministic metadata generators:
+- `generateMetadata()` in `src/app/explore/[category]/page.tsx`
+- `generateMetadata()` in `src/app/explore/[category]/[subcategory]/page.tsx`
 - `generateMetadata()` in `src/app/products/[slug]/page.tsx`
 - `generateMetadata()` in `src/app/blog/[slug]/page.tsx`
-- Site-wide defaults configured in `src/config/site.ts`.
+- Site-wide defaults configured in `src/app/layout.tsx`.
+

@@ -90,9 +90,23 @@ Monospace Font: `JetBrains Mono`, `Fira Code`, `ui-monospace`, monospace.
 
 ---
 
-## 6. Accessibility & Motion Guidelines
+---
+
+## 7. Centralized Skeleton System
+
+To eliminate jarring layout shifts and flashing loaders, all loading states adhere to unified token styling:
+
+- **Component**: `src/components/ui/skeleton.tsx`
+- **Classes**: `animate-pulse rounded-xl bg-muted/40 dark:bg-muted/30 transition-colors`
+- **Layout Rule**: Every dynamic page route must have a matching `loading.tsx` file that accurately mirrors the typography, grid columns, and card dimensions of the rendered page.
+- **Forbidden**: Do not use ad-hoc spinners or unstyled animated text. Always use structural skeletons.
+
+---
+
+## 8. Accessibility & Motion Guidelines
 
 - All interactive controls have visible, high-contrast keyboard focus indicators (`focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none`).
 - Minimum touch targets on mobile: 44px x 44px.
 - `@media (prefers-reduced-motion: reduce)` respected globally across transitions.
 - All SVG icons have `aria-hidden="true"` or accompanying screen-reader labels.
+
