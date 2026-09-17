@@ -9,23 +9,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static routes
   const routes = [
     "",
-    "/search",
     "/explore",
+    "/search",
+    "/featured",
+    "/free",
     "/offers",
-    "/docs/route-guide",
+    "/creator",
+    "/hire-me",
+    "/about",
+    "/trust",
+    "/contact",
+    "/licenses",
     "/terms",
     "/privacy",
     "/refund",
     "/shipping",
     "/dmca",
-    "/licenses",
-    "/about",
-    "/contact"
+    "/docs/route-guide",
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,
-    priority: route === "" ? 1.0 : (route === "/explore" || route === "/search") ? 0.9 : 0.7,
+    priority: route === "" ? 1.0 : (route === "/explore" || route === "/free" || route === "/creator") ? 0.9 : 0.7,
   }));
 
   // Dynamic products
@@ -37,16 +42,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${baseUrl}/products/${product.slug}`,
     lastModified: product.updatedAt,
     changeFrequency: "weekly" as const,
-    priority: 0.7,
+    priority: 0.8,
   }));
 
   // Dynamic categories
   const allCategories = await db.query.categories.findMany();
   const categoryRoutes = allCategories.map((category) => ({
-    url: `${baseUrl}/?category=${category.slug}`,
+    url: `${baseUrl}/explore/${category.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
-    priority: 0.6,
+    priority: 0.8,
   }));
 
   // Blog dynamic pages

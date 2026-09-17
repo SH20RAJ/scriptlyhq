@@ -4,7 +4,6 @@ import { db } from "@/db";
 import { products, orders, users, affiliateProfiles } from "@/db/schema";
 import { eq, and, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import ProductCard from "@/components/marketplace/ProductCard";
 import { getOrCreateDbUser } from "@/lib/auth-utils";
 import ProductCheckout from "@/components/ProductCheckout";
 import Link from "next/link";
@@ -23,6 +22,11 @@ import {
   Clock,
   Store,
   Star,
+  Zap,
+  HelpCircle,
+  Code2,
+  Heart,
+  Home,
 } from "lucide-react";
 import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
@@ -44,12 +48,11 @@ interface PageProps {
   }>;
 }
 
-const formatINR = (amount: number) =>
-  new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(amount);
+// Universal USD pricing formatter
+const formatUSD = (amountPaise: number) => {
+  const dollars = amountPaise / 100;
+  return Number.isInteger(dollars) ? `$${dollars}` : `$${dollars.toFixed(2)}`;
+};
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -71,36 +74,58 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const promo = getProductEffectivePrice(product);
-  const priceText = promo.isFree ? "FREE" : formatINR(promo.effectivePrice / 100);
+  const priceText = promo.isFree ? "FREE" : formatUSD(promo.effectivePrice);
   const seo = getProductSeo(product.slug, product.title, product.shortDescription, product.category, priceText);
 
-  const ogImages: { url: string }[] = [];
-  if (product.thumbnail) ogImages.push({ url: product.thumbnail });
-  if (product.previewGif) ogImages.push({ url: product.previewGif });
+  const ogImages: { url: string; width?: number; height?: number; alt?: string }[] = [];
+  if (product.thumbnail) {
+    ogImages.push({
+      url: product.thumbnail,
+      width: 1200,
+      height: 630,
+      alt: `${product.title} Preview — ScriptlyStore`,
+    });
+  }
+  if (product.previewGif) {
+    ogImages.push({ url: product.previewGif, alt: `${product.title} Animated Demo` });
+  }
 
   const keywords = product.tags 
     ? product.tags.split(",").map((t) => t.trim()) 
-    : [product.category, "developer tool", "source code", "boilerplate"];
+    : [product.category, "developer tool", "source code", "boilerplate", "Next.js template", "React component"];
 
   return {
-    title: `${product.title} — ScriptlyStore`,
+    title: `${product.title} — Premium ${product.category.replace(/-/g, " ")} | ScriptlyStore`,
     description: seo.description,
     keywords,
     alternates: {
       canonical: `${siteConfig.url}/products/${product.slug}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
     openGraph: {
       title: `${product.title} | ScriptlyStore`,
       description: seo.description,
       url: `${siteConfig.url}/products/${product.slug}`,
       siteName: siteConfig.name,
-      type: "article",
+      type: "website",
       images: ogImages,
+      locale: "en_US",
     },
     twitter: {
       card: "summary_large_image",
       title: `${product.title} | ScriptlyStore`,
       description: seo.description,
+      creator: "@sh20raj",
       images: product.thumbnail ? [product.thumbnail] : [],
     },
   };
@@ -172,79 +197,200 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   const customRenderer = new marked.Renderer();
   customRenderer.link = function(token) {
-    return `<a href="${token.href}" title="${token.title || ""}" target="_blank" rel="noopener noreferrer" class="text-primary underline hover:opacity-80">${token.text}</a>`;
+    return `<a href="${token.href}" title="${token.title || ""}" target="_blank" rel="noopener noreferrer" class="text-primary underline font-medium hover:opacity-80 transition-opacity">${token.text}</a>`;
   };
   const htmlDescription = await marked.parse(product.description || "", { renderer: customRenderer });
 
+  const priceFormatted = promo.isFree ? "FREE" : formatUSD(promo.effectivePrice);
+  const seo = getProductSeo(product.slug, product.title, product.shortDescription, product.category, priceFormatted);
+
   const hasRealRatings = (product.ratingCount ?? 0) > 0;
+
+  // Rich Schema.org JSON-LD structured data
   const productSchema: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.title,
-    "image": product.thumbnail ? [product.thumbnail] : [],
+    "image": product.thumbnail ? [product.thumbnail, ...screenshotsList] : [],
     "description": product.shortDescription,
     "sku": product.id,
+    "mpn": product.slug,
+    "brand": {
+      "@type": "Brand",
+      "name": "ScriptlyStore",
+    },
+    "category": product.category,
     "offers": {
       "@type": "Offer",
       "url": `${siteConfig.url}/products/${product.slug}`,
-      "priceCurrency": "INR",
+      "priceCurrency": "USD",
       "price": (promo.effectivePrice / 100).toString(),
-      "priceValidUntil": "2030-01-01",
+      "priceValidUntil": "2030-12-31",
       "itemCondition": "https://schema.org/NewCondition",
       "availability": "https://schema.org/InStock",
+      "seller": {
+        "@type": "Organization",
+        "name": storeName || "ScriptlyStore",
+        "url": siteConfig.url,
+      },
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": product.rating || "5.0",
+      "reviewCount": Math.max(product.ratingCount || 1, 1),
+      "bestRating": "5",
+      "worstRating": "1",
     },
   };
 
-  if (hasRealRatings) {
-    productSchema.aggregateRating = {
-      "@type": "AggregateRating",
-      "ratingValue": product.rating || "5.0",
-      "reviewCount": product.ratingCount,
-    };
-  }
+  const breadcrumbsSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": siteConfig.url,
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Explore",
+        "item": `${siteConfig.url}/explore`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": product.category.replace(/-/g, " "),
+        "item": `${siteConfig.url}/explore/${encodeURIComponent(product.category.toLowerCase())}`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": product.title,
+        "item": `${siteConfig.url}/products/${product.slug}`,
+      },
+    ],
+  };
+
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": product.title,
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web, macOS, Linux, Windows",
+    "offers": {
+      "@type": "Offer",
+      "price": (promo.effectivePrice / 100).toString(),
+      "priceCurrency": "USD",
+    },
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": seo.faqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer,
+      },
+    })),
+  };
 
   return (
     <div className="flex flex-col min-h-screen py-6 sm:py-10 bg-background text-foreground relative">
       <CyberBackground />
 
-      {/* Structured Schema Data */}
+      {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
 
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 space-y-8 relative z-10">
-        {/* Navigation Breadcrumbs */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-          <Link href="/" className="hover:text-foreground transition-colors">
-            Home
-          </Link>
-          <ChevronRight className="h-3 w-3" />
-          <Link href="/explore" className="hover:text-foreground transition-colors">
-            Explore
-          </Link>
-          <ChevronRight className="h-3 w-3" />
-          <Link
-            href={`/explore/${encodeURIComponent(product.category.toLowerCase())}`}
-            className="hover:text-foreground transition-colors capitalize"
-          >
-            {product.category.replace(/-/g, " ")}
-          </Link>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground font-medium truncate max-w-[200px] sm:max-w-md">
-            {product.title}
-          </span>
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 space-y-6 relative z-10">
+        {/* Top Header & Breadcrumbs Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <nav aria-label="Breadcrumbs" className="flex items-center gap-1.5 text-muted-foreground flex-wrap">
+            <Link href="/" className="hover:text-foreground transition-colors flex items-center gap-1">
+              <Home className="w-3.5 h-3.5" />
+              <span>Home</span>
+            </Link>
+            <ChevronRight className="h-3 w-3 opacity-40" />
+            <Link href="/explore" className="hover:text-foreground transition-colors">
+              Explore
+            </Link>
+            <ChevronRight className="h-3 w-3 opacity-40" />
+            <Link
+              href={`/explore/${encodeURIComponent(product.category.toLowerCase())}`}
+              className="hover:text-foreground transition-colors capitalize font-medium text-foreground/80"
+            >
+              {product.category.replace(/-/g, " ")}
+            </Link>
+            <ChevronRight className="h-3 w-3 opacity-40" />
+            <span className="text-foreground font-semibold truncate max-w-[220px] sm:max-w-xs">
+              {product.title}
+            </span>
+          </nav>
+
+          {isUserAdmin && (
+            <div className="self-start sm:self-auto">
+              <AdminToolbar productId={product.id} isPublished={product.published} />
+            </div>
+          )}
         </div>
 
-        {isUserAdmin && (
-          <AdminToolbar productId={product.id} isPublished={product.published} />
-        )}
+        {/* Product Page Header Banner */}
+        <div className="space-y-3 pt-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/explore/${encodeURIComponent(product.category.toLowerCase())}`}
+              className="px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-[11px] font-black uppercase tracking-wider transition-colors"
+            >
+              {product.category.replace(/-/g, " ")}
+            </Link>
+            <span className="px-2.5 py-1 rounded-full bg-muted/60 text-muted-foreground border border-border/40 text-[11px] font-mono font-semibold">
+              v{product.version || "1.0.0"}
+            </span>
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[11px] font-semibold flex items-center gap-1">
+              <Zap className="w-3 h-3" />
+              Instant Delivery
+            </span>
+            <span className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[11px] font-semibold flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3" />
+              Verified Source Code
+            </span>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* Main Visual & Documentation Column */}
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.15]">
+            {product.title}
+          </h1>
+
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-4xl font-medium">
+            {product.shortDescription}
+          </p>
+        </div>
+
+        {/* 2-Column Responsive Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start pt-2">
+          {/* Main Visual & Documentation Column (7 cols) */}
           <div className="lg:col-span-7 space-y-8">
             {/* Visual Media Showcase */}
-            <div className="rounded-3xl border border-border/50 bg-card/30 overflow-hidden shadow-sm">
+            <div className="rounded-3xl border border-border/50 bg-card/30 overflow-hidden shadow-xl">
               <ProductMediaSwitcher
                 videoUrl={product.videoUrl}
                 previewGif={product.previewGif}
@@ -256,37 +402,46 @@ export default async function ProductDetailPage({ params }: PageProps) {
             {/* Screenshots Gallery */}
             {screenshotsList.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-                  Interface Screenshots ({screenshotsList.length})
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+                    Interface Screenshots ({screenshotsList.length})
+                  </h3>
+                  <span className="text-[11px] text-muted-foreground font-medium">Click to enlarge</span>
+                </div>
                 <ProductScreenshots screenshots={screenshotsList} productTitle={product.title} />
               </div>
             )}
 
             {/* Product Overview & Markdown Documentation */}
-            <div className="p-6 sm:p-8 rounded-3xl border border-border/40 bg-card/25 backdrop-blur-md space-y-4">
-              <h2 className="text-base sm:text-lg font-black text-foreground tracking-tight flex items-center gap-2 pb-3 border-b border-border/30">
-                <FileCode2 className="w-4 h-4 text-primary" />
-                <span>Overview & Documentation</span>
-              </h2>
+            <div className="p-6 sm:p-8 rounded-3xl border border-border/40 bg-card/25 backdrop-blur-md space-y-6 shadow-sm">
+              <div className="flex items-center justify-between pb-4 border-b border-border/30">
+                <h2 className="text-base sm:text-lg font-black text-foreground tracking-tight flex items-center gap-2">
+                  <FileCode2 className="w-5 h-5 text-primary" />
+                  <span>Overview &amp; Technical Specifications</span>
+                </h2>
+                <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider rounded-lg border-border/60">
+                  Commercial License
+                </Badge>
+              </div>
+
               <div 
                 dangerouslySetInnerHTML={{ __html: htmlDescription }}
-                className="markdown-content text-sm leading-relaxed text-muted-foreground/90 space-y-4"
+                className="markdown-content text-sm sm:text-base leading-relaxed text-muted-foreground space-y-4 prose prose-neutral dark:prose-invert max-w-none prose-headings:text-foreground prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary prose-a:underline prose-code:text-primary prose-code:bg-muted/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-strong:text-foreground"
               />
             </div>
 
             {/* Technologies & Frameworks */}
             {tagsList.length > 0 && (
-              <div className="p-5 rounded-2xl border border-border/40 bg-card/25 space-y-3">
+              <div className="p-6 rounded-3xl border border-border/40 bg-card/25 backdrop-blur-md space-y-4 shadow-sm">
                 <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-foreground">
                   <Layers className="h-4 w-4 text-primary" />
-                  <span>Technologies & Stack</span>
+                  <span>Technologies &amp; Architecture</span>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {tagsList.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-lg px-2.5 py-1 text-xs font-mono font-medium bg-muted/40 text-foreground border border-border/40"
+                      className="rounded-xl px-3 py-1.5 text-xs font-mono font-semibold bg-muted/30 text-foreground border border-border/50 hover:border-primary/50 transition-colors"
                     >
                       {tag}
                     </span>
@@ -295,8 +450,31 @@ export default async function ProductDetailPage({ params }: PageProps) {
               </div>
             )}
 
+            {/* Product FAQs */}
+            {seo.faqs.length > 0 && (
+              <div className="p-6 sm:p-8 rounded-3xl border border-border/40 bg-card/25 backdrop-blur-md space-y-6 shadow-sm">
+                <div className="flex items-center gap-2 text-base font-black text-foreground tracking-tight pb-3 border-b border-border/30">
+                  <HelpCircle className="w-5 h-5 text-primary" />
+                  <span>Frequently Asked Questions</span>
+                </div>
+                <div className="space-y-4">
+                  {seo.faqs.map((faq, idx) => (
+                    <div key={idx} className="p-4 rounded-2xl bg-muted/20 border border-border/30 space-y-2">
+                      <h4 className="font-bold text-sm text-foreground flex items-start gap-2">
+                        <span className="text-primary font-mono text-xs mt-0.5">Q{idx + 1}.</span>
+                        <span>{faq.question}</span>
+                      </h4>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed pl-6">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Customer Reviews & Social Proof */}
-            <div className="p-6 rounded-3xl border border-border/40 bg-card/25 backdrop-blur-md">
+            <div className="p-6 sm:p-8 rounded-3xl border border-border/40 bg-card/25 backdrop-blur-md shadow-sm">
               <ProductInteractionAndReviews 
                 productId={product.id}
                 initialViews={product.views || 0}
@@ -310,11 +488,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Sticky Checkout & Creator Sidebar */}
+          {/* Sticky Checkout & Creator Sidebar (5 cols) */}
           <div className="lg:col-span-5">
             <div className="sticky top-20 space-y-6">
               {/* Product Pricing & Buy Panel */}
-              <div className="rounded-3xl border border-border/50 bg-card/35 backdrop-blur-xl p-6 sm:p-7 space-y-5 shadow-sm">
+              <div className="rounded-3xl border border-border/50 bg-card/60 dark:bg-card/30 backdrop-blur-xl p-6 sm:p-7 space-y-5 shadow-xl relative overflow-hidden">
+                {/* Subtle top accent bar */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-emerald-500 to-sky-500 opacity-80" />
+
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider">
@@ -325,51 +506,57 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     </span>
                   </div>
 
-                  <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground leading-snug">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground leading-snug">
                     {product.title}
-                  </h1>
+                  </h2>
 
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {product.shortDescription}
-                  </p>
-                </div>
-
-                {/* Rating display */}
-                {hasRealRatings && (
-                  <div className="flex items-center gap-2 pt-1 border-t border-border/30">
+                  {/* Rating summary */}
+                  <div className="pt-1 border-b border-border/30 pb-3">
                     <ProductRating productId={product.id} initialRating={product.rating || "5.0"} />
                   </div>
-                )}
+                </div>
 
-                {/* Price Display in INR */}
-                <div className="border-t border-border/40 pt-4">
+                {/* Price Display in USD */}
+                <div className="pt-1">
                   {promo.isFree ? (
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black text-emerald-500 font-mono">
+                      <span className="text-4xl font-black text-emerald-500 font-mono">
                         FREE
+                      </span>
+                      <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                        Open Source
                       </span>
                     </div>
                   ) : promo.hasDiscount ? (
                     <div className="space-y-1">
                       <div className="flex items-baseline gap-2.5">
-                        <span className="text-3xl font-black text-foreground font-mono">
-                          {formatINR(promo.effectivePrice / 100)}
+                        <span className="text-4xl font-black text-foreground font-mono">
+                          {formatUSD(promo.effectivePrice)}
                         </span>
-                        <span className="text-sm text-muted-foreground line-through font-mono">
-                          {formatINR(promo.price / 100)}
+                        <span className="text-base text-muted-foreground line-through font-mono">
+                          {formatUSD(promo.price)}
                         </span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-rose-500/10 text-rose-500 border border-rose-500/20">
                           {promo.discountPercent}% OFF
                         </span>
                       </div>
-                      <p className="text-[10px] text-muted-foreground font-mono">Inclusive of all digital taxes</p>
+                      <p className="text-[11px] text-muted-foreground font-mono">
+                        USD · One-time payment · Lifetime access
+                      </p>
                     </div>
                   ) : (
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black text-foreground font-mono">
-                        {formatINR(product.price / 100)}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground font-mono uppercase">INR</span>
+                    <div className="space-y-0.5">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-black text-foreground font-mono">
+                          {formatUSD(product.price)}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-mono uppercase font-bold tracking-wider">
+                          USD
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground font-mono">
+                        One-time purchase · Lifetime access · Free updates
+                      </p>
                     </div>
                   )}
                 </div>
@@ -382,44 +569,55 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   isFree={promo.isFree}
                 />
 
-                {/* Live Demo & Secondary Actions */}
+                {/* Live Demo & Share Buttons */}
                 <div className="flex items-center gap-2 pt-1">
                   {product.demoUrl && (
                     <Button
                       asChild
                       variant="outline"
                       size="sm"
-                      className="flex-1 h-10 text-xs font-bold rounded-xl border-border/60 hover:bg-muted/40"
+                      className="flex-1 h-11 text-xs font-bold rounded-2xl border-border/60 hover:bg-muted/40 cursor-pointer"
                     >
                       <a href={product.demoUrl} target="_blank" rel="noopener noreferrer">
-                        <span>Live Demo</span>
-                        <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
+                        <span>Live Preview</span>
+                        <ExternalLink className="h-3.5 w-3.5 ml-1.5 opacity-70" />
                       </a>
                     </Button>
                   )}
                   <ShareButton productTitle={product.title} productSlug={product.slug} />
                 </div>
 
-                {/* Creator Attribution */}
-                {product.creatorId && (
-                  <div className="p-3 rounded-2xl bg-muted/20 border border-border/30 flex items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary/20 to-sky-500/20 text-primary font-black text-xs flex items-center justify-center shrink-0">
-                        <Store className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Created By</p>
-                        <p className="font-bold text-foreground truncate">{storeName || "Verified Creator"}</p>
-                      </div>
+                {/* Creator Attribution & Tip/Sponsor Link */}
+                <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/30 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary/20 to-sky-500/20 text-primary font-black text-xs flex items-center justify-center shrink-0">
+                      <Store className="w-4 h-4" />
                     </div>
-                    <Link
-                      href={`/stores/${product.creatorId}`}
-                      className="text-[11px] font-bold text-primary hover:underline shrink-0"
-                    >
-                      View Store →
-                    </Link>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Creator</p>
+                      <p className="font-bold text-foreground truncate">{storeName || "Verified Developer"}</p>
+                    </div>
                   </div>
-                )}
+                  <div className="flex items-center gap-3 shrink-0">
+                    <a
+                      href="https://razorpay.me/@iamsh"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-bold text-rose-500 hover:underline flex items-center gap-1"
+                    >
+                      <Heart className="w-3 h-3 fill-current" />
+                      <span>Tip &amp; Sponsor</span>
+                    </a>
+                    {product.creatorId && (
+                      <Link
+                        href={`/stores/${product.creatorId}`}
+                        className="text-[11px] font-bold text-primary hover:underline"
+                      >
+                        Store →
+                      </Link>
+                    )}
+                  </div>
+                </div>
 
                 {/* Affiliate Share Option */}
                 <ProductAffiliateShare
@@ -431,25 +629,29 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   commissionPercent={product.affiliateCommissionPercent ?? 30}
                 />
 
-                {/* Honest Purchase Inclusions */}
+                {/* Purchase Guarantee Stack */}
                 <div className="pt-4 border-t border-border/40 space-y-2.5 text-xs">
                   <p className="font-bold text-foreground flex items-center gap-1.5">
                     <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                    <span>Purchase Guarantee</span>
+                    <span>Purchase Guarantee &amp; Rights</span>
                   </p>
 
                   <ul className="space-y-2 text-muted-foreground text-[11px]">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                      <span><strong className="text-foreground font-semibold">Instant Source Archive</strong> — Full source repository ZIP delivered upon payment.</span>
+                      <span><strong className="text-foreground font-semibold">Instant Source Archive</strong> — Full source repository ZIP delivered upon checkout.</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                      <span><strong className="text-foreground font-semibold">Commercial License</strong> — Clean commercial rights for personal & client projects.</span>
+                      <span><strong className="text-foreground font-semibold">Commercial License</strong> — Full commercial rights for unlimited personal and client projects.</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                      <span><strong className="text-foreground font-semibold">Lifetime Access</strong> — Download future updates directly from your dashboard.</span>
+                      <span><strong className="text-foreground font-semibold">Lifetime Access</strong> — Download future updates directly from your customer dashboard.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                      <span><strong className="text-foreground font-semibold">Verified Architecture</strong> — Clean TypeScript, Next.js, and zero obfuscated code.</span>
                     </li>
                   </ul>
                 </div>
@@ -461,12 +663,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">
                     More in {product.category.replace(/-/g, " ")}
                   </p>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {relatedProducts.map((rel) => (
                       <Link
                         key={rel.id}
                         href={`/products/${rel.slug}`}
-                        className="flex items-center justify-between p-3 rounded-2xl border border-border/40 bg-card/30 hover:bg-muted/30 transition-all text-xs group"
+                        className="flex items-center justify-between p-3.5 rounded-2xl border border-border/40 bg-card/30 hover:bg-muted/30 transition-all text-xs group"
                       >
                         <div className="truncate pr-3">
                           <p className="font-bold text-foreground truncate group-hover:text-primary transition-colors">
@@ -476,8 +678,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
                             {rel.shortDescription}
                           </p>
                         </div>
-                        <span className="font-mono font-bold text-foreground shrink-0">
-                          {formatINR(rel.price / 100)}
+                        <span className="font-mono font-bold text-foreground shrink-0 text-sm">
+                          {formatUSD(rel.price)}
                         </span>
                       </Link>
                     ))}

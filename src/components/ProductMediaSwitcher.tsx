@@ -174,41 +174,46 @@ export default function ProductMediaSwitcher({ videoUrl, previewGif, thumbnail, 
         )}
       </div>
 
-      {/* Selector Thumbnails / Tabs */}
-      <div className="flex flex-wrap items-center gap-3">
-        {hasVideo && (
-          <Button
-            variant={activeTab === "video" ? "default" : "outline"}
-            onClick={() => handleTabChange("video")}
-            className="cursor-pointer font-bold h-10 rounded-xl px-5"
-          >
-            <Play className="w-3.5 h-3.5 mr-1" />
-            Watch Video
-          </Button>
-        )}
+      {/* Selector Thumbnails / Tabs (only shown if multiple formats exist) */}
+      {((hasVideo ? 1 : 0) + (hasGif ? 1 : 0) + (hasPoster ? 1 : 0)) > 1 && (
+        <div className="flex flex-wrap items-center gap-2.5">
+          {hasVideo && (
+            <Button
+              variant={activeTab === "video" ? "default" : "outline"}
+              onClick={() => handleTabChange("video")}
+              size="sm"
+              className="cursor-pointer font-bold h-9 rounded-xl px-4 text-xs"
+            >
+              <Play className="w-3.5 h-3.5 mr-1.5 fill-current" />
+              Watch Video
+            </Button>
+          )}
 
-        {hasGif && (
-          <Button
-            variant={activeTab === "gif" ? "default" : "outline"}
-            onClick={() => handleTabChange("gif")}
-            className="cursor-pointer font-bold h-10 rounded-xl px-5"
-          >
-            <Film className="w-3.5 h-3.5 mr-1" />
-            View GIF
-          </Button>
-        )}
+          {hasGif && (
+            <Button
+              variant={activeTab === "gif" ? "default" : "outline"}
+              onClick={() => handleTabChange("gif")}
+              size="sm"
+              className="cursor-pointer font-bold h-9 rounded-xl px-4 text-xs"
+            >
+              <Film className="w-3.5 h-3.5 mr-1.5" />
+              Interactive GIF
+            </Button>
+          )}
 
-        {hasPoster && (
-          <Button
-            variant={activeTab === "poster" ? "default" : "outline"}
-            onClick={() => handleTabChange("poster")}
-            className="cursor-pointer font-bold h-10 rounded-xl px-5"
-          >
-            <ImageIcon className="w-3.5 h-3.5 mr-1" />
-            Static Poster
-          </Button>
-        )}
-      </div>
+          {hasPoster && (
+            <Button
+              variant={activeTab === "poster" ? "default" : "outline"}
+              onClick={() => handleTabChange("poster")}
+              size="sm"
+              className="cursor-pointer font-bold h-9 rounded-xl px-4 text-xs"
+            >
+              <ImageIcon className="w-3.5 h-3.5 mr-1.5" />
+              Screenshot Poster
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

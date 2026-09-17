@@ -19,7 +19,7 @@ export default function AboutPage() {
       role: "Founder & Lead Architect",
       bio: "Full-stack engineer and product builder. Created ScriptlyStore to solve the repetitive pain of boilerplate setups for developers.",
       github: "https://github.com/SH20RAJ",
-      twitter: "https://x.com/sh20raj",
+      twitter: "https://x.com/ShaswatBuilds",
       sponsor: "https://razorpay.me/@iamsh"
     }
   ];

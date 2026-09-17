@@ -61,6 +61,20 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: ["/og-image.png"],
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  authors: [{ name: "Shaswat Raj", url: "https://github.com/SH20RAJ" }],
+  creator: "Shaswat Raj",
+  publisher: "ScriptlyStore",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

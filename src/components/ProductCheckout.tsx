@@ -157,36 +157,40 @@ export default function ProductCheckout({
     });
   };
 
-  const handleCartToggle = () => {
+  const formatPrice = (amountPaise: number) => {
+    const dollars = amountPaise / 100;
+    return Number.isInteger(dollars) ? `$${dollars}` : `$${dollars.toFixed(2)}`;
+  };
+
+  const handleCartToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (inCart) {
       removeFromCart(product.id);
     } else {
       addToCart({
         id: product.id,
         title: product.title,
-        slug: product.slug,
-        price: promo.effectivePrice,
+        price: product.price,
         originalPrice: product.price,
-        category: product.category,
+        slug: product.slug,
         thumbnail: product.thumbnail,
+        category: product.category,
       });
     }
   };
 
   return (
-    <div className="w-full space-y-4">
-      {/* Optional Setup/Customization Add-ons */}
-      <div className="rounded-lg border border-border/70 bg-card overflow-hidden text-xs">
+    <div className="space-y-4">
+      {/* Optional Addons Dropdown */}
+      <div className="rounded-2xl border border-border/50 bg-secondary/15 overflow-hidden transition-all duration-200">
         <button
           type="button"
           onClick={() => setIsAddonsExpanded(!isAddonsExpanded)}
-          className="w-full flex items-center justify-between p-3.5 hover:bg-secondary/40 transition-colors text-left"
+          className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-secondary/25 transition-colors cursor-pointer"
         >
-          <div className="space-y-0.5">
-            <span className="font-medium text-foreground">
-              Optional Add-on Services
-            </span>
-            <p className="text-[11px] text-muted-foreground">
+          <div>
+            <p className="text-xs font-bold text-foreground">Optional Add-on Services</p>
+            <p className="text-[10px] text-muted-foreground">
               {addOnEditCopy || addOnSetupDeploy ? "Services selected" : "Setup & customization available"}
             </p>
           </div>
@@ -194,8 +198,8 @@ export default function ProductCheckout({
         </button>
 
         {isAddonsExpanded && (
-          <div className="p-3.5 pt-0 border-t border-border/50 space-y-2">
-            <label className={`flex items-start gap-2.5 p-2.5 rounded-md border cursor-pointer transition-colors ${addOnEditCopy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
+          <div className="p-3 pt-0 border-t border-border/40 space-y-2">
+            <label className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${addOnEditCopy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
               <input 
                 type="checkbox" 
                 checked={addOnEditCopy} 
@@ -204,30 +208,14 @@ export default function ProductCheckout({
               />
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline gap-2">
-                  <span className="font-medium text-foreground">Custom Copy & Branding</span>
-                  <span className="font-mono text-primary">+${(editCopyPrice / 100).toFixed(2)}</span>
+                  <span className="font-semibold text-foreground text-xs">Custom Copy &amp; Branding</span>
+                  <span className="font-mono text-primary font-bold text-xs">+{formatPrice(editCopyPrice)}</span>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Customize default text, colors, and components for your brand.</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">Customize default text, colors, and components for your brand.</p>
               </div>
             </label>
 
-            <label className={`flex items-start gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-colors ${addOnEditCopy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
-              <input 
-                type="checkbox" 
-                checked={addOnEditCopy} 
-                onChange={(e) => setAddOnEditCopy(e.target.checked)} 
-                className="mt-0.5 h-3.5 w-3.5 accent-primary rounded"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-baseline gap-2">
-                  <span className="font-semibold text-foreground text-xs">Custom Copy & Branding</span>
-                  <span className="font-mono text-primary font-bold text-xs">+₹{(editCopyPrice / 100).toLocaleString("en-IN")}</span>
-                </div>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Customize default text, colors, and components for your brand.</p>
-              </div>
-            </label>
-
-            <label className={`flex items-start gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-colors ${addOnSetupDeploy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
+            <label className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${addOnSetupDeploy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
               <input 
                 type="checkbox" 
                 checked={addOnSetupDeploy} 
@@ -236,10 +224,10 @@ export default function ProductCheckout({
               />
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline gap-2">
-                  <span className="font-semibold text-foreground text-xs">Cloud Deployment & Setup</span>
-                  <span className="font-mono text-primary font-bold text-xs">+₹{(setupDeployPrice / 100).toLocaleString("en-IN")}</span>
+                  <span className="font-semibold text-foreground text-xs">Cloud Deployment &amp; Setup</span>
+                  <span className="font-mono text-primary font-bold text-xs">+{formatPrice(setupDeployPrice)}</span>
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Full production setup on Cloudflare or Vercel.</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">Full production setup on Cloudflare, Vercel, or AWS.</p>
               </div>
             </label>
           </div>
@@ -254,7 +242,7 @@ export default function ProductCheckout({
       )}
 
       {/* Primary Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-2.5">
+      <div className="flex items-center gap-2.5">
         <Button
           onClick={handleCheckout}
           disabled={isPending}
@@ -267,7 +255,7 @@ export default function ProductCheckout({
           )}
           <span>
             {userLoggedIn 
-              ? (totalDisplayPrice === 0 ? "Download Free" : `Get Access — ₹${(totalDisplayPrice / 100).toLocaleString("en-IN")}`) 
+              ? (totalDisplayPrice === 0 ? "Download Free" : `Get Access — ${formatPrice(totalDisplayPrice)}`) 
               : "Sign In to Buy"
             }
           </span>
@@ -277,16 +265,17 @@ export default function ProductCheckout({
           type="button"
           onClick={handleCartToggle}
           variant={inCart ? "secondary" : "outline"}
-          className="h-12 px-4 text-xs font-bold rounded-2xl border-border/60 hover:bg-muted/40 cursor-pointer transition-colors"
+          className="h-12 px-4 text-xs font-bold rounded-2xl border-border/60 hover:bg-muted/40 cursor-pointer transition-colors shrink-0"
+          aria-label={inCart ? "Remove from cart" : "Add to cart"}
         >
           {inCart ? (
             <>
-              <Trash className="w-3.5 h-3.5 mr-1.5 text-destructive" />
+              <Trash className="w-4 h-4 mr-1.5 text-destructive" />
               <span>In Cart</span>
             </>
           ) : (
             <>
-              <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
+              <ShoppingCart className="w-4 h-4 mr-1.5" />
               <span>Cart</span>
             </>
           )}
@@ -294,7 +283,7 @@ export default function ProductCheckout({
       </div>
 
       {error && (
-        <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-md">
+        <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 px-3 py-2 rounded-xl">
           {error}
         </p>
       )}

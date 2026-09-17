@@ -6,7 +6,7 @@ export const siteConfig = {
   creatorTagline: "Sell your developer assets and keep 95% of direct sales.",
   social: {
     github: "https://github.com/SH20RAJ",
-    twitter: "https://x.com/sh20raj",
+    twitter: "https://x.com/ShaswatBuilds",
     sponsor: "https://razorpay.me/@iamsh",
   },
   supportEmail: "support@scriptly.store",
