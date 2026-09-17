@@ -4,7 +4,7 @@ import { getProductsAction, getCategoriesAction, getSubcategoriesAction } from "
 import { ProductCard } from "@/components/SearchFilter";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Terminal, Palette, Bot, BookOpen, Zap, ShieldCheck, Coins, LayoutGrid, ArrowRight } from "lucide-react";
+import { Sparkles, Terminal, Palette, Bot, BookOpen, Zap, ShieldCheck, Coins, LayoutGrid, ArrowRight, Search } from "lucide-react";
 import { CyberBackground } from "@/components/ui/CyberBackground";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -175,6 +175,8 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
     e.preventDefault();
     if (heroSearch.trim()) {
       router.push(`/search?search=${encodeURIComponent(heroSearch.trim())}`);
+    } else {
+      router.push("/explore");
     }
   };
 
@@ -263,10 +265,10 @@ export default function ClientHome({ searchParams }: ClientHomeProps) {
                 onChange={(e) => setHeroSearch(e.target.value)}
                 className="w-full pl-16 pr-36 py-4 text-base font-semibold rounded-2xl border-2 border-border bg-card/60 backdrop-blur-md text-foreground placeholder:text-muted-foreground focus:outline-none transition-all shadow-[0_5px_0_var(--border)] dark:shadow-[0_5px_0_#2A3842] focus:translate-y-[2px] focus:shadow-[0_3px_0_var(--border)]"
               />
-              {/* <Search className="absolute left-5 w-6 h-6 text-muted-foreground group-focus-within:text-accent transition-colors" /> */}
+              <Search className="absolute left-5 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none" />
               <button
                 type="submit"
-                className="absolute right-3 px-6 py-2.5 text-sm font-black uppercase bg-primary text-white rounded-xl shadow-[0_4px_0_#46A302] hover:brightness-105 active:translate-y-[2px] active:shadow-none transition-all"
+                className="absolute right-3 px-6 py-2.5 text-sm font-black uppercase bg-primary text-white rounded-xl shadow-[0_4px_0_#46A302] hover:brightness-105 active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
               >
                 Search
               </button>

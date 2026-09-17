@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
-import { Edit2, Eye, Trash2, Search, Filter, Loader2, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
+import { Edit2, Eye, Trash2, Search, Filter, Loader2, AlertCircle, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { deleteProductAction } from "@/lib/actions/products";
 import { toast } from "sonner";
 
@@ -21,6 +21,13 @@ interface CreatorProduct {
 interface CreatorProductsTableProps {
   products: CreatorProduct[];
 }
+
+const formatINR = (val: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(val);
 
 export default function CreatorProductsTable({ products }: CreatorProductsTableProps) {
   const [search, setSearch] = useState("");
@@ -72,52 +79,52 @@ export default function CreatorProductsTable({ products }: CreatorProductsTableP
     switch (val) {
       case "approved":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-            <CheckCircle className="w-3.5 h-3.5" />
-            Approved
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="w-3 h-3" />
+            Active
           </span>
         );
       case "rejected":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 border border-rose-500/20 text-rose-400">
-            <XCircle className="w-3.5 h-3.5" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400">
+            <XCircle className="w-3 h-3" />
             Rejected
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 border border-amber-500/20 text-amber-400">
-            <Clock className="w-3.5 h-3.5" />
-            Pending Review
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400">
+            <Clock className="w-3 h-3" />
+            Reviewing
           </span>
         );
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Search & Filter Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-border/40">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search your scripts..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/40 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-700 focus:border-neutral-700 transition-colors"
+            placeholder="Search scripts..."
+            className="w-full pl-9 pr-4 py-2 rounded-xl border border-border/60 bg-background/50 text-foreground placeholder:text-muted-foreground text-xs focus:outline-none focus:border-primary/50 transition-colors font-medium"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-neutral-500" />
+          <Filter className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3.5 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-300 text-sm focus:outline-none focus:border-neutral-700 cursor-pointer"
+            className="px-3 py-2 rounded-xl border border-border/60 bg-background/50 text-foreground text-xs focus:outline-none focus:border-primary/50 cursor-pointer font-medium"
           >
             <option value="all">All Statuses</option>
-            <option value="approved">Approved</option>
+            <option value="approved">Approved / Active</option>
             <option value="pending">Pending Review</option>
             <option value="rejected">Rejected</option>
           </select>
@@ -126,152 +133,119 @@ export default function CreatorProductsTable({ products }: CreatorProductsTableP
 
       {/* Catalog Table */}
       {filteredProducts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 border border-neutral-800/60 rounded-3xl bg-neutral-900/10 text-center space-y-4">
-          <AlertCircle className="w-10 h-10 text-neutral-600" />
+        <div className="flex flex-col items-center justify-center py-16 text-center space-y-2 p-4">
+          <AlertCircle className="w-8 h-8 text-muted-foreground/40" />
           <div className="space-y-1">
-            <p className="text-sm font-bold text-neutral-300">No scripts found</p>
-            <p className="text-xs text-neutral-500">Try adjusting your search filters or list a new script.</p>
+            <p className="text-xs font-bold text-foreground">No scripts found</p>
+            <p className="text-[11px] text-muted-foreground">Try adjusting your search filters or list a new script.</p>
           </div>
         </div>
       ) : (
-        <div className="border border-neutral-800/80 rounded-2xl overflow-hidden bg-neutral-900/10 backdrop-blur-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-neutral-800/80 bg-neutral-950/40 text-[10px] font-black uppercase tracking-wider text-neutral-400">
-                  <th className="py-4 px-6">Script Details</th>
-                  <th className="py-4 px-6">Category</th>
-                  <th className="py-4 px-6">Price (USD)</th>
-                  <th className="py-4 px-6">Moderation</th>
-                  <th className="py-4 px-6 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-800/40 text-sm font-medium text-neutral-300">
-                {paginatedProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-neutral-800/10 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="space-y-1">
-                        <Link href={`/products/${p.slug}`} className="font-bold text-white hover:underline text-base">
-                          {p.title}
-                        </Link>
-                        <p className="text-xs text-neutral-500 font-mono">slug: {p.slug}</p>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="space-y-0.5">
-                        <span className="px-2 py-0.5 rounded bg-neutral-800/60 text-xs font-bold text-neutral-400 uppercase tracking-wide">
-                          {p.category}
-                        </span>
-                        {p.subcategory && (
-                          <p className="text-[10px] text-neutral-500 font-semibold">{p.subcategory}</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-border/40 bg-muted/20 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                <th className="py-3 px-5">Script Details</th>
+                <th className="py-3 px-4">Category</th>
+                <th className="py-3 px-4">Price</th>
+                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/30 text-xs">
+              {paginatedProducts.map((p) => (
+                <tr key={p.id} className="hover:bg-muted/15 transition-colors">
+                  <td className="py-3.5 px-5">
+                    <div className="space-y-0.5">
+                      <Link
+                        href={`/products/${p.slug}`}
+                        className="font-bold text-foreground hover:text-primary transition-colors text-xs line-clamp-1"
+                      >
+                        {p.title}
+                      </Link>
+                      <p className="text-[10px] text-muted-foreground font-mono">/{p.slug}</p>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className="px-2 py-0.5 rounded bg-muted/40 text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+                      {p.category}
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4 font-mono font-bold text-foreground">
+                    {formatINR(p.price / 100)}
+                  </td>
+                  <td className="py-3.5 px-4">
+                    {getStatusBadge(p.status)}
+                  </td>
+                  <td className="py-3.5 px-5 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Link
+                        href={`/products/${p.slug}`}
+                        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors"
+                        title="View Public Page"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </Link>
+                      <Link
+                        href={`/creator/${p.id}/edit`}
+                        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors"
+                        title="Edit Details"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Link>
+                      <button
+                        type="button"
+                        disabled={deletingId === p.id}
+                        onClick={() => handleDelete(p.id, p.title)}
+                        className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                        title="Delete Script"
+                      >
+                        {deletingId === p.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-500" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
                         )}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 text-white font-mono font-bold text-base">
-                      ${(p.price / 100).toFixed(2)}
-                    </td>
-                    <td className="py-4 px-6">
-                      {getStatusBadge(p.status)}
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2.5">
-                        <Link
-                          href={`/products/${p.slug}`}
-                          className="p-2 text-neutral-400 hover:text-white bg-neutral-800/40 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-xl transition-all"
-                          title="Preview Product Page"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        <Link
-                          href={`/creator/${p.id}/edit`}
-                          className="p-2 text-neutral-400 hover:text-white bg-neutral-800/40 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-xl transition-all"
-                          title="Edit Script"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Link>
-                        <button
-                          type="button"
-                          disabled={deletingId === p.id}
-                          onClick={() => handleDelete(p.id, p.title)}
-                          className="p-2 text-neutral-500 hover:text-rose-400 bg-neutral-800/40 hover:bg-rose-500/10 border border-neutral-800 hover:border-rose-500/20 rounded-xl transition-all cursor-pointer"
-                          title="Delete Script"
-                        >
-                          {deletingId === p.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-rose-400" />
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-neutral-800/80 bg-neutral-950/40 text-xs font-semibold text-neutral-400">
-              <div>
-                Showing <span className="text-white font-bold">{startIndex + 1}</span> to{" "}
-                <span className="text-white font-bold">
-                  {Math.min(startIndex + itemsPerPage, filteredProducts.length)}
-                </span>{" "}
-                of <span className="text-white font-bold">{filteredProducts.length}</span> scripts
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={displayPage === 1}
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                  className="px-3.5 py-2 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-800 hover:text-white transition-colors cursor-pointer"
-                >
-                  Previous
-                </button>
-                <div className="flex items-center gap-1.5">
-                  {[...Array(totalPages)].map((_, i) => {
-                    const pageNum = i + 1;
-                    if (
-                      pageNum === 1 ||
-                      pageNum === totalPages ||
-                      (pageNum >= displayPage - 1 && pageNum <= displayPage + 1)
-                    ) {
-                      return (
-                        <button
-                          key={pageNum}
-                          type="button"
-                          onClick={() => setCurrentPage(pageNum)}
-                          className={`w-8 h-8 rounded-xl border text-xs font-bold transition-all flex items-center justify-center cursor-pointer ${
-                            displayPage === pageNum
-                              ? "border-purple-500/40 bg-purple-500/10 text-purple-400"
-                              : "border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:border-neutral-700 hover:text-white"
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    } else if (pageNum === displayPage - 2 || pageNum === displayPage + 2) {
-                      return (
-                        <span key={pageNum} className="text-neutral-600 px-1 select-none">
-                          •••
-                        </span>
-                      );
-                    }
-                    return null;
-                  })}
-                </div>
-                <button
-                  type="button"
-                  disabled={displayPage === totalPages}
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  className="px-3.5 py-2 rounded-xl border border-neutral-800 bg-neutral-900/40 text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-800 hover:text-white transition-colors cursor-pointer"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3 border-t border-border/40 text-xs text-muted-foreground">
+          <div className="text-[11px]">
+            Showing <strong className="text-foreground">{startIndex + 1}</strong>–
+            <strong className="text-foreground">
+              {Math.min(startIndex + itemsPerPage, filteredProducts.length)}
+            </strong>{" "}
+            of <strong className="text-foreground">{filteredProducts.length}</strong> scripts
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              disabled={displayPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+              className="px-2.5 py-1 rounded-lg border border-border/60 bg-card/40 text-foreground text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted/40 transition-colors cursor-pointer"
+            >
+              Prev
+            </button>
+            <span className="text-[11px] px-2 font-mono">
+              {displayPage} / {totalPages}
+            </span>
+            <button
+              type="button"
+              disabled={displayPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+              className="px-2.5 py-1 rounded-lg border border-border/60 bg-card/40 text-foreground text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted/40 transition-colors cursor-pointer"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

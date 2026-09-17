@@ -1,36 +1,42 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function ExploreLoading() {
+export default function CategoryLoading() {
   return (
-    <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-16 space-y-8 animate-in fade-in duration-200">
-      {/* Header Skeleton */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/40 pb-6">
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-32 rounded-md" />
-          <Skeleton className="h-10 w-64 rounded-xl" />
-          <Skeleton className="h-4 w-96 max-w-full rounded-md" />
-        </div>
-        <Skeleton className="h-5 w-28 rounded-md" />
+    <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-14 space-y-8 animate-in fade-in duration-200">
+      {/* Breadcrumb Skeleton */}
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-4 w-12 rounded-md" />
+        <Skeleton className="h-4 w-14 rounded-md" />
+        <Skeleton className="h-4 w-28 rounded-md" />
       </div>
 
-      {/* Category Pills Skeleton */}
+      {/* Category Header Skeleton */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/40 pb-6">
+        <div className="space-y-2">
+          <Skeleton className="h-9 w-48 rounded-xl" />
+          <Skeleton className="h-4 w-80 rounded-md" />
+        </div>
+        <Skeleton className="h-5 w-24 rounded-md" />
+      </div>
+
+      {/* Subcategory Pills Skeleton */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-9 w-28 rounded-xl shrink-0" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-8 w-24 rounded-xl shrink-0" />
         ))}
       </div>
 
-      {/* Search & Filter Toolbar Skeleton */}
-      <div className="p-3.5 rounded-2xl bg-card/25 border border-border/40 flex flex-col sm:flex-row justify-between gap-3">
+      {/* Filter Toolbar Skeleton */}
+      <div className="p-3.5 rounded-2xl bg-card/25 border border-border/40 flex justify-between gap-3">
         <Skeleton className="h-9 w-full max-w-md rounded-xl" />
         <div className="flex gap-2">
-          <Skeleton className="h-8 w-16 rounded-lg" />
-          <Skeleton className="h-8 w-16 rounded-lg" />
-          <Skeleton className="h-8 w-16 rounded-lg" />
+          <Skeleton className="h-8 w-14 rounded-lg" />
+          <Skeleton className="h-8 w-14 rounded-lg" />
+          <Skeleton className="h-8 w-14 rounded-lg" />
         </div>
       </div>
 
-      {/* Grid Skeleton */}
+      {/* Product Cards Grid Skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, idx) => (
           <div
@@ -39,13 +45,9 @@ export default function ExploreLoading() {
           >
             <Skeleton className="aspect-[16/10] w-full rounded-2xl" />
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-4 w-20 rounded-md" />
-                <Skeleton className="h-4 w-12 rounded-md" />
-              </div>
+              <Skeleton className="h-4 w-20 rounded-md" />
               <Skeleton className="h-6 w-4/5 rounded-lg" />
               <Skeleton className="h-4 w-full rounded-md" />
-              <Skeleton className="h-4 w-3/4 rounded-md" />
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border/30">
               <Skeleton className="h-5 w-16 rounded-md" />

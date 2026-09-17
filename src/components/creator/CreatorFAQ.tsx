@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, HelpCircle, ShieldCheck } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const FAQS = [
@@ -13,7 +13,7 @@ const FAQS = [
   {
     question: "How and when do I get paid?",
     answer:
-      "Payouts are processed directly to your bank account via Razorpay Route or through our automated payouts system. You can configure your beneficiary bank details or UPI in the Creator Console settings.",
+      "Payouts are processed directly to your bank account via Razorpay Route. You can configure your beneficiary bank details in your Creator Console settings.",
   },
   {
     question: "Do I retain the intellectual property of my code?",
@@ -23,17 +23,17 @@ const FAQS = [
   {
     question: "What file formats can I sell on Scriptly?",
     answer:
-      "You can sell ZIP packages of complete source repositories, standalone scripts (.py, .ts, .sh), Figma/UI component assets, database schemas, prompt packs, or private GitHub repository invite access.",
+      "You can sell ZIP packages of complete source repositories, standalone scripts (.py, .ts, .sh), UI component assets, database schemas, prompt packs, or private GitHub repository invite access.",
   },
   {
     question: "Can I list free products or lead magnets?",
     answer:
-      "Absolutely. You can set any product price to ₹0 / Free. Free products are featured prominently across Scriptly's /free collection and help you build an audience of developers who often convert to your paid tools.",
+      "Yes. You can set any product price to ₹0 / Free. Free products are featured prominently across Scriptly's /free collection and help you build an audience of developers who often convert to your paid tools.",
   },
   {
     question: "What kind of support am I expected to provide to buyers?",
     answer:
-      "Scriptly products are sold as developer assets. You are expected to provide code that works as described in your README. You are not obligated to build custom features or act as an on-call consultant, though answering bug reports or clarifying setup questions in your reviews will significantly boost your creator rating.",
+      "Scriptly products are sold as developer assets. You are expected to provide code that works as described in your README. You are not obligated to build custom client features or act as an on-call consultant.",
   },
 ];
 
@@ -45,31 +45,29 @@ export default function CreatorFAQ() {
   };
 
   return (
-    <section className="py-16 md:py-24 border-b border-border/40">
-      <div className="max-w-4xl mx-auto px-4 space-y-10">
+    <section className="py-16 md:py-24 border-b border-border/30">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-10">
         <div className="text-center space-y-3">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-wider">
             <HelpCircle className="w-3.5 h-3.5" /> Frequently Asked Questions
           </span>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-            Everything you need to know about selling
+            Everything you need to know
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
             Straightforward answers for engineers looking to monetize their software.
           </p>
         </div>
 
-        <div className="space-y-3">
+        {/* Minimal Hairline Divider FAQ Accordion */}
+        <div className="divide-y divide-border/40 border-y border-border/40">
           {FAQS.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (
-              <div
-                key={idx}
-                className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-md overflow-hidden transition-colors"
-              >
+              <div key={idx} className="transition-colors">
                 <button
                   onClick={() => toggle(idx)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-black text-sm text-foreground hover:text-primary transition-colors"
+                  className="w-full py-4 text-left flex items-center justify-between gap-4 font-bold text-sm text-foreground hover:text-primary transition-colors cursor-pointer"
                 >
                   <span>{faq.question}</span>
                   <ChevronDown
@@ -81,7 +79,7 @@ export default function CreatorFAQ() {
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed border-t border-border/20">
+                  <div className="pb-4 pt-1 text-xs text-muted-foreground leading-relaxed">
                     {faq.answer}
                   </div>
                 )}

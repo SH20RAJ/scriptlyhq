@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default async function CreatorProductsPage() {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/creator/products");
+    redirect("/handler/sign-in?redirectTo=/creator/dashboard");
   }
 
   // Fetch creator's products
@@ -31,30 +31,31 @@ export default async function CreatorProductsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-5">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+          <h1 className="text-2xl font-black tracking-tight text-foreground">
             My Creations
           </h1>
-          <p className="text-xs text-muted-foreground font-medium mt-1">
-            Manage your listed scripts, adjust pricing, or edit information.
+          <p className="text-xs text-muted-foreground mt-1">
+            Manage your listed scripts, adjust pricing, or edit documentation.
           </p>
         </div>
-        <Button asChild size="sm" className="rounded-xl h-10 px-5 font-black uppercase tracking-wider text-[10px] bg-[#58CC02] text-white hover:bg-[#58CC02]/90 cursor-pointer shadow-sm">
+        <Button
+          asChild
+          size="sm"
+          className="bg-[#58CC02] hover:bg-[#58CC02]/90 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_3px_0_#46A302] active:translate-y-px active:shadow-none"
+        >
           <Link href="/creator/new">
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            List New Script
+            <Plus className="w-3.5 h-3.5 mr-1.5" /> List New Script
           </Link>
         </Button>
       </div>
 
-      {/* Table */}
-      <div className="border border-border/40 bg-card/45 backdrop-blur-md rounded-2xl p-4 shadow-sm overflow-hidden">
+      {/* Table Container */}
+      <div className="border border-border/50 bg-card/30 backdrop-blur-md rounded-2xl overflow-hidden shadow-sm">
         <CreatorProductsTable products={creatorProducts} />
       </div>
-
     </div>
   );
 }

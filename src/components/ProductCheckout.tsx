@@ -211,7 +211,23 @@ export default function ProductCheckout({
               </div>
             </label>
 
-            <label className={`flex items-start gap-2.5 p-2.5 rounded-md border cursor-pointer transition-colors ${addOnSetupDeploy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
+            <label className={`flex items-start gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-colors ${addOnEditCopy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
+              <input 
+                type="checkbox" 
+                checked={addOnEditCopy} 
+                onChange={(e) => setAddOnEditCopy(e.target.checked)} 
+                className="mt-0.5 h-3.5 w-3.5 accent-primary rounded"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="font-semibold text-foreground text-xs">Custom Copy & Branding</span>
+                  <span className="font-mono text-primary font-bold text-xs">+₹{(editCopyPrice / 100).toLocaleString("en-IN")}</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Customize default text, colors, and components for your brand.</p>
+              </div>
+            </label>
+
+            <label className={`flex items-start gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-colors ${addOnSetupDeploy ? 'border-primary bg-primary/5' : 'border-border/60 hover:bg-secondary/30'}`}>
               <input 
                 type="checkbox" 
                 checked={addOnSetupDeploy} 
@@ -220,10 +236,10 @@ export default function ProductCheckout({
               />
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline gap-2">
-                  <span className="font-medium text-foreground">Cloud Deployment & Setup</span>
-                  <span className="font-mono text-primary">+${(setupDeployPrice / 100).toFixed(2)}</span>
+                  <span className="font-semibold text-foreground text-xs">Cloud Deployment & Setup</span>
+                  <span className="font-mono text-primary font-bold text-xs">+₹{(setupDeployPrice / 100).toLocaleString("en-IN")}</span>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Full environment deployment on Vercel or Cloudflare.</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Full production setup on Cloudflare or Vercel.</p>
               </div>
             </label>
           </div>
@@ -231,7 +247,7 @@ export default function ProductCheckout({
       </div>
 
       {appliedReferral && !isFree && (
-        <div className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-md">
+        <div className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl font-medium">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
           <span>Referral active: 5% discount applied at checkout.</span>
         </div>
@@ -242,7 +258,7 @@ export default function ProductCheckout({
         <Button
           onClick={handleCheckout}
           disabled={isPending}
-          className="flex-1 h-11 text-xs font-semibold"
+          className="flex-1 h-12 text-xs font-black uppercase tracking-wider bg-[#58CC02] hover:bg-[#58CC02]/90 text-white rounded-2xl shadow-[0_3px_0_#46A302] active:translate-y-px active:shadow-none transition-all cursor-pointer"
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -251,7 +267,7 @@ export default function ProductCheckout({
           )}
           <span>
             {userLoggedIn 
-              ? (totalDisplayPrice === 0 ? "Download Free" : `Buy Now — $${(totalDisplayPrice / 100).toFixed(2)}`) 
+              ? (totalDisplayPrice === 0 ? "Download Free" : `Get Access — ₹${(totalDisplayPrice / 100).toLocaleString("en-IN")}`) 
               : "Sign In to Buy"
             }
           </span>
@@ -261,7 +277,7 @@ export default function ProductCheckout({
           type="button"
           onClick={handleCartToggle}
           variant={inCart ? "secondary" : "outline"}
-          className="h-11 px-4 text-xs font-medium"
+          className="h-12 px-4 text-xs font-bold rounded-2xl border-border/60 hover:bg-muted/40 cursor-pointer transition-colors"
         >
           {inCart ? (
             <>
@@ -271,7 +287,7 @@ export default function ProductCheckout({
           ) : (
             <>
               <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
-              <span>Add to Cart</span>
+              <span>Cart</span>
             </>
           )}
         </Button>

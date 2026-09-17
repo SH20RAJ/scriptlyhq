@@ -255,9 +255,15 @@ export default function PaymentCard({
         </div>
 
         {/* Destination preview */}
-        <div className="p-3 rounded-xl bg-muted/30 border border-border/40 text-[11px] text-muted-foreground flex items-center justify-between">
+        <div className="p-3 rounded-xl bg-muted/25 border border-border/40 text-[11px] text-muted-foreground flex items-center justify-between">
           <span className="truncate pr-2">
-            Redirects after payment to: <strong className="text-foreground truncate">{new URL(redirectUrl).hostname}</strong>
+            Redirects after payment to: <strong className="text-foreground truncate">{(() => {
+              try {
+                return new URL(redirectUrl).hostname || redirectUrl;
+              } catch {
+                return redirectUrl;
+              }
+            })()}</strong>
           </span>
           <ExternalLink className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
         </div>

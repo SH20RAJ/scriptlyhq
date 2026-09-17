@@ -2,57 +2,42 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RootLoading() {
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8 space-y-8">
-      {/* Categories filter skeleton */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-4 border-b border-border/20">
-        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
-          <Skeleton className="h-9 w-16 rounded-full shrink-0" />
-          <Skeleton className="h-9 w-24 rounded-full shrink-0" />
-          <Skeleton className="h-9 w-28 rounded-full shrink-0" />
-          <Skeleton className="h-9 w-20 rounded-full shrink-0" />
-          <Skeleton className="h-9 w-24 rounded-full shrink-0" />
-        </div>
-        <Skeleton className="h-10 w-full md:w-80 rounded-full" />
+    <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-16 space-y-12 animate-in fade-in duration-200">
+      {/* Hero Skeleton */}
+      <div className="max-w-3xl mx-auto text-center space-y-4">
+        <Skeleton className="h-6 w-32 rounded-full mx-auto" />
+        <Skeleton className="h-12 sm:h-16 w-3/4 rounded-2xl mx-auto" />
+        <Skeleton className="h-5 w-2/3 rounded-xl mx-auto" />
+        <Skeleton className="h-12 w-full max-w-xl rounded-2xl mx-auto mt-4" />
       </div>
 
-      {/* Grid skeleton of cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Category Pills Skeleton */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-border/40 pb-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-9 w-28 rounded-xl shrink-0" />
+        ))}
+      </div>
+
+      {/* Product Cards Grid Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, idx) => (
-          <div key={idx} className="border border-border/50 bg-card rounded-2xl flex flex-col h-full overflow-hidden shadow-sm">
-            {/* Image Aspect ratio skeleton */}
-            <div className="aspect-[4/3] w-full bg-muted relative">
-              <div className="absolute top-4 left-4">
-                <Skeleton className="h-5 w-20 rounded-md opacity-80" />
+          <div
+            key={idx}
+            className="rounded-3xl border border-border/40 bg-card/25 p-4 space-y-4 shadow-sm"
+          >
+            <Skeleton className="aspect-[16/10] w-full rounded-2xl" />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-20 rounded-md" />
+                <Skeleton className="h-4 w-12 rounded-md" />
               </div>
-              <div className="absolute top-4 right-4">
-                <Skeleton className="h-6 w-12 rounded-md opacity-80" />
-              </div>
+              <Skeleton className="h-6 w-4/5 rounded-lg" />
+              <Skeleton className="h-4 w-full rounded-md" />
+              <Skeleton className="h-4 w-3/4 rounded-md" />
             </div>
-            
-            {/* Card Content skeleton */}
-            <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
-              <div className="space-y-3">
-                <Skeleton className="h-6 w-3/4 rounded-md" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full rounded-md" />
-                  <Skeleton className="h-4 w-5/6 rounded-md" />
-                </div>
-                <div className="flex gap-1.5 pt-1.5">
-                  <Skeleton className="h-5 w-12 rounded-full" />
-                  <Skeleton className="h-5 w-14 rounded-full" />
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between pt-4 border-t border-border/40">
-                <div className="flex gap-2">
-                  <Skeleton className="h-5 w-10 rounded-full" />
-                  <Skeleton className="h-5 w-8 rounded-full" />
-                </div>
-                <div className="flex gap-2">
-                  <Skeleton className="h-8 w-16 rounded-lg" />
-                  <Skeleton className="h-8 w-20 rounded-lg" />
-                </div>
-              </div>
+            <div className="flex items-center justify-between pt-2 border-t border-border/30">
+              <Skeleton className="h-5 w-16 rounded-md" />
+              <Skeleton className="h-8 w-24 rounded-xl" />
             </div>
           </div>
         ))}

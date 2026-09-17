@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { products } from "@/db/schema";
-import { eq, desc, inArray } from "drizzle-orm";
+import { eq, desc, asc, inArray, and, or, ilike, gt, sql } from "drizzle-orm";
 import { isAdmin, getOrCreateDbUser } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
 
@@ -658,87 +658,88 @@ export async function getProductsAction(options?: {
   limit?: number;
 }) {
   try {
-    const page = options?.page || 1;
-    const limit = options?.limit || 12;
+    const page = Math.max(1, options?.page || 1);
+    const limit = Math.max(1, Math.min(100, options?.limit || 12));
     const offset = (page - 1) * limit;
 
-    const allProducts = await db.query.products.findMany({
-      orderBy: [desc(products.createdAt)],
-    });
-
-    let filtered = allProducts.filter((p) => p.published && p.status === "approved");
+    const conditions = [
+      eq(products.published, true),
+      eq(products.status, "approved"),
+    ];
 
     if (options?.featuredOnly) {
-      filtered = filtered.filter((p) => p.featured);
+      conditions.push(eq(products.featured, true));
     }
 
     if (options?.category && options.category !== "all") {
-      filtered = filtered.filter((p) => p.category === options.category);
+      conditions.push(eq(products.category, options.category));
     }
 
-    if (options?.subcategory) {
-      filtered = filtered.filter((p) => p.subcategory === options.subcategory);
+    if (options?.subcategory && options.subcategory !== "all") {
+      conditions.push(eq(products.subcategory, options.subcategory));
     }
 
     if (options?.priceType && options.priceType !== "all") {
       if (options.priceType === "free") {
-        filtered = filtered.filter((p) => p.isFree || p.price === 0);
+        conditions.push(or(eq(products.isFree, true), eq(products.price, 0))!);
       } else if (options.priceType === "paid") {
-        filtered = filtered.filter((p) => !p.isFree && p.price > 0);
+        conditions.push(and(eq(products.isFree, false), gt(products.price, 0))!);
       }
     }
 
     if (options?.tag) {
-      const tagTerm = options.tag.toLowerCase();
-      filtered = filtered.filter((p) => 
-        p.tags?.toLowerCase().split(",").map(t => t.trim()).includes(tagTerm)
+      conditions.push(ilike(products.tags, `%${options.tag.trim()}%`));
+    }
+
+    if (options?.search && options.search.trim()) {
+      const term = `%${options.search.trim()}%`;
+      conditions.push(
+        or(
+          ilike(products.title, term),
+          ilike(products.shortDescription, term),
+          ilike(products.description, term),
+          ilike(products.tags, term)
+        )!
       );
     }
 
-    if (options?.search) {
-      const term = options.search.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.title.toLowerCase().includes(term) ||
-          p.shortDescription.toLowerCase().includes(term) ||
-          p.description.toLowerCase().includes(term) ||
-          (p.tags && p.tags.toLowerCase().includes(term))
-      );
-    }
+    const whereClause = and(...conditions);
 
-    // Apply sorting
+    // Apply SQL sorting
+    let orderBys: any[] = [desc(products.createdAt)];
     const sortBy = options?.sortBy || "newest";
     if (sortBy === "rating") {
-      filtered.sort((a, b) => parseFloat(b.rating || "0") - parseFloat(a.rating || "0"));
+      orderBys = [desc(products.rating), desc(products.createdAt)];
     } else if (sortBy === "price_asc") {
-      filtered.sort((a, b) => a.price - b.price);
+      orderBys = [asc(products.price), desc(products.createdAt)];
     } else if (sortBy === "price_desc") {
-      filtered.sort((a, b) => b.price - a.price);
+      orderBys = [desc(products.price), desc(products.createdAt)];
     } else if (sortBy === "featured_premium") {
-      filtered.sort((a, b) => {
-        if (a.featured && !b.featured) return -1;
-        if (!a.featured && b.featured) return 1;
-        
-        const aPremium = !a.isFree && a.price > 0;
-        const bPremium = !b.isFree && b.price > 0;
-        if (aPremium && !bPremium) return -1;
-        if (!aPremium && bPremium) return 1;
-        
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-    } else {
-      // newest: default
-      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      orderBys = [desc(products.featured), desc(products.price), desc(products.createdAt)];
     }
 
-    const total = filtered.length;
-    const paginated = filtered.slice(offset, offset + limit);
+    // Execute parallel SQL count and paginated query
+    const [countResult, productRows] = await Promise.all([
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(products)
+        .where(whereClause),
+      db
+        .select()
+        .from(products)
+        .where(whereClause)
+        .orderBy(...orderBys)
+        .limit(limit)
+        .offset(offset),
+    ]);
+
+    const total = Number(countResult[0]?.count || 0);
 
     return {
-      products: paginated,
+      products: productRows,
       total,
       totalPages: Math.ceil(total / limit),
-      currentPage: page
+      currentPage: page,
     };
   } catch (err) {
     console.error("getProductsAction failed:", err);
@@ -746,7 +747,7 @@ export async function getProductsAction(options?: {
       products: [],
       total: 0,
       totalPages: 0,
-      currentPage: 1
+      currentPage: 1,
     };
   }
 }

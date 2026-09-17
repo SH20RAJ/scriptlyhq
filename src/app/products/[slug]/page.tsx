@@ -10,7 +10,20 @@ import ProductCheckout from "@/components/ProductCheckout";
 import Link from "next/link";
 import ProductAffiliateShare from "@/components/ProductAffiliateShare";
 import { getProductEffectivePrice } from "@/lib/price-utils";
-import { ArrowLeft, ExternalLink, ShieldCheck, Download, RefreshCw, Layers, CheckCircle2, ChevronRight, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  ExternalLink,
+  ShieldCheck,
+  Download,
+  Layers,
+  CheckCircle2,
+  ChevronRight,
+  Sparkles,
+  FileCode2,
+  Clock,
+  Store,
+  Star,
+} from "lucide-react";
 import { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,12 +36,20 @@ import ProductRating from "@/components/ProductRating";
 import ProductInteractionAndReviews from "@/components/ProductInteractionAndReviews";
 import { getProductSeo } from "@/lib/seo-data";
 import { siteConfig } from "@/config/site";
+import { CyberBackground } from "@/components/ui/CyberBackground";
 
 interface PageProps {
   params: Promise<{
     slug: string;
   }>;
 }
+
+const formatINR = (amount: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(amount);
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -50,7 +71,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const promo = getProductEffectivePrice(product);
-  const priceText = promo.isFree ? "FREE" : `$${(promo.effectivePrice / 100).toFixed(2)}`;
+  const priceText = promo.isFree ? "FREE" : formatINR(promo.effectivePrice / 100);
   const seo = getProductSeo(product.slug, product.title, product.shortDescription, product.category, priceText);
 
   const ogImages: { url: string }[] = [];
@@ -58,18 +79,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (product.previewGif) ogImages.push({ url: product.previewGif });
 
   const keywords = product.tags 
-    ? product.tags.split(",").map(t => t.trim()) 
-    : [product.category, "digital asset", "source code", "boilerplate"];
+    ? product.tags.split(",").map((t) => t.trim()) 
+    : [product.category, "developer tool", "source code", "boilerplate"];
 
   return {
-    title: seo.title,
+    title: `${product.title} — ScriptlyStore`,
     description: seo.description,
     keywords,
     alternates: {
       canonical: `${siteConfig.url}/products/${product.slug}`,
     },
     openGraph: {
-      title: seo.title,
+      title: `${product.title} | ScriptlyStore`,
       description: seo.description,
       url: `${siteConfig.url}/products/${product.slug}`,
       siteName: siteConfig.name,
@@ -78,7 +99,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
+      title: `${product.title} | ScriptlyStore`,
       description: seo.description,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
@@ -111,18 +132,17 @@ export default async function ProductDetailPage({ params }: PageProps) {
   }
   const isApprovedAffiliate = affiliateProfile?.status === "approved";
 
-  // Load creator store name
+  // Load creator store name and info
   let storeName: string | null = null;
+  let creatorRecord = null;
   if (product.creatorId) {
-    const creatorRecord = await db.query.users.findFirst({
+    creatorRecord = await db.query.users.findFirst({
       where: eq(users.id, product.creatorId),
     });
-    storeName = creatorRecord?.storeName || null;
+    storeName = creatorRecord?.storeName || creatorRecord?.name || null;
   }
 
   const promo = getProductEffectivePrice(product);
-  const priceText = promo.isFree ? "FREE" : `$${(promo.effectivePrice / 100).toFixed(2)}`;
-  const seo = getProductSeo(product.slug, product.title, product.shortDescription, product.category, priceText);
 
   // Fetch related products in same category
   const relatedProducts = await db.query.products.findMany({
@@ -156,7 +176,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
   };
   const htmlDescription = await marked.parse(product.description || "", { renderer: customRenderer });
 
-  // Truthful Schema rating generation: only include aggregateRating if real ratings exist
   const hasRealRatings = (product.ratingCount ?? 0) > 0;
   const productSchema: Record<string, any> = {
     "@context": "https://schema.org",
@@ -165,11 +184,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
     "image": product.thumbnail ? [product.thumbnail] : [],
     "description": product.shortDescription,
     "sku": product.id,
-    "mpn": product.id,
     "offers": {
       "@type": "Offer",
       "url": `${siteConfig.url}/products/${product.slug}`,
-      "priceCurrency": "USD",
+      "priceCurrency": "INR",
       "price": (promo.effectivePrice / 100).toString(),
       "priceValidUntil": "2030-01-01",
       "itemCondition": "https://schema.org/NewCondition",
@@ -186,48 +204,45 @@ export default async function ProductDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen py-6 sm:py-10">
-      {/* Product JSON-LD Schema */}
+    <div className="flex flex-col min-h-screen py-6 sm:py-10 bg-background text-foreground relative">
+      <CyberBackground />
+
+      {/* Structured Schema Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
 
-      {/* BreadcrumbList Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              { "@type": "ListItem", "position": 1, "name": "Home", "item": siteConfig.url },
-              { "@type": "ListItem", "position": 2, "name": product.category, "item": `${siteConfig.url}/explore?category=${encodeURIComponent(product.category.toLowerCase())}` },
-              { "@type": "ListItem", "position": 3, "name": product.title, "item": `${siteConfig.url}/products/${product.slug}` },
-            ],
-          }),
-        }}
-      />
-
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 space-y-8 relative z-10">
         {/* Navigation Breadcrumbs */}
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
-          <Link href="/" className="hover:text-foreground transition-colors">Catalog</Link>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+          <Link href="/" className="hover:text-foreground transition-colors">
+            Home
+          </Link>
           <ChevronRight className="h-3 w-3" />
-          <Link href={`/explore?category=${encodeURIComponent(product.category.toLowerCase())}`} className="hover:text-foreground transition-colors capitalize">
+          <Link href="/explore" className="hover:text-foreground transition-colors">
+            Explore
+          </Link>
+          <ChevronRight className="h-3 w-3" />
+          <Link
+            href={`/explore/${encodeURIComponent(product.category.toLowerCase())}`}
+            className="hover:text-foreground transition-colors capitalize"
+          >
             {product.category.replace(/-/g, " ")}
           </Link>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground truncate max-w-[200px] sm:max-w-md">{product.title}</span>
+          <span className="text-foreground font-medium truncate max-w-[200px] sm:max-w-md">
+            {product.title}
+          </span>
         </div>
 
         {isUserAdmin && (
           <AdminToolbar productId={product.id} isPublished={product.published} />
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Main Visual & Content Column */}
-          <div className="lg:col-span-7 space-y-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          {/* Main Visual & Documentation Column */}
+          <div className="lg:col-span-7 space-y-8">
             {/* Visual Media Showcase */}
             <div className="rounded-3xl border border-border/50 bg-card/30 overflow-hidden shadow-sm">
               <ProductMediaSwitcher
@@ -240,8 +255,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             {/* Screenshots Gallery */}
             {screenshotsList.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-3">
+                <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
                   Interface Screenshots ({screenshotsList.length})
                 </h3>
                 <ProductScreenshots screenshots={screenshotsList} productTitle={product.title} />
@@ -249,28 +264,29 @@ export default async function ProductDetailPage({ params }: PageProps) {
             )}
 
             {/* Product Overview & Markdown Documentation */}
-            <div className="space-y-4 pt-4 border-t border-border/40">
-              <h2 className="text-lg font-bold text-foreground tracking-tight">
-                Overview & Specifications
+            <div className="p-6 sm:p-8 rounded-3xl border border-border/40 bg-card/25 backdrop-blur-md space-y-4">
+              <h2 className="text-base sm:text-lg font-black text-foreground tracking-tight flex items-center gap-2 pb-3 border-b border-border/30">
+                <FileCode2 className="w-4 h-4 text-primary" />
+                <span>Overview & Documentation</span>
               </h2>
               <div 
                 dangerouslySetInnerHTML={{ __html: htmlDescription }}
-                className="markdown-content text-sm leading-relaxed text-muted-foreground/90"
+                className="markdown-content text-sm leading-relaxed text-muted-foreground/90 space-y-4"
               />
             </div>
 
-            {/* Tech Stack / Tags */}
+            {/* Technologies & Frameworks */}
             {tagsList.length > 0 && (
-              <div className="space-y-3 pt-6 border-t border-border/40">
-                <div className="flex items-center gap-2 text-xs font-bold text-foreground">
+              <div className="p-5 rounded-2xl border border-border/40 bg-card/25 space-y-3">
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-foreground">
                   <Layers className="h-4 w-4 text-primary" />
-                  <span>Technologies & Frameworks</span>
+                  <span>Technologies & Stack</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {tagsList.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full px-3 py-1 text-xs font-mono font-medium bg-secondary/70 text-foreground border border-border/40"
+                      className="rounded-lg px-2.5 py-1 text-xs font-mono font-medium bg-muted/40 text-foreground border border-border/40"
                     >
                       {tag}
                     </span>
@@ -279,8 +295,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
               </div>
             )}
 
-            {/* Reviews & Social Proof */}
-            <div className="pt-8 border-t border-border/40">
+            {/* Customer Reviews & Social Proof */}
+            <div className="p-6 rounded-3xl border border-border/40 bg-card/25 backdrop-blur-md">
               <ProductInteractionAndReviews 
                 productId={product.id}
                 initialViews={product.views || 0}
@@ -294,25 +310,25 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Sticky Checkout Sidebar */}
+          {/* Sticky Checkout & Creator Sidebar */}
           <div className="lg:col-span-5">
             <div className="sticky top-20 space-y-6">
-              {/* Product Header & Pricing Box */}
-              <div className="rounded-3xl border border-border/50 bg-card/60 backdrop-blur-md p-6 sm:p-7 space-y-6 shadow-sm">
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="rounded-full text-[11px] capitalize px-3">
+              {/* Product Pricing & Buy Panel */}
+              <div className="rounded-3xl border border-border/50 bg-card/35 backdrop-blur-xl p-6 sm:p-7 space-y-5 shadow-sm">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider">
                       {product.category.replace(/-/g, " ")}
-                    </Badge>
-                    {storeName && (
-                      <Link href={`/stores/${product.creatorId}`} className="text-xs text-muted-foreground hover:text-foreground transition-colors font-medium">
-                        By {storeName}
-                      </Link>
-                    )}
+                    </span>
+                    <span className="text-[11px] font-mono text-muted-foreground">
+                      v{product.version || "1.0.0"}
+                    </span>
                   </div>
-                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground leading-snug">
+
+                  <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground leading-snug">
                     {product.title}
                   </h1>
+
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {product.shortDescription}
                   </p>
@@ -320,45 +336,45 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
                 {/* Rating display */}
                 {hasRealRatings && (
-                  <ProductRating productId={product.id} initialRating={product.rating || "5.0"} />
+                  <div className="flex items-center gap-2 pt-1 border-t border-border/30">
+                    <ProductRating productId={product.id} initialRating={product.rating || "5.0"} />
+                  </div>
                 )}
 
-                {/* Price Display */}
+                {/* Price Display in INR */}
                 <div className="border-t border-border/40 pt-4">
                   {promo.isFree ? (
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                      <span className="text-3xl font-black text-emerald-500 font-mono">
                         FREE
                       </span>
-                      {promo.price > 0 && (
-                        <span className="text-sm text-muted-foreground line-through font-mono">
-                          ${(promo.price / 100).toFixed(2)}
-                        </span>
-                      )}
                     </div>
                   ) : promo.hasDiscount ? (
-                    <div className="flex items-baseline gap-2.5">
-                      <span className="text-3xl font-extrabold text-foreground font-mono">
-                        ${(promo.effectivePrice / 100).toFixed(2)}
-                      </span>
-                      <span className="text-sm text-muted-foreground line-through font-mono">
-                        ${(promo.price / 100).toFixed(2)}
-                      </span>
-                      <Badge variant="destructive" className="rounded-full text-[10px] font-bold">
-                        Save {promo.discountPercent}%
-                      </Badge>
+                    <div className="space-y-1">
+                      <div className="flex items-baseline gap-2.5">
+                        <span className="text-3xl font-black text-foreground font-mono">
+                          {formatINR(promo.effectivePrice / 100)}
+                        </span>
+                        <span className="text-sm text-muted-foreground line-through font-mono">
+                          {formatINR(promo.price / 100)}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                          {promo.discountPercent}% OFF
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground font-mono">Inclusive of all digital taxes</p>
                     </div>
                   ) : (
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl font-extrabold text-foreground font-mono">
-                        ${(product.price / 100).toFixed(2)}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black text-foreground font-mono">
+                        {formatINR(product.price / 100)}
                       </span>
-                      <span className="text-xs text-muted-foreground font-mono font-medium">USD</span>
+                      <span className="text-[11px] text-muted-foreground font-mono uppercase">INR</span>
                     </div>
                   )}
                 </div>
 
-                {/* Checkout Action Component */}
+                {/* Checkout Component */}
                 <ProductCheckout
                   product={product}
                   hasPurchased={hasPurchased}
@@ -366,18 +382,44 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   isFree={promo.isFree}
                 />
 
-                {/* Live Preview & Secondary Links */}
+                {/* Live Demo & Secondary Actions */}
                 <div className="flex items-center gap-2 pt-1">
                   {product.demoUrl && (
-                    <Button asChild variant="outline" size="sm" className="flex-1 text-xs font-bold">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-10 text-xs font-bold rounded-xl border-border/60 hover:bg-muted/40"
+                    >
                       <a href={product.demoUrl} target="_blank" rel="noopener noreferrer">
-                        <span>Live Preview</span>
+                        <span>Live Demo</span>
                         <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
                       </a>
                     </Button>
                   )}
                   <ShareButton productTitle={product.title} productSlug={product.slug} />
                 </div>
+
+                {/* Creator Attribution */}
+                {product.creatorId && (
+                  <div className="p-3 rounded-2xl bg-muted/20 border border-border/30 flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary/20 to-sky-500/20 text-primary font-black text-xs flex items-center justify-center shrink-0">
+                        <Store className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Created By</p>
+                        <p className="font-bold text-foreground truncate">{storeName || "Verified Creator"}</p>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/stores/${product.creatorId}`}
+                      className="text-[11px] font-bold text-primary hover:underline shrink-0"
+                    >
+                      View Store →
+                    </Link>
+                  </div>
+                )}
 
                 {/* Affiliate Share Option */}
                 <ProductAffiliateShare
@@ -390,24 +432,24 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 />
 
                 {/* Honest Purchase Inclusions */}
-                <div className="pt-4 border-t border-border/40 space-y-3 text-xs">
+                <div className="pt-4 border-t border-border/40 space-y-2.5 text-xs">
                   <p className="font-bold text-foreground flex items-center gap-1.5">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                    <span>What's Included</span>
+                    <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                    <span>Purchase Guarantee</span>
                   </p>
 
-                  <ul className="space-y-2 text-muted-foreground">
+                  <ul className="space-y-2 text-muted-foreground text-[11px]">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
                       <span><strong className="text-foreground font-semibold">Instant Source Archive</strong> — Full source repository ZIP delivered upon payment.</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                      <span><strong className="text-foreground font-semibold">Commercial License</strong> — Clean license for commercial client & SaaS projects.</span>
+                      <span><strong className="text-foreground font-semibold">Commercial License</strong> — Clean commercial rights for personal & client projects.</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                      <span><strong className="text-foreground font-semibold">Lifetime Access</strong> — Re-download future patches directly from your dashboard.</span>
+                      <span><strong className="text-foreground font-semibold">Lifetime Access</strong> — Download future updates directly from your dashboard.</span>
                     </li>
                   </ul>
                 </div>
@@ -416,20 +458,26 @@ export default async function ProductDetailPage({ params }: PageProps) {
               {/* Related Products */}
               {relatedProducts.length > 0 && (
                 <div className="space-y-3 pt-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Related in {product.category}</p>
-                  <div className="space-y-2.5">
+                  <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+                    More in {product.category.replace(/-/g, " ")}
+                  </p>
+                  <div className="space-y-2">
                     {relatedProducts.map((rel) => (
                       <Link
                         key={rel.id}
                         href={`/products/${rel.slug}`}
-                        className="flex items-center justify-between p-3.5 rounded-2xl border border-border/40 bg-card/40 hover:bg-secondary/40 hover:border-border/70 transition-all text-xs group"
+                        className="flex items-center justify-between p-3 rounded-2xl border border-border/40 bg-card/30 hover:bg-muted/30 transition-all text-xs group"
                       >
                         <div className="truncate pr-3">
-                          <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">{rel.title}</p>
-                          <p className="text-muted-foreground text-[11px] truncate mt-0.5">{rel.shortDescription}</p>
+                          <p className="font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                            {rel.title}
+                          </p>
+                          <p className="text-muted-foreground text-[11px] truncate mt-0.5">
+                            {rel.shortDescription}
+                          </p>
                         </div>
                         <span className="font-mono font-bold text-foreground shrink-0">
-                          ${(rel.price / 100).toFixed(2)}
+                          {formatINR(rel.price / 100)}
                         </span>
                       </Link>
                     ))}

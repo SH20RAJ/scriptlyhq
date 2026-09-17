@@ -30,37 +30,47 @@ export default function StoreNameEditor({ initialStoreName }: StoreNameEditorPro
   };
 
   return (
-    <form onSubmit={handleSave} className="p-6 rounded-2xl border border-border/40 bg-card/35 backdrop-blur-md shadow-sm space-y-4">
-      <h3 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2 border-b border-border/40 pb-3">
-        <Store className="w-4 h-4 text-[#CE82FF]" />
-        Storefront Branding
-      </h3>
+    <form
+      onSubmit={handleSave}
+      className="p-6 rounded-2xl border border-border/50 bg-card/30 backdrop-blur-md shadow-sm space-y-5"
+    >
+      <div className="flex items-center gap-2.5 pb-4 border-b border-border/40">
+        <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+          <Store className="w-4 h-4" />
+        </div>
+        <div>
+          <h3 className="text-sm font-black text-foreground">Store Identity</h3>
+          <p className="text-[11px] text-muted-foreground">Public storefront brand name</p>
+        </div>
+      </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Store Name</label>
-        <div className="flex gap-2.5">
+        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider block">
+          Public Store Name
+        </label>
+        <div className="flex flex-col sm:flex-row gap-2.5">
           <input
             type="text"
             value={storeName}
             onChange={(e) => setStoreName(e.target.value)}
-            placeholder="e.g. Acme Scripts Store"
-            className="flex-1 px-4 py-2.5 rounded-xl border-2 border-border bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:shadow-[0_3px_0_var(--duo-feather-shadow)] shadow-[0_3px_0_var(--border)] transition-all font-bold"
+            placeholder="e.g. Acme Studio, DevLabs, Nova Scripts"
+            className="flex-1 px-3.5 py-2.5 rounded-xl border border-border/60 bg-background/50 text-foreground text-xs focus:outline-none focus:border-primary/50 transition-colors font-medium placeholder:text-muted-foreground/60"
           />
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center px-4 py-2.5 bg-primary text-primary-foreground hover:brightness-105 disabled:opacity-50 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer gap-1.5 shadow-[0_3px_0_var(--duo-feather-shadow)] active:translate-y-px active:shadow-none"
+            className="inline-flex items-center justify-center px-5 py-2.5 bg-primary text-primary-foreground hover:brightness-105 disabled:opacity-50 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer gap-1.5 shadow-[0_3px_0_var(--duo-feather-shadow)] active:translate-y-px active:shadow-none shrink-0"
           >
             {isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <Save className="w-3.5 h-3.5" />
             )}
-            Save
+            Save Name
           </button>
         </div>
-        <p className="text-[9px] text-muted-foreground font-semibold">
-          This store name will be displayed on your product pages for customers to identify your catalog.
+        <p className="text-[11px] text-muted-foreground">
+          This store name appears across your product pages and public creator profile.
         </p>
       </div>
     </form>

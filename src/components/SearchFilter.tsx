@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTransition, useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import { Search, X, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import ProductCard from "@/components/marketplace/ProductCard";
@@ -27,31 +27,48 @@ export default function SearchFilter({
   }, [searchParams]);
 
   function handleSearchSubmit(value: string) {
+    const term = value.trim();
     const params = new URLSearchParams(searchParams.toString());
-    if (value.trim()) {
-      params.set("search", value);
+    if (term) {
+      params.set("search", term);
     } else {
       params.delete("search");
     }
-    params.delete("page"); // Reset page on search submit
+    params.delete("page");
+
     startTransition(() => {
-      const targetPath = pathname === "/free" ? "/free" : (pathname === "/" ? "/" : "/search");
-      router.push(`${targetPath}?${params.toString()}`, { scroll: false });
+      if (pathname.startsWith("/explore")) {
+        router.push(`/explore?${params.toString()}`);
+      } else if (pathname === "/free") {
+        router.push(`/free?${params.toString()}`);
+      } else if (pathname === "/search") {
+        router.push(`/search?${params.toString()}`);
+      } else {
+        router.push(`/search?${params.toString()}`);
+      }
     });
   }
 
   function handleCategorySelect(slug: string) {
-    const params = new URLSearchParams(searchParams.toString());
     if (slug === "all") {
-      params.delete("category");
+      if (pathname.startsWith("/explore")) {
+        router.push("/explore");
+      } else {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("category");
+        params.delete("page");
+        router.push(`${pathname}?${params.toString()}`);
+      }
     } else {
-      params.set("category", slug);
+      if (pathname.startsWith("/explore")) {
+        router.push(`/explore/${slug}`);
+      } else {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("category", slug);
+        params.delete("page");
+        router.push(`${pathname}?${params.toString()}`);
+      }
     }
-    params.delete("page"); // Reset page on category change
-    startTransition(() => {
-      const targetPath = pathname === "/free" ? "/free" : "/";
-      router.push(`${targetPath}?${params.toString()}`, { scroll: false });
-    });
   }
 
   return (
@@ -61,9 +78,9 @@ export default function SearchFilter({
         <button
           type="button"
           className={cn(
-            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border",
+            "rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer border whitespace-nowrap",
             currentCategory === "all"
-              ? "bg-foreground text-background border-foreground font-semibold"
+              ? "bg-foreground text-background border-foreground shadow-sm"
               : "bg-background text-muted-foreground border-border/80 hover:bg-secondary hover:text-foreground"
           )}
           onClick={() => handleCategorySelect("all")}
@@ -75,9 +92,9 @@ export default function SearchFilter({
             key={cat.id}
             type="button"
             className={cn(
-              "rounded-md px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border whitespace-nowrap",
+              "rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer border whitespace-nowrap",
               currentCategory === cat.slug
-                ? "bg-foreground text-background border-foreground font-semibold"
+                ? "bg-foreground text-background border-foreground shadow-sm"
                 : "bg-background text-muted-foreground border-border/80 hover:bg-secondary hover:text-foreground"
             )}
             onClick={() => handleCategorySelect(cat.slug)}
@@ -87,24 +104,47 @@ export default function SearchFilter({
         ))}
       </div>
 
-      {/* Search Bar */}
+      {/* Search Bar with Submit & Clear Button */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSearchSubmit(searchValue);
         }}
-        className="relative group w-full md:w-80"
+        className="relative group w-full md:w-80 flex items-center"
       >
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-foreground transition-colors" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
         <Input
-          placeholder="Filter products or stack..."
+          placeholder="Filter scripts or stack..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          className="pl-9 h-9 w-full rounded-md bg-secondary/30 border-border text-xs focus-visible:bg-background transition-colors"
+          className="pl-9 pr-14 h-9 w-full rounded-xl bg-secondary/40 border-border text-xs focus-visible:bg-background transition-colors font-medium placeholder:text-muted-foreground"
         />
-        {isPending && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+
+        {searchValue && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearchValue("");
+              handleSearchSubmit("");
+            }}
+            className="absolute right-7 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+            title="Clear search"
+          >
+            <X className="h-3 w-3" />
+          </button>
         )}
+
+        <button
+          type="submit"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 bg-primary text-primary-foreground rounded-lg hover:brightness-105 transition-all cursor-pointer"
+          title="Search"
+        >
+          {isPending ? (
+            <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <ArrowRight className="h-3 w-3" />
+          )}
+        </button>
       </form>
     </div>
   );

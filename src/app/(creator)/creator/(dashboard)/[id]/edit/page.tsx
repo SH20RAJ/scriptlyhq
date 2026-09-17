@@ -1,11 +1,6 @@
 export const dynamic = "force-dynamic";
 
 import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Edit Product",
-};
-
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -13,6 +8,11 @@ import { getCategoriesAction, getSubcategoriesAction } from "@/lib/actions/produ
 import { getOrCreateDbUser } from "@/lib/auth-utils";
 import ProductForm from "@/components/ProductForm";
 import { notFound, redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Edit Script | Creator Console",
+  description: "Modify details, adjust price, or replace script file assets.",
+};
 
 interface PageProps {
   params: Promise<{
@@ -23,7 +23,7 @@ interface PageProps {
 export default async function CreatorEditScriptPage({ params }: PageProps) {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/creator");
+    redirect("/handler/sign-in?redirectTo=/creator/dashboard");
   }
 
   const { id } = await params;
@@ -46,13 +46,14 @@ export default async function CreatorEditScriptPage({ params }: PageProps) {
   const subcategoriesList = await getSubcategoriesAction();
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-8">
-      <div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">
+    <div className="space-y-6 animate-in fade-in duration-300">
+      {/* Header */}
+      <div className="border-b border-border/40 pb-5">
+        <h1 className="text-2xl font-black tracking-tight text-foreground">
           Edit Script Submission
         </h1>
-        <p className="text-sm text-neutral-400 mt-1.5">
-          Modify details, adjust price, or replace script file assets. Edits will reset moderation status to pending review.
+        <p className="text-xs text-muted-foreground mt-1">
+          Modify details, adjust price, or replace script file assets. Edits will update your live listing.
         </p>
       </div>
 

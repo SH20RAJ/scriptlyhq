@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default async function CreatorCouponsPage() {
   const user = await getOrCreateDbUser();
   if (!user) {
-    redirect("/handler/sign-in?redirectTo=/creator/coupons");
+    redirect("/handler/sign-in?redirectTo=/creator/dashboard");
   }
 
   // Fetch creator's specific store coupons
@@ -35,13 +35,12 @@ export default async function CreatorCouponsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      
       {/* Header */}
-      <div className="border-b border-border pb-6">
-        <h1 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+      <div className="border-b border-border/40 pb-5">
+        <h1 className="text-2xl font-black tracking-tight text-foreground">
           Store Coupons
         </h1>
-        <p className="text-xs text-muted-foreground font-medium mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Create discount codes valid across all your storefront products.
         </p>
       </div>
@@ -50,7 +49,6 @@ export default async function CreatorCouponsPage() {
       <div>
         <CreatorCouponsManager initialCoupons={storeCoupons} />
       </div>
-
     </div>
   );
 }
