@@ -7,6 +7,7 @@ export const siteConfig = {
   social: {
     github: "https://github.com/SH20RAJ",
     twitter: "https://x.com/sh20raj",
+    sponsor: "https://razorpay.me/@iamsh",
   },
   supportEmail: "support@scriptly.store",
 };

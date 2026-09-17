@@ -18,8 +18,9 @@ export default function AboutPage() {
       name: "Shaswat Raj",
       role: "Founder & Lead Architect",
       bio: "Full-stack engineer and product builder. Created ScriptlyStore to solve the repetitive pain of boilerplate setups for developers.",
-      github: "https://github.com/shraj",
-      twitter: "https://x.com/sh20raj"
+      github: "https://github.com/SH20RAJ",
+      twitter: "https://x.com/sh20raj",
+      sponsor: "https://razorpay.me/@iamsh"
     }
   ];
 
@@ -183,6 +184,7 @@ export default function AboutPage() {
                 <div className="flex gap-4 pt-3 border-t border-border/30">
                   <a href={t.github} target="_blank" rel="noopener" className="text-[10px] font-black uppercase text-primary hover:underline">GitHub</a>
                   <a href={t.twitter} target="_blank" rel="noopener" className="text-[10px] font-black uppercase text-primary hover:underline">Twitter</a>
+                  <a href={t.sponsor} target="_blank" rel="noopener" className="text-[10px] font-black uppercase text-rose-500 hover:underline">Tip &amp; Sponsor</a>
                 </div>
               </CardContent>
             </Card>

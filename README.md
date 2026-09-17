@@ -8,11 +8,12 @@
 [![Drizzle](https://img.shields.io/badge/Drizzle%20ORM-0.45-C5F74F?style=for-the-badge&logo=drizzle)](https://orm.drizzle.team/)
 [![Hexclave](https://img.shields.io/badge/Hexclave-Auth%20Infra-4F46E5?style=for-the-badge)](https://hexclave.com/)
 [![Razorpay](https://img.shields.io/badge/Razorpay-Verified%20Payments-0C2340?style=for-the-badge&logo=razorpay)](https://razorpay.com/)
+[![Tip & Sponsor](https://img.shields.io/badge/Tip%20%26%20Sponsor-Razorpay-0C2340?style=for-the-badge&logo=razorpay)](https://razorpay.me/@iamsh)
 [![Bun](https://img.shields.io/badge/Bun-1.1+-fbf0df?style=for-the-badge&logo=bun)](https://bun.sh/)
 
 **High-performance developer marketplace for production-ready SaaS templates, automation scripts, boilerplates, and developer tools.**
 
-[Live Marketplace: scriptly.store](https://scriptly.store) • [Public API Docs](https://scriptly.store/docs/api/payment-links) • [Explore Products](https://scriptly.store/explore) • [Creator Studio](https://scriptly.store/creator)
+[Live Marketplace: scriptly.store](https://scriptly.store) • [Public API Docs](https://scriptly.store/docs/api/payment-links) • [Explore Products](https://scriptly.store/explore) • [Creator Studio](https://scriptly.store/creator) • [Tip & Sponsor](https://razorpay.me/@iamsh)
 
 </div>
 
@@ -204,6 +205,16 @@ Explore the detailed architecture guides in the [`docs/`](file:///Users/shaswatr
 
 ---
 
+## 💖 Sponsor & Support
+
+If you find ScriptlyStore or any of the open-source boilerplates helpful, consider tipping or sponsoring continued development:
+
+[![Tip & Sponsor](https://img.shields.io/badge/Tip%20%26%20Sponsor-Razorpay-0C2340?style=for-the-badge&logo=razorpay)](https://razorpay.me/@iamsh)
+
+- **Razorpay Direct Tip & Sponsor**: [https://razorpay.me/@iamsh](https://razorpay.me/@iamsh)
+
+---
+
 ## 📄 License
 
-ScriptlyStore is built by [Shaswat Raj](https://github.com/SH20RAJ). All rights reserved. Commercial licenses for individual templates and scripts are governed by their respective product license agreements.
+ScriptlyStore is built by [Shaswat Raj](https://github.com/SH20RAJ) ([Tip & Sponsor](https://razorpay.me/@iamsh)). All rights reserved. Commercial licenses for individual templates and scripts are governed by their respective product license agreements.

@@ -37,6 +37,7 @@ export const FOOTER_NAVIGATION = {
     { href: "/about", label: "About" },
     { href: "/trust", label: "Trust Center" },
     { href: "/contact", label: "Support & Contact" },
+    { href: "https://razorpay.me/@iamsh", label: "Tip & Sponsor" },
   ],
   legal: [
     { href: "/terms", label: "Terms of Service" },

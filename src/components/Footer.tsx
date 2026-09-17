@@ -99,6 +99,10 @@ export default function Footer() {
             <Link href={siteConfig.social.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
               Twitter
             </Link>
+            <Link href="https://razorpay.me/@iamsh" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors inline-flex items-center gap-1 font-medium">
+              <Heart className="h-3 w-3 text-rose-500 fill-rose-500" />
+              <span>Tip & Sponsor</span>
+            </Link>
             <Link href="/trust" className="hover:text-foreground transition-colors">
               Trust & Security
             </Link>

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Mail, Globe, ExternalLink, Sparkles, Terminal, CheckCircle2 } from "lucide-react";
+import { Mail, Globe, ExternalLink, Sparkles, Terminal, CheckCircle2, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -23,6 +23,17 @@ export default function HireMePage() {
         </svg>
       ),
       color: "hover:text-white hover:bg-neutral-900 border-white/5",
+    },
+    {
+      name: "Tip & Sponsor",
+      url: "https://razorpay.me/@iamsh",
+      desc: "Support open-source work via Razorpay",
+      svg: (
+        <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+        </svg>
+      ),
+      color: "hover:text-[#3395FF] hover:bg-[#3395FF]/10 border-[#3395FF]/10",
     },
     {
       name: "LinkedIn",
@@ -126,6 +137,13 @@ export default function HireMePage() {
             <a href="https://sh20raj.github.io" target="_blank" rel="noopener noreferrer">
               <Globe className="w-4 h-4 mr-2" />
               sh20raj.github.io
+              <ExternalLink className="w-3 h-3 ml-1.5 opacity-60" />
+            </a>
+          </Button>
+          <Button asChild size="lg" variant="outline" className="rounded-xl font-bold uppercase tracking-wider text-xs border-border/80 hover:bg-card h-11 px-6 cursor-pointer">
+            <a href="https://razorpay.me/@iamsh" target="_blank" rel="noopener noreferrer">
+              <Heart className="w-4 h-4 mr-2 text-rose-500 fill-rose-500" />
+              Tip & Sponsor
               <ExternalLink className="w-3 h-3 ml-1.5 opacity-60" />
             </a>
           </Button>
